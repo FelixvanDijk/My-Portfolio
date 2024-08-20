@@ -1,25 +1,56 @@
-let currentSlide = 0;
+const canvas = document.getElementById('backgroundCanvas');
+const ctx = canvas.getContext('2d');
 
-function showSlide(index) {
-    const slides = document.querySelectorAll('.carousel-item');
-    const totalSlides = slides.length;
+let width, height;
+let particles = [];
 
-    if (index >= totalSlides) {
-        currentSlide = 0;
-    } else if (index < 0) {
-        currentSlide = totalSlides - 1;
-    } else {
-        currentSlide = index;
+// Update the canvas size to the window size
+function updateCanvasSize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+}
+
+// Create particles
+function createParticles() {
+    particles = [];
+    for (let i = 0; i < 100; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 2 + 1,
+            color: `rgba(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},0.8)`,
+            dx: (Math.random() - 0.5) * 2,
+            dy: (Math.random() - 0.5) * 2
+        });
     }
-
-    const carouselInner = document.querySelector('.carousel-inner');
-    carouselInner.style.transform = `translateX(-${currentSlide * 100}%)`;
 }
 
-function nextSlide() {
-    showSlide(currentSlide + 1);
+// Draw and animate particles
+function animateParticles() {
+    ctx.clearRect(0, 0, width, height);
+
+    particles.forEach(p => {
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if (p.x < 0 || p.x > width) p.dx *= -1;
+        if (p.y < 0 || p.y > height) p.dy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+    });
+
+    requestAnimationFrame(animateParticles);
 }
 
-function prevSlide() {
-    showSlide(currentSlide - 1);
+// Initialize everything
+function init() {
+    updateCanvasSize();
+    createParticles();
+    animateParticles();
 }
+
+window.addEventListener('resize', updateCanvasSize);
+window.addEventListener('load', init);
