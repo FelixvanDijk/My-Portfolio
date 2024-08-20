@@ -3,7 +3,7 @@ body, html {
     padding: 0;
     height: 100%;
     overflow: hidden;
-    background-color: #2d2c2c; /* A slightly lighter black */
+    background-color: #2d2c2c; /* Light black background */
 }
 
 .landing-page {
