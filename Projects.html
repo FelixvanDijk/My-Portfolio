@@ -3,32 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects</title>
+    <title>My Projects</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
         <h1>My Projects</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="Projects.html">Projects</a></li>
-            </ul>
-        </nav>
     </header>
     <main>
-        <section>
-            <h2>Projects</h2>
-            <ul>
-                <li><a href="Sketch.html" class="project-button">Sketch</a></li>
-                <li><a href="gatehouse.html" class="project-button">The Gatehouse Vets</a></li>
-                <li><a href="game-ai.html" class="project-button">Game Winning AI</a></li>
-                <li><a href="online-vetinary.html" class="project-button">Online Veterinary Consultant</a></li>
-            </ul>
-        </section>
+        <div class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="images/sketch.png" alt="Sketch Project">
+                    <div class="carousel-caption">
+                        <h2>Sketch</h2>
+                        <p><a href="Sketch.html">Learn more</a></p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="images/gatehouse-vets.png" alt="The Gatehouse Vets">
+                    <div class="carousel-caption">
+                        <h2>The Gatehouse Vets</h2>
+                        <p><a href="gatehouse.html">Learn more</a></p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="images/game-winning-ai.png" alt="Game Winning AI">
+                    <div class="carousel-caption">
+                        <h2>Game Winning AI</h2>
+                        <p><a href="game-ai.html">Learn more</a></p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="images/online-vet-consultant.png" alt="Online Veterinary Consultant">
+                    <div class="carousel-caption">
+                        <h2>Online Veterinary Consultant</h2>
+                        <p><a href="online-vetinary.html">Learn more</a></p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" onclick="prevSlide()">❮</button>
+            <button class="carousel-control-next" onclick="nextSlide()">❯</button>
+        </div>
     </main>
     <footer>
         <p>&copy; 2024 My Portfolio</p>
     </footer>
+    <script src="scripts.js"></script>
 </body>
 </html>
