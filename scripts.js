@@ -10,15 +10,17 @@ function updateCanvasSize() {
     height = canvas.height = window.innerHeight;
 }
 
-// Create particles
+// Create particles with specific colors
 function createParticles() {
     particles = [];
+    const colors = ['#FF0000', '#0000FF', '#FFFFFF']; // Red, Blue, White
+
     for (let i = 0; i < 100; i++) {
         particles.push({
             x: Math.random() * width,
             y: Math.random() * height,
             radius: Math.random() * 2 + 1,
-            color: `rgba(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},0.8)`,
+            color: colors[Math.floor(Math.random() * colors.length)],
             dx: (Math.random() - 0.5) * 2,
             dy: (Math.random() - 0.5) * 2
         });
