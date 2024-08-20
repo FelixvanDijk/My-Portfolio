@@ -112,6 +112,25 @@ const canvasDots = function () {
     };
 
     init();
+
+    // Add the text positioning and resizing logic
+    window.addEventListener('load', () => {
+        const introContainer = document.querySelector('.intro-text-container');
+        const canvas = document.querySelector('canvas');
+
+        // Set the text container to be centered
+        introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
+        introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
+        
+        // Adjust canvas size
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+    });
 };
 
 canvasDots();
