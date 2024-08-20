@@ -2,7 +2,7 @@ const canvasDots = function () {
     const canvas = document.querySelector('canvas'),
         ctx = canvas.getContext('2d'),
         colorDot = ['#0000FF', '#0000FF', '#FF0000', '#FFFFFF'], // Blue, Red, White
-        color = '#0000FF'; // Default line color if needed
+        color = 'rgba(0, 0, 255, 0.5)'; // Default line color if needed (more transparent blue)
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -46,7 +46,7 @@ const canvasDots = function () {
         this.y = Math.random() * canvas.height;
         this.vx = -0.5 + Math.random();
         this.vy = -0.5 + Math.random();
-        this.radius = Math.random() * 1.5 + 1;
+        this.radius = Math.random() * 1.0 + 0.5; // Smaller maximum radius
         this.color = colorDot[Math.floor(Math.random() * colorDot.length)];
     }
 
@@ -55,7 +55,9 @@ const canvasDots = function () {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
             ctx.fillStyle = this.color;
+            ctx.globalAlpha = 0.6; // Set transparency of the dots
             ctx.fill();
+            ctx.globalAlpha = 1.0; // Reset transparency for future drawing
         },
         animate: function () {
             for (let i = 0; i < dots.nb; i++) {
@@ -80,8 +82,8 @@ const canvasDots = function () {
             const dot = dots.array[i];
             dot.create();
         }
-        dots.array[0].radius = 1.5;
-        dots.array[0].color = '#51a2e9'; // First dot always blue
+        dots.array[0].radius = 1.0; // Smaller radius for the first dot
+        dots.array[0].color = 'rgba(81, 162, 233, 0.8)'; // Slightly transparent blue
     }
 
     function init() {
