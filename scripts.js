@@ -1,58 +1,117 @@
-const canvas = document.getElementById('backgroundCanvas');
-const ctx = canvas.getContext('2d');
+const canvasDots = function () {
+    const canvas = document.querySelector('canvas'),
+        ctx = canvas.getContext('2d'),
+        colorDot = ['#0000FF', '#0000FF', '#FF0000', '#FFFFFF'], // Blue, Red, White
+        color = '#0000FF'; // Default line color if needed
 
-let width, height;
-let particles = [];
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.display = 'block';
+    ctx.lineWidth = 0.3;
+    ctx.strokeStyle = color;
 
-// Update the canvas size to the window size
-function updateCanvasSize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-}
+    let mousePosition = {
+        x: (30 * canvas.width) / 100,
+        y: (30 * canvas.height) / 100,
+    };
 
-// Create particles with specific colors
-function createParticles() {
-    particles = [];
-    const colors = ['#FF0000', '#0000FF', '#FFFFFF']; // Red, Blue, White
+    const windowSize = window.innerWidth;
+    let dots;
 
-    for (let i = 0; i < 100; i++) {
-        particles.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            radius: Math.random() * 2 + 1,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            dx: (Math.random() - 0.5) * 2,
-            dy: (Math.random() - 0.5) * 2
-        });
+    if (windowSize > 1600) {
+        dots = {
+            nb: 600, // Number of particles
+            distance: 70, // Max distance between particles for linking
+            d_radius: 300, // Radius from mouse where particles will link
+            array: [],
+        };
+    } else if (windowSize > 1300) {
+        dots = {
+            nb: 575,
+            distance: 60,
+            d_radius: 280,
+            array: [],
+        };
+    } else {
+        dots = {
+            nb: 300,
+            distance: 0,
+            d_radius: 0,
+            array: [],
+        };
     }
-}
 
-// Draw and animate particles
-function animateParticles() {
-    ctx.clearRect(0, 0, width, height);
+    function Dot() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = -0.5 + Math.random();
+        this.vy = -0.5 + Math.random();
+        this.radius = Math.random() * 1.5 + 1;
+        this.color = colorDot[Math.floor(Math.random() * colorDot.length)];
+    }
 
-    particles.forEach(p => {
-        p.x += p.dx;
-        p.y += p.dy;
+    Dot.prototype = {
+        create: function () {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        },
+        animate: function () {
+            for (let i = 0; i < dots.nb; i++) {
+                const dot = dots.array[i];
+                if (dot.y < 0 || dot.y > canvas.height) {
+                    dot.vx = dot.vx;
+                    dot.vy = -dot.vy;
+                } else if (dot.x < 0 || dot.x > canvas.width) {
+                    dot.vx = -dot.vx;
+                    dot.vy = dot.vy;
+                }
+                dot.x += dot.vx;
+                dot.y += dot.vy;
+            }
+        }
+    };
 
-        if (p.x < 0 || p.x > width) p.dx *= -1;
-        if (p.y < 0 || p.y > height) p.dy *= -1;
+    function createDots() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < dots.nb; i++) {
+            dots.array.push(new Dot());
+            const dot = dots.array[i];
+            dot.create();
+        }
+        dots.array[0].radius = 1.5;
+        dots.array[0].color = '#51a2e9'; // First dot always blue
+    }
 
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-    });
+    function init() {
+        createDots();
+        setInterval(() => {
+            createDots();
+            dots.array[0].animate();
+        }, 1000 / 30);
+    }
 
-    requestAnimationFrame(animateParticles);
-}
+    window.onmousemove = function (e) {
+        mousePosition.x = e.pageX;
+        mousePosition.y = e.pageY;
+        try {
+            dots.array[0].x = e.pageX;
+            dots.array[0].y = e.pageY;
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-// Initialize everything
-function init() {
-    updateCanvasSize();
-    createParticles();
-    animateParticles();
-}
+    window.onresize = function () {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        dots.array = [];
+        createDots();
+    };
 
-window.addEventListener('resize', updateCanvasSize);
-window.addEventListener('load', init);
+    init();
+};
+
+canvasDots();
