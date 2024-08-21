@@ -1,5 +1,5 @@
 html {
-    scroll-behavior: smooth; /* Ensure smooth scrolling when clicking links */
+    scroll-behavior: smooth; /* Smooth scrolling for anchor links */
 }
 
 body {
@@ -13,20 +13,23 @@ body {
 }
 
 canvas {
-    position: absolute;
+    position: fixed; /* Keep the canvas in place */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1; /* Ensure canvas is behind other content */
+    z-index: -1; /* Canvas should be behind other content */
 }
 
 .intro-text-container {
-    position: fixed; /* Make it fixed to keep it in place */
-    text-align: center;
-    z-index: 10; /* Ensure text is above other content */
+    position: fixed; /* Fix the intro text at the top */
+    top: 0;
+    left: 0;
     width: 100%;
-    top: 0; /* Adjust if needed */
+    text-align: center;
+    z-index: 10; /* Ensure it's above the canvas */
+    padding: 20px 0;
+    background: rgba(32, 32, 32, 0.8); /* Slightly transparent background to make text stand out */
 }
 
 .intro-line {
@@ -88,26 +91,11 @@ canvas {
     color: #202020; /* Change text color on hover */
 }
 
-.content {
-    margin-top: 200px; /* Space for the fixed intro text container */
-}
-
 .section {
     padding: 60px 20px;
     color: white;
     text-align: center;
     background: #202020; /* Dark background for sections */
-    min-height: 100vh; /* Full viewport height */
-}
-
-#about-me {
-    background: #303030; /* Slightly different background color for variety */
-}
-
-#projects {
-    background: #404040; /* Slightly different background color for variety */
-}
-
-#contact {
-    background: #505050; /* Slightly different background color for variety */
+    min-height: 100vh; /* Ensure full viewport height for each section */
+    margin-top: 80px; /* Space to ensure sections are not covered by the fixed intro text */
 }

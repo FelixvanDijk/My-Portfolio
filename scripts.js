@@ -105,35 +105,23 @@ const canvasDots = function () {
         }
     };
 
-    window.onresize = function () {
+    function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         dots.array = [];
         createDots();
-    };
+    }
 
+    window.onresize = resizeCanvas;
     init();
 
-    // Smooth scrolling functionality
-    function scrollToSection(sectionId) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            window.scrollTo({
-                top: section.offsetTop - document.querySelector('.intro-text-container').offsetHeight,
-                behavior: 'smooth'
-            });
-        }
-    }
-
-    // Update intro container position on resize
+    // Update intro position if needed
     function updateIntroPosition() {
         const introContainer = document.querySelector('.intro-text-container');
-        introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
-        introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
+        introContainer.style.top = `0px`; // Keep it fixed at the top
     }
 
-    window.addEventListener('resize', updateIntroPosition);
     updateIntroPosition(); // Initial call to position the intro text container correctly
 };
 
