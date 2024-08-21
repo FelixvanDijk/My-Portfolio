@@ -1,5 +1,3 @@
-
-
 const canvasDots = function () {
     const canvas = document.querySelector('canvas'),
         ctx = canvas.getContext('2d'),
@@ -123,18 +121,29 @@ const canvasDots = function () {
         const canvas = document.querySelector('canvas');
 
         // Set the text container to be centered
-        introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
-        introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
+                introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
+                introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
+                
+                // Adjust canvas size
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+                
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+            });
         
-        // Adjust canvas size
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+            // Smooth scroll function
+            function scrollToSection(sectionId) {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        };
         
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-    });
-};
-
-canvasDots();
+        canvasDots();
+        
