@@ -16,10 +16,63 @@ canvas {
     height: 100%;
 }
 
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #202020;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: red;
+}
+
+.section {
+    padding: 100px 20px 60px 20px;
+    color: white;
+    text-align: center;
+    background: #202020;
+    min-height: 100vh;
+    display: none;
+}
+
+.section.hidden {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
 .intro-text-container {
     position: absolute;
     text-align: center;
-    z-index: 10; /* Ensure text is above other content */
+    z-index: 10;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .intro-line {
@@ -64,38 +117,19 @@ canvas {
 }
 
 .projects-button {
-    margin-top: 20px; /* Space between the text and button */
+    margin-top: 20px;
     padding: 10px 20px;
     font-size: 1.2em;
-    background: #202020; /* Match the background color */
+    background: #202020;
     color: white;
-    border: 2px solid red; /* Red outline */
-    border-radius: 5px; /* Slightly rounded corners */
+    border: 2px solid red;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s, color 0.3s; /* Smooth transition for hover effect */
-    z-index: 10; /* Ensure button is above other content */
+    transition: background 0.3s, color 0.3s;
+    z-index: 10;
 }
 
 .projects-button:hover {
-    background: red; /* Change background color on hover */
-    color: #202020; /* Change text color on hover */
-}
-
-.section {
-    padding: 60px 20px;
-    color: white;
-    text-align: center;
-    background: #202020; /* Dark background for sections */
-}
-
-#about-me {
-    background: #202020; /* Slightly different background color for variety */
-}
-
-#projects {
-    background: #202020; /* Slightly different background color for variety */
-}
-
-#contact {
-    background: #202020; /* Slightly different background color for variety */
+    background: red;
+    color: #202020;
 }
