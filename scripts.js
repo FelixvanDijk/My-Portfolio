@@ -1,8 +1,15 @@
 const canvasDots = function () {
     const canvas = document.querySelector('canvas'),
         ctx = canvas.getContext('2d'),
-        colorDot = ['#0000FF', '#0000FF', '#FF0000', '#FFFFFF'], // Blue, Red, White
+        colorDot = ['#0000FF', '#FF0000', '#FFFFFF'], // Blue, Red, White
         color = 'rgba(0, 0, 255, 0.5)'; // Default line color if needed (more transparent blue)
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        createDots();
+    }
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -105,24 +112,8 @@ const canvasDots = function () {
         }
     };
 
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        dots.array = [];
-        createDots();
-    }
-
     window.onresize = resizeCanvas;
     init();
-
-    // Update intro position if needed
-    function updateIntroPosition() {
-        const introContainer = document.querySelector('.intro-text-container');
-        introContainer.style.top = `0px`; // Keep it fixed at the top
-    }
-
-    updateIntroPosition(); // Initial call to position the intro text container correctly
 };
 
 canvasDots();

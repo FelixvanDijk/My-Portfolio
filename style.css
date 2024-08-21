@@ -9,7 +9,7 @@ body {
     height: 100%;
     overflow-x: hidden;
     font-family: 'Montserrat', sans-serif;
-    background: #202020;
+    background: #202020; /* Dark background to match the intro section */
 }
 
 canvas {
@@ -97,5 +97,5 @@ canvas {
     text-align: center;
     background: #202020; /* Dark background for sections */
     min-height: 100vh; /* Ensure full viewport height for each section */
-    margin-top: 80px; /* Space to ensure sections are not covered by the fixed intro text */
+    margin-top: 100px; /* Space to ensure sections are not covered by the fixed intro text */
 }
