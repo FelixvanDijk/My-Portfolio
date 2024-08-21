@@ -1,35 +1,78 @@
-html {
-    scroll-behavior: smooth; /* Smooth scrolling for anchor links */
-}
-
-body {
+html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow-x: hidden;
+    overflow: hidden;
     font-family: 'Montserrat', sans-serif;
-    background: #202020; /* Dark background to match the intro section */
+    background: #202020;
 }
 
 canvas {
-    position: fixed; /* Keep the canvas in place */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1; /* Canvas should be behind other content */
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #202020;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: red;
+}
+
+.section {
+    padding: 100px 20px 60px 20px;
+    color: white;
+    text-align: center;
+    background: #202020;
+    min-height: 100vh;
+    display: none;
+}
+
+.section.hidden {
+    display: none;
+}
+
+.section.active {
+    display: block;
 }
 
 .intro-text-container {
-    position: fixed; /* Fix the intro text at the top */
-    top: 0;
-    left: 0;
-    width: 100%;
+    position: absolute;
     text-align: center;
-    z-index: 10; /* Ensure it's above the canvas */
-    padding: 20px 0;
-    background: rgba(32, 32, 32, 0.8); /* Slightly transparent background to make text stand out */
+    z-index: 10;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .intro-line {
@@ -74,28 +117,19 @@ canvas {
 }
 
 .projects-button {
-    margin-top: 20px; /* Space between the text and button */
+    margin-top: 20px;
     padding: 10px 20px;
     font-size: 1.2em;
-    background: #202020; /* Match the background color */
+    background: #202020;
     color: white;
-    border: 2px solid red; /* Red outline */
-    border-radius: 5px; /* Slightly rounded corners */
+    border: 2px solid red;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s, color 0.3s; /* Smooth transition for hover effect */
-    z-index: 10; /* Ensure button is above other content */
+    transition: background 0.3s, color 0.3s;
+    z-index: 10;
 }
 
 .projects-button:hover {
-    background: red; /* Change background color on hover */
-    color: #202020; /* Change text color on hover */
-}
-
-.section {
-    padding: 60px 20px;
-    color: white;
-    text-align: center;
-    background: #202020; /* Dark background for sections */
-    min-height: 100vh; /* Ensure full viewport height for each section */
-    margin-top: 100px; /* Space to ensure sections are not covered by the fixed intro text */
+    background: red;
+    color: #202020;
 }

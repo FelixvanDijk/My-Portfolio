@@ -1,21 +1,13 @@
 const canvasDots = function () {
     const canvas = document.querySelector('canvas'),
         ctx = canvas.getContext('2d'),
-        colorDot = ['#0000FF', '#FF0000', '#FFFFFF'], // Blue, Red, White
-        color = 'rgba(0, 0, 255, 0.5)'; // Default line color if needed (more transparent blue)
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        createDots();
-    }
+        colorDot = ['#0000FF', '#0000FF', '#FF0000', '#FFFFFF'];
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     canvas.style.display = 'block';
     ctx.lineWidth = 0.3;
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
 
     let mousePosition = {
         x: (30 * canvas.width) / 100,
@@ -27,9 +19,9 @@ const canvasDots = function () {
 
     if (windowSize > 1600) {
         dots = {
-            nb: 600, // Number of particles
-            distance: 70, // Max distance between particles for linking
-            d_radius: 300, // Radius from mouse where particles will link
+            nb: 600,
+            distance: 70,
+            d_radius: 300,
             array: [],
         };
     } else if (windowSize > 1300) {
@@ -53,7 +45,7 @@ const canvasDots = function () {
         this.y = Math.random() * canvas.height;
         this.vx = -0.5 + Math.random();
         this.vy = -0.5 + Math.random();
-        this.radius = Math.random() * 1.0 + 0.5; // Smaller maximum radius
+        this.radius = Math.random() * 1.0 + 0.5;
         this.color = colorDot[Math.floor(Math.random() * colorDot.length)];
     }
 
@@ -62,9 +54,9 @@ const canvasDots = function () {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
             ctx.fillStyle = this.color;
-            ctx.globalAlpha = 0.6; // Set transparency of the dots
+            ctx.globalAlpha = 0.6;
             ctx.fill();
-            ctx.globalAlpha = 1.0; // Reset transparency for future drawing
+            ctx.globalAlpha = 1.0;
         },
         animate: function () {
             for (let i = 0; i < dots.nb; i++) {
@@ -89,8 +81,8 @@ const canvasDots = function () {
             const dot = dots.array[i];
             dot.create();
         }
-        dots.array[0].radius = 1.0; // Smaller radius for the first dot
-        dots.array[0].color = 'rgba(81, 162, 233, 0.8)'; // Slightly transparent blue
+        dots.array[0].radius = 1.0;
+        dots.array[0].color = 'rgba(81, 162, 233, 0.8)';
     }
 
     function init() {
@@ -112,8 +104,60 @@ const canvasDots = function () {
         }
     };
 
-    window.onresize = resizeCanvas;
+    window.onresize = function () {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        dots.array = [];
+        createDots();
+    };
+
     init();
+
+    // Adjust text container position on window resize and load
+    window.addEventListener('load', () => {
+        const introContainer = document.querySelector('.intro-text-container');
+        const canvas = document.querySelector('canvas');
+
+        // Center the intro text container
+        introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
+        introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
+
+        // Resize canvas to cover the entire window
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+    });
 };
 
+// Initialize the canvas dots effect
 canvasDots();
+
+// Function to navigate between sections without reloading the page
+function navigateToSection(sectionId) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+        section.classList.add('hidden');
+        section.classList.remove('active');
+    });
+
+    // Show the selected section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+        targetSection.classList.add('active');
+
+        // Scroll to the top of the section
+        targetSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Automatically display the home section on initial load
+document.addEventListener('DOMContentLoaded', () => {
+    navigateToSection('home');
+});
