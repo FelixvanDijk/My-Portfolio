@@ -9,40 +9,29 @@
 </head>
 <body>
     <canvas class="connecting-dots"></canvas>
+    <div class="intro-text-container">
+        <div class="intro-line left">Hello, I'm <span class="highlight">Felix</span>.</div>
+        <div class="intro-line right">I'm a <span class="highlight">CS</span> student at the University of Bristol.</div>
+        <button class="projects-button" onclick="scrollToSection('projects')">My projects ↓</button>
+    </div>
 
-    <!-- Navigation -->
-    <nav>
-        <ul>
-            <li><a href="#home" onclick="navigateToSection('home')">Home</a></li>
-            <li><a href="#projects" onclick="navigateToSection('projects')">Projects</a></li>
-            <li><a href="#about-me" onclick="navigateToSection('about-me')">About Me</a></li>
-            <li><a href="#contact" onclick="navigateToSection('contact')">Contact</a></li>
-        </ul>
-    </nav>
-
-    <!-- Sections -->
-    <div id="content">
-        <section id="home" class="section">
-            <div class="intro-text-container">
-                <div class="intro-line left">Hello, I'm <span class="highlight">Felix</span>.</div>
-                <div class="intro-line right">I'm a <span class="highlight">CS</span> student at the University of Bristol.</div>
-                <button class="projects-button" onclick="navigateToSection('projects')">My projects ↓</button>
-            </div>
+    <!-- Content Sections -->
+    <div class="content">
+        <section id="home" class="section active">
+            <h1>Home</h1>
+            <p>Welcome to my portfolio. Scroll down to explore more!</p>
         </section>
-        
-        <section id="projects" class="section hidden">
-            <h2>Projects</h2>
-            <p>Here are some of my projects...</p>
+        <section id="about-me" class="section">
+            <h1>About Me</h1>
+            <p>Learn more about my background and experience.</p>
         </section>
-
-        <section id="about-me" class="section hidden">
-            <h2>About Me</h2>
-            <p>Information about Felix...</p>
+        <section id="projects" class="section">
+            <h1>Projects</h1>
+            <p>Check out some of the projects I've worked on.</p>
         </section>
-
-        <section id="contact" class="section hidden">
-            <h2>Contact</h2>
-            <p>How to contact me...</p>
+        <section id="contact" class="section">
+            <h1>Contact</h1>
+            <p>Get in touch with me!</p>
         </section>
     </div>
 

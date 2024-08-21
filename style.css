@@ -1,9 +1,13 @@
-html, body {
+html {
+    scroll-behavior: smooth; /* Ensure smooth scrolling when clicking links */
+}
+
+body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
     font-family: 'Montserrat', sans-serif;
     background: #202020;
 }
@@ -14,65 +18,15 @@ canvas {
     left: 0;
     width: 100%;
     height: 100%;
-}
-
-nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background: #202020;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-}
-
-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-}
-
-nav ul li {
-    margin: 0 15px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 1.2em;
-    transition: color 0.3s;
-}
-
-nav ul li a:hover {
-    color: red;
-}
-
-.section {
-    padding: 100px 20px 60px 20px;
-    color: white;
-    text-align: center;
-    background: #202020;
-    min-height: 100vh;
-    display: none;
-}
-
-.section.hidden {
-    display: none;
-}
-
-.section.active {
-    display: block;
+    z-index: -1; /* Ensure canvas is behind other content */
 }
 
 .intro-text-container {
-    position: absolute;
+    position: fixed; /* Make it fixed to keep it in place */
     text-align: center;
-    z-index: 10;
+    z-index: 10; /* Ensure text is above other content */
     width: 100%;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 0; /* Adjust if needed */
 }
 
 .intro-line {
@@ -117,19 +71,43 @@ nav ul li a:hover {
 }
 
 .projects-button {
-    margin-top: 20px;
+    margin-top: 20px; /* Space between the text and button */
     padding: 10px 20px;
     font-size: 1.2em;
-    background: #202020;
+    background: #202020; /* Match the background color */
     color: white;
-    border: 2px solid red;
-    border-radius: 5px;
+    border: 2px solid red; /* Red outline */
+    border-radius: 5px; /* Slightly rounded corners */
     cursor: pointer;
-    transition: background 0.3s, color 0.3s;
-    z-index: 10;
+    transition: background 0.3s, color 0.3s; /* Smooth transition for hover effect */
+    z-index: 10; /* Ensure button is above other content */
 }
 
 .projects-button:hover {
-    background: red;
-    color: #202020;
+    background: red; /* Change background color on hover */
+    color: #202020; /* Change text color on hover */
+}
+
+.content {
+    margin-top: 200px; /* Space for the fixed intro text container */
+}
+
+.section {
+    padding: 60px 20px;
+    color: white;
+    text-align: center;
+    background: #202020; /* Dark background for sections */
+    min-height: 100vh; /* Full viewport height */
+}
+
+#about-me {
+    background: #303030; /* Slightly different background color for variety */
+}
+
+#projects {
+    background: #404040; /* Slightly different background color for variety */
+}
+
+#contact {
+    background: #505050; /* Slightly different background color for variety */
 }
