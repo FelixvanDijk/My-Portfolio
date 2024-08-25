@@ -55,7 +55,7 @@ nav ul li a:hover {
     text-align: center;
     background: #202020;
     min-height: 100vh;
-    display: none;
+    display: none; /* Hidden by default */
 }
 
 .section.hidden {
@@ -63,7 +63,7 @@ nav ul li a:hover {
 }
 
 .section.active {
-    display: block;
+    display: block; /* Only active section is visible */
 }
 
 .intro-text-container {
@@ -130,6 +130,47 @@ nav ul li a:hover {
 }
 
 .projects-button:hover {
+    background: red;
+    color: #202020;
+}
+
+/* Contact Form Styles */
+#contact-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+#contact-form input, #contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #FF0000;
+    border-radius: 5px;
+    font-size: 1em;
+    background: #303030;
+    color: white;
+}
+
+#contact-form input::placeholder,
+#contact-form textarea::placeholder {
+    color: #bbb;
+}
+
+#contact-form button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background: #202020;
+    color: white;
+    border: 2px solid red;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+}
+
+#contact-form button:hover {
     background: red;
     color: #202020;
 }
