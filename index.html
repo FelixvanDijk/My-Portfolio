@@ -10,6 +10,13 @@
 <body>
     <canvas class="connecting-dots"></canvas>
 
+    <!-- Fixed Intro Section -->
+    <div class="intro-text-container">
+        <div class="intro-line left">Hello, I'm <span class="highlight">Felix</span>.</div>
+        <div class="intro-line right">I'm a <span class="highlight">CS</span> student at the University of Bristol.</div>
+        <button class="projects-button" onclick="navigateToSection('projects')">My projects ↓</button>
+    </div>
+
     <!-- Navigation -->
     <nav>
         <ul>
@@ -22,12 +29,8 @@
 
     <!-- Sections -->
     <div id="content">
-        <section id="home" class="section">
-            <div class="intro-text-container">
-                <div class="intro-line left">Hello, I'm <span class="highlight">Felix</span>.</div>
-                <div class="intro-line right">I'm a <span class="highlight">CS</span> student at the University of Bristol.</div>
-                <button class="projects-button" onclick="navigateToSection('projects')">My projects ↓</button>
-            </div>
+        <section id="home" class="section active">
+            <!-- The home section will be handled by the intro-text-container, so it can be empty -->
         </section>
         
         <section id="projects" class="section hidden">
@@ -41,8 +44,14 @@
         </section>
 
         <section id="contact" class="section hidden">
-            <h2>Contact</h2>
-            <p>How to contact me...</p>
+            <h2>Contact Me</h2>
+            <p>If you'd like to get in touch, please fill out the form below:</p>
+            <form id="contact-form" action="https://formspree.io/f/movaykle" method="POST">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="_replyto" placeholder="Your Email" required>
+                <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
         </section>
     </div>
 

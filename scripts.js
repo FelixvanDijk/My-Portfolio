@@ -113,25 +113,6 @@ const canvasDots = function () {
     };
 
     init();
-
-    // Adjust text container position on window resize and load
-    window.addEventListener('load', () => {
-        const introContainer = document.querySelector('.intro-text-container');
-        const canvas = document.querySelector('canvas');
-
-        // Center the intro text container
-        introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
-        introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
-
-        // Resize canvas to cover the entire window
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-    });
 };
 
 // Initialize the canvas dots effect
