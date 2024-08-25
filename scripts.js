@@ -1,5 +1,3 @@
-
-
 const canvasDots = function () {
     const canvas = document.querySelector('canvas'),
         ctx = canvas.getContext('2d'),
@@ -10,6 +8,7 @@ const canvasDots = function () {
     canvas.style.display = 'block';
     ctx.lineWidth = 0.3;
     ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
+    canvas.style.zIndex = '1'; // Ensure canvas is below other elements
 
     let mousePosition = {
         x: (30 * canvas.width) / 100,
@@ -119,7 +118,6 @@ const canvasDots = function () {
     // Adjust text container position on window resize and load
     window.addEventListener('load', () => {
         const introContainer = document.querySelector('.intro-text-container');
-        const canvas = document.querySelector('canvas');
 
         // Center the intro text container
         introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
@@ -163,5 +161,3 @@ function navigateToSection(sectionId) {
 document.addEventListener('DOMContentLoaded', () => {
     navigateToSection('home');
 });
-
-
