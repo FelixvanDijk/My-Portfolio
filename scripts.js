@@ -1,3 +1,5 @@
+
+
 const canvasDots = function () {
     const canvas = document.querySelector('canvas'),
         ctx = canvas.getContext('2d'),
@@ -161,3 +163,5 @@ function navigateToSection(sectionId) {
 document.addEventListener('DOMContentLoaded', () => {
     navigateToSection('home');
 });
+
+

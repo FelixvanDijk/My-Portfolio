@@ -3,19 +3,17 @@ html, body {
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    overflow: hidden;
     font-family: 'Montserrat', sans-serif;
     background: #202020;
-    position: relative; /* Allow fixed elements to stay in place */
 }
 
 canvas {
-    position: fixed; /* Fixed position to cover the entire background */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1; /* Behind other elements */
 }
 
 nav {
@@ -57,28 +55,24 @@ nav ul li a:hover {
     text-align: center;
     background: #202020;
     min-height: 100vh;
-    display: none; /* Hidden by default */
+    display: none;
 }
 
 .section.hidden {
-    display: none; /* Ensure hidden sections are not shown */
+    display: none;
 }
 
 .section.active {
-    display: block; /* Only active section is visible */
+    display: block;
 }
 
 .intro-text-container {
-    position: fixed; /* Fix intro text at the top of the page */
-    top: 50px; /* Adjust to position below the nav */
-    left: 50%;
-    transform: translateX(-50%);
+    position: absolute;
     text-align: center;
     z-index: 10;
-    width: auto;
-    background-color: rgba(0, 0, 0, 0.5); /* Slight background to enhance readability */
-    padding: 20px;
-    border-radius: 10px;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .intro-line {
@@ -139,38 +133,3 @@ nav ul li a:hover {
     background: red;
     color: #202020;
 }
-
-/* Styles for the contact form */
-#contact-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-#contact-form input, #contact-form textarea {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 2px solid #FF0000;
-    border-radius: 5px;
-    font-size: 1em;
-}
-
-#contact-form button {
-    padding: 10px 20px;
-    font-size: 1.2em;
-    background: #202020;
-    color: white;
-    border: 2px solid red;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s, color 0.3s;
-}
-
-#contact-form button:hover {
-    background: red;
-    color: #202020;
-}
-
