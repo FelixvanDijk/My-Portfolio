@@ -37,8 +37,8 @@ const canvasDots = function () {
     } else {
         dots = {
             nb: 300,
-            distance: 0,
-            d_radius: 0,
+            distance: 60,
+            d_radius: 200,
             array: [],
         };
     }
@@ -59,51 +59,31 @@ const canvasDots = function () {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
             ctx.fillStyle = this.color;
-            ctx.globalAlpha = 0.6;
             ctx.fill();
-            ctx.globalAlpha = 1.0;
         },
         animate: function () {
-            for (let i = 0; i < dots.nb; i++) {
-                const dot = dots.array[i];
-
-                if (dot.y < 0 || dot.y > canvas.height) {
-                    dot.vx = dot.vx;
-                    dot.vy = -dot.vy;
-                } else if (dot.x < 0 || dot.x > canvas.width) {
-                    dot.vx = -dot.vx;
-                    dot.vy = dot.vy;
-                }
-
-                dot.x += dot.vx;
-                dot.y += dot.vy;
+            if (this.y < 0 || this.y > canvas.height) {
+                this.vx = this.vx;
+                this.vy = -this.vy;
             }
+            if (this.x < 0 || this.x > canvas.width) {
+                this.vx = -this.vx;
+                this.vy = this.vy;
+            }
+            this.x += this.vx;
+            this.y += this.vy;
         },
         drawLine: function () {
             for (let i = 0; i < dots.nb; i++) {
-                for (let j = 0; j < dots.nb; j++) {
-                    let i_dot = dots.array[i];
-                    let j_dot = dots.array[j];
-
-                    if (
-                        (i_dot.x - j_dot.x) < dots.distance &&
-                        (i_dot.y - j_dot.y) < dots.distance &&
-                        (i_dot.x - j_dot.x) > -dots.distance &&
-                        (i_dot.y - j_dot.y) > -dots.distance
-                    ) {
-                        if (
-                            (i_dot.x - mousePosition.x) < dots.d_radius &&
-                            (i_dot.y - mousePosition.y) < dots.d_radius &&
-                            (i_dot.x - mousePosition.x) > -dots.d_radius &&
-                            (i_dot.y - mousePosition.y) > -dots.d_radius
-                        ) {
-                            ctx.beginPath();
-                            ctx.moveTo(i_dot.x, i_dot.y);
-                            ctx.lineTo(j_dot.x, j_dot.y);
-                            ctx.strokeStyle = `rgba(0, 0, 255, 0.2)`;
-                            ctx.stroke();
-                            ctx.closePath();
-                        }
+                const dot = dots.array[i];
+                if ((dot.x - this.x) < dots.distance && (dot.y - this.y) < dots.distance && (dot.x - this.x) > -dots.distance && (dot.y - this.y) > -dots.distance) {
+                    if ((dot.x - mousePosition.x) < dots.d_radius && (dot.y - mousePosition.y) < dots.d_radius && (dot.x - mousePosition.x) > -dots.d_radius && (dot.y - mousePosition.y) > -dots.d_radius) {
+                        ctx.beginPath();
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(dot.x, dot.y);
+                        ctx.strokeStyle = 'rgba(0,0,255,0.1)';
+                        ctx.stroke();
+                        ctx.closePath();
                     }
                 }
             }
@@ -120,24 +100,23 @@ const canvasDots = function () {
     // Draw dots on the canvas
     function drawDots() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         for (let i = 0; i < dots.nb; i++) {
             const dot = dots.array[i];
             dot.create();
-        }
-
-        for (let i = 0; i < dots.nb; i++) {
-            const dot = dots.array[i];
+            dot.animate();
             dot.drawLine();
         }
-
-        Dot.prototype.animate();
     }
 
     // Initialize the animation loop for dots
     function init() {
         createDots();
-        setInterval(drawDots, 1000 / 30); // 30 FPS
+        animateDots();
+    }
+
+    function animateDots() {
+        drawDots();
+        requestAnimationFrame(animateDots);
     }
 
     // Update mouse position on mouse move
@@ -163,15 +142,6 @@ const canvasDots = function () {
         // Center the intro text container
         introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
         introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
-
-        // Resize canvas to cover the entire window
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
     });
 };
 
