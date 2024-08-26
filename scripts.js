@@ -6,8 +6,8 @@ const canvasDots = function () {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     canvas.style.display = 'block';
-    ctx.lineWidth = 0.3;
-    ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
+    ctx.lineWidth = 0.4;
+    ctx.strokeStyle = 'rgba(100, 100, 255, 0.7)';
 
     let mousePosition = {
         x: (30 * canvas.width) / 100,
