@@ -22,7 +22,7 @@
 
     <!-- Sections -->
     <div id="content">
-        <section id="home" class="section active"> <!-- Set 'active' class by default -->
+        <section id="home" class="section active">
             <div class="intro-text-container">
                 <div class="intro-line left">Hello, I'm <span class="highlight">Felix</span>.</div>
                 <div class="intro-line right">I'm a <span class="highlight">CS</span> student at the University of Bristol.</div>
@@ -41,13 +41,17 @@
         </section>
 
         <section id="contact" class="section hidden">
-            <h2>Contact</h2>
-            <p>If you would like to get in touch, please fill out the form below:</p>
+            <h2>Contact Me</h2>
+            <form id="contact-form">
+                <p>If you would like to get in touch, please fill out the form below:</p>
             <form id="contact-form" action="https://formspree.io/f/movaykle" method="POST">
-                <input type="text" name="name" placeholder="Your Name" required>
-                <input type="email" name="_replyto" placeholder="Your Email" required>
-                <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
-                <button type="submit">Send Message</button>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required><br><br>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required><br><br>
+                <label for="message">Message:</label><br>
+                <textarea id="message" name="message" rows="4" required></textarea><br><br>
+                <input type="submit" value="Send">
             </form>
         </section>
     </div>
