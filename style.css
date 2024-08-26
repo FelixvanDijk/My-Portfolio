@@ -14,7 +14,7 @@ canvas {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1; /* Set the z-index to a lower value to keep canvas in the background */
+    z-index: 0; /* Ensure the canvas is at the lowest z-index to be in the background */
 }
 
 nav {
@@ -58,7 +58,7 @@ nav ul li a:hover {
     min-height: 100vh;
     display: none;
     position: relative; /* Ensure sections are positioned relative to manage stacking order */
-    z-index: 2; /* Set a higher z-index for sections to ensure they are above the canvas */
+    z-index: 1; /* Set a higher z-index for sections to ensure they are above the canvas */
 }
 
 .section.hidden {
