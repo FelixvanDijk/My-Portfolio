@@ -3,6 +3,7 @@ const canvasDots = function () {
         ctx = canvas.getContext('2d'),
         colorDot = ['#0000FF', '#0000FF', '#FF0000', '#FFFFFF'];
 
+    // Set canvas dimensions and properties
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     canvas.style.display = 'block';
@@ -18,6 +19,7 @@ const canvasDots = function () {
     const windowSize = window.innerWidth;
     let dots;
 
+    // Define different dot settings based on window width
     if (windowSize > 1600) {
         dots = {
             nb: 600,
@@ -41,6 +43,7 @@ const canvasDots = function () {
         };
     }
 
+    // Dot constructor function
     function Dot() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
@@ -50,6 +53,7 @@ const canvasDots = function () {
         this.color = colorDot[Math.floor(Math.random() * colorDot.length)];
     }
 
+    // Define Dot prototype methods
     Dot.prototype = {
         create: function () {
             ctx.beginPath();
@@ -62,6 +66,7 @@ const canvasDots = function () {
         animate: function () {
             for (let i = 0; i < dots.nb; i++) {
                 const dot = dots.array[i];
+
                 if (dot.y < 0 || dot.y > canvas.height) {
                     dot.vx = dot.vx;
                     dot.vy = -dot.vy;
@@ -69,42 +74,79 @@ const canvasDots = function () {
                     dot.vx = -dot.vx;
                     dot.vy = dot.vy;
                 }
+
                 dot.x += dot.vx;
                 dot.y += dot.vy;
+            }
+        },
+        drawLine: function () {
+            for (let i = 0; i < dots.nb; i++) {
+                for (let j = 0; j < dots.nb; j++) {
+                    let i_dot = dots.array[i];
+                    let j_dot = dots.array[j];
+
+                    if (
+                        (i_dot.x - j_dot.x) < dots.distance &&
+                        (i_dot.y - j_dot.y) < dots.distance &&
+                        (i_dot.x - j_dot.x) > -dots.distance &&
+                        (i_dot.y - j_dot.y) > -dots.distance
+                    ) {
+                        if (
+                            (i_dot.x - mousePosition.x) < dots.d_radius &&
+                            (i_dot.y - mousePosition.y) < dots.d_radius &&
+                            (i_dot.x - mousePosition.x) > -dots.d_radius &&
+                            (i_dot.y - mousePosition.y) > -dots.d_radius
+                        ) {
+                            ctx.beginPath();
+                            ctx.moveTo(i_dot.x, i_dot.y);
+                            ctx.lineTo(j_dot.x, j_dot.y);
+                            ctx.strokeStyle = `rgba(0, 0, 255, 0.2)`;
+                            ctx.stroke();
+                            ctx.closePath();
+                        }
+                    }
+                }
             }
         }
     };
 
+    // Create dots and initialize them
     function createDots() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let i = 0; i < dots.nb; i++) {
             dots.array.push(new Dot());
+        }
+    }
+
+    // Draw dots on the canvas
+    function drawDots() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < dots.nb; i++) {
             const dot = dots.array[i];
             dot.create();
         }
-        dots.array[0].radius = 1.0;
-        dots.array[0].color = 'rgba(81, 162, 233, 0.8)';
+
+        for (let i = 0; i < dots.nb; i++) {
+            const dot = dots.array[i];
+            dot.drawLine();
+        }
+
+        Dot.prototype.animate();
     }
 
+    // Initialize the animation loop for dots
     function init() {
         createDots();
-        setInterval(() => {
-            createDots();
-            dots.array[0].animate();
-        }, 1000 / 30);
+        setInterval(drawDots, 1000 / 30); // 30 FPS
     }
 
+    // Update mouse position on mouse move
     window.onmousemove = function (e) {
         mousePosition.x = e.pageX;
         mousePosition.y = e.pageY;
-        try {
-            dots.array[0].x = e.pageX;
-            dots.array[0].y = e.pageY;
-        } catch (error) {
-            console.log(error);
-        }
     };
 
+    // Handle window resize
     window.onresize = function () {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -113,10 +155,9 @@ const canvasDots = function () {
         createDots();
     };
 
-    init();
-
-    // Adjust text container position on window resize and load
+    // Start animation when the window is loaded
     window.addEventListener('load', () => {
+        init();
         const introContainer = document.querySelector('.intro-text-container');
 
         // Center the intro text container
