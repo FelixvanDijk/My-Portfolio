@@ -5,57 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Felix's Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> <!-- Link to your CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <canvas class="connecting-dots"></canvas>
-
-    <!-- Navigation -->
-    <nav>
-        <ul>
-            <li><a href="#home" onclick="navigateToSection('home')">Home</a></li>
-            <li><a href="#projects" onclick="navigateToSection('projects')">Projects</a></li>
-            <li><a href="#about-me" onclick="navigateToSection('about-me')">About Me</a></li>
-            <li><a href="#contact" onclick="navigateToSection('contact')">Contact</a></li>
-        </ul>
-    </nav>
-
-    <!-- Sections -->
     <div id="content">
-        <section id="home" class="section active">
+        <section id="home" class="section">
             <div class="intro-text-container">
                 <div class="intro-line left">Hello, I'm <span class="highlight">Felix</span>.</div>
                 <div class="intro-line right">I'm a <span class="highlight">CS</span> student at the University of Bristol.</div>
-                <button class="projects-button" onclick="navigateToSection('projects')">My projects ↓</button>
+                <a href="#projects" class="projects-button">My projects ↓</a>
             </div>
         </section>
         
-        <section id="projects" class="section hidden">
+        <section id="projects" class="section">
             <h2>Projects</h2>
             <p>Here are some of my projects...</p>
         </section>
 
-        <section id="about-me" class="section hidden">
+        <section id="about-me" class="section">
             <h2>About Me</h2>
             <p>Information about Felix...</p>
         </section>
 
-        <section id="contact" class="section hidden">
+        <section id="contact" class="section">
             <h2>Contact Me</h2>
-            <form id="contact-form">
-                <p>If you would like to get in touch, please fill out the form below:</p>
             <form id="contact-form" action="https://formspree.io/f/movaykle" method="POST">
+                <p>If you would like to get in touch, please fill out the form below:</p>
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required><br><br>
+                <input type="text" id="name" name="name" required>
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required><br><br>
-                <label for="message">Message:</label><br>
-                <textarea id="message" name="message" rows="4" required></textarea><br><br>
+                <input type="email" id="email" name="email" required>
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
                 <input type="submit" value="Send">
             </form>
         </section>
     </div>
 
-    <script src="scripts.js"></script> <!-- Link to your JavaScript -->
+    <script src="scripts.js"></script>
 </body>
 </html>
+

@@ -3,87 +3,55 @@ html, body {
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
     font-family: 'Montserrat', sans-serif;
     background: #202020;
+    color: white;
+    overflow-x: hidden;
 }
 
-canvas {
-    position: absolute;
+canvas.connecting-dots {
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: auto; /* Enable pointer events by default */
+    z-index: 0;
 }
 
-nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background: #202020;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-}
-
-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-}
-
-nav ul li {
-    margin: 0 15px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 1.2em;
-    transition: color 0.3s;
-    z-index: 10; /* Ensure the link is above the canvas */
-}
-
-nav ul li a:hover {
-    color: red;
+#content {
+    position: relative;
+    z-index: 1;
 }
 
 .section {
-    padding: 100px 20px 60px 20px;
-    color: white;
-    text-align: center;
-    background: #202020;
+    padding: 100px 20px;
     min-height: 100vh;
-    display: none;
-    position: relative;
-    z-index: 1; /* Ensure sections are above the canvas */
-}
-
-.section.hidden {
-    display: none;
-}
-
-.section.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .intro-text-container {
     position: absolute;
-    text-align: center;
-    z-index: 10;
-    width: 100%;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+    z-index: 10;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .intro-line {
     font-size: 2em;
     color: white;
     opacity: 0;
+    margin-bottom: 10px;
     position: relative;
+    left: 50%; /* Center the line */
+    transform: translateX(-50%); /* Adjust for the line's width */
 }
 
 .intro-line.left {
@@ -95,25 +63,17 @@ nav ul li a:hover {
 }
 
 @keyframes slideInLeft {
-    0% {
-        left: -100%;
-        opacity: 0;
-    }
-    100% {
-        left: 0;
-        opacity: 1;
-    }
+    0% { transform: translateX(-150%); opacity: 0; }
+    100% { transform: translateX(-50%); opacity: 1; }
 }
 
 @keyframes slideInRight {
-    0% {
-        right: -100%;
-        opacity: 0;
-    }
-    100% {
-        right: 0;
-        opacity: 1;
-    }
+    0% { transform: translateX(50%); opacity: 0; }
+    100% { transform: translateX(-50%); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
 }
 
 .highlight {
@@ -124,13 +84,16 @@ nav ul li a:hover {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 1.2em;
-    background: #202020;
+    background: transparent;
     color: white;
     border: 2px solid red;
     border-radius: 5px;
     cursor: pointer;
     transition: background 0.3s, color 0.3s;
-    z-index: 10;
+    display: inline-block;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+    animation-delay: 2s; /* Start after text animations complete */
 }
 
 .projects-button:hover {
@@ -139,16 +102,8 @@ nav ul li a:hover {
 }
 
 #contact-form {
-    margin: 20px auto;
     max-width: 400px;
     text-align: left;
-    z-index: 10; /* Ensure form is above the canvas */
-}
-
-#contact-form label {
-    display: block;
-    margin-bottom: 5px;
-    color: white;
 }
 
 #contact-form input, #contact-form textarea {
@@ -159,7 +114,6 @@ nav ul li a:hover {
     border-radius: 5px;
     background: #333;
     color: white;
-    z-index: 10; /* Ensure inputs are above the canvas */
 }
 
 #contact-form input[type="submit"] {
@@ -168,9 +122,12 @@ nav ul li a:hover {
     border: none;
     cursor: pointer;
     transition: background 0.3s;
-    z-index: 10; /* Ensure button is above the canvas */
 }
 
 #contact-form input[type="submit"]:hover {
     background: darkred;
+}
+
+html {
+    scroll-behavior: smooth;
 }

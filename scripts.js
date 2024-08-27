@@ -1,4 +1,3 @@
-// Function to initialize the canvas dots effect
 const canvasDots = function () {
     const canvas = document.querySelector('.connecting-dots'),
         ctx = canvas.getContext('2d'),
@@ -95,6 +94,8 @@ const canvasDots = function () {
             const dot = dots.array[i];
             dot.create();
         }
+        dots.array[0].radius = 1.0;
+        dots.array[0].color = 'rgba(81, 162, 233, 0.8)';
     }
 
     function drawDots() {
@@ -135,9 +136,12 @@ const canvasDots = function () {
 
     window.addEventListener('load', () => {
         const introContainer = document.querySelector('.intro-text-container');
+
+        // Center the intro text container
         introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
         introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
 
+        // Resize canvas to cover the entire window
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
@@ -153,60 +157,47 @@ const canvasDots = function () {
 // Initialize the canvas dots effect
 canvasDots();
 
-// Function to navigate between sections without reloading the page
-function navigateToSection(sectionId) {
-    // Hide all sections
-    const sections = document.querySelectorAll('.section');
-    sections.forEach(section => {
-        section.classList.add('hidden');
-        section.classList.remove('active');
-    });
-
-    // Show the selected section
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.classList.remove('hidden');
-        targetSection.classList.add('active');
-
-        // Scroll to the top of the section smoothly
-        targetSection.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-// Automatically display the home section on initial load
-document.addEventListener('DOMContentLoaded', () => {
-    navigateToSection('home');
-    
-    // Adjust canvas mouse events
-    const canvas = document.querySelector('.connecting-dots');
-    
-    // Prevent canvas interaction when hovering over interactive elements
-    document.querySelectorAll('nav ul li a, #contact-form input, #contact-form textarea, #contact-form input[type="submit"], .projects-button').forEach(element => {
-        element.addEventListener('mouseenter', () => {
-            canvas.style.pointerEvents = 'none'; // Disable canvas interactions
-        });
-        element.addEventListener('mouseleave', () => {
-            canvas.style.pointerEvents = 'auto'; // Re-enable canvas interactions
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
         });
     });
 });
 
 // Handle form submission
 document.getElementById('contact-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission behavior
-
-    // Extract form data
+    event.preventDefault();
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const message = document.getElementById('message').value;
-
-    // Implement form submission logic, such as sending the data to a server
     console.log('Form submitted with:', { name, email, message });
-
-    // Display a simple alert
     alert('Thank you for contacting me, ' + name + '! I will get back to you soon.');
+    this.reset();
+});
 
-    // Reset form fields
-    document.getElementById('contact-form').reset();
+window.addEventListener('load', () => {
+    const introContainer = document.querySelector('.intro-text-container');
+    const projectsButton = document.querySelector('.projects-button');
+
+    function centerIntroText() {
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+        const containerHeight = introContainer.offsetHeight;
+        const containerWidth = introContainer.offsetWidth;
+        
+        introContainer.style.top = `${(windowHeight - containerHeight) / 2}px`;
+        introContainer.style.left = `${(windowWidth - containerWidth) / 2}px`;
+        introContainer.style.transform = 'translate(-50%, -50%)';
+    }
+
+    centerIntroText();
+    window.addEventListener('resize', centerIntroText);
+
+    projectsButton.addEventListener('click', () => {
+        document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+    });
 });
 
