@@ -1,3 +1,4 @@
+// Function to initialize the canvas dots effect
 const canvasDots = function () {
     const canvas = document.querySelector('.connecting-dots'),
         ctx = canvas.getContext('2d'),
@@ -17,7 +18,6 @@ const canvasDots = function () {
     const windowSize = window.innerWidth;
     let dots;
 
-    // Define different dot settings based on window width
     if (windowSize > 1600) {
         dots = {
             nb: 600,
@@ -41,7 +41,6 @@ const canvasDots = function () {
         };
     }
 
-    // Dot constructor function
     function Dot() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
@@ -51,7 +50,6 @@ const canvasDots = function () {
         this.color = colorDot[Math.floor(Math.random() * colorDot.length)];
     }
 
-    // Define Dot prototype methods
     Dot.prototype = {
         create: function () {
             ctx.beginPath();
@@ -90,7 +88,6 @@ const canvasDots = function () {
         }
     };
 
-    // Create dots and initialize them
     function createDots() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let i = 0; i < dots.nb; i++) {
@@ -98,11 +95,8 @@ const canvasDots = function () {
             const dot = dots.array[i];
             dot.create();
         }
-        dots.array[0].radius = 1.0;
-        dots.array[0].color = 'rgba(81, 162, 233, 0.8)';
     }
 
-    // Draw dots on the canvas
     function drawDots() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let i = 0; i < dots.nb; i++) {
@@ -113,7 +107,6 @@ const canvasDots = function () {
         }
     }
 
-    // Initialize the animation loop for dots
     function init() {
         createDots();
         setInterval(() => {
@@ -121,7 +114,6 @@ const canvasDots = function () {
         }, 1000 / 30);
     }
 
-    // Update mouse position on mouse move
     window.onmousemove = function (e) {
         mousePosition.x = e.pageX;
         mousePosition.y = e.pageY;
@@ -133,7 +125,6 @@ const canvasDots = function () {
         }
     };
 
-    // Handle window resize
     window.onresize = function () {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -142,15 +133,11 @@ const canvasDots = function () {
         createDots();
     };
 
-    // Adjust text container position on window resize and load
     window.addEventListener('load', () => {
         const introContainer = document.querySelector('.intro-text-container');
-
-        // Center the intro text container
         introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
         introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
 
-        // Resize canvas to cover the entire window
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
@@ -189,6 +176,19 @@ function navigateToSection(sectionId) {
 // Automatically display the home section on initial load
 document.addEventListener('DOMContentLoaded', () => {
     navigateToSection('home');
+    
+    // Adjust canvas mouse events
+    const canvas = document.querySelector('.connecting-dots');
+    
+    // Prevent canvas interaction when hovering over interactive elements
+    document.querySelectorAll('nav ul li a, #contact-form input, #contact-form textarea, #contact-form input[type="submit"], .projects-button').forEach(element => {
+        element.addEventListener('mouseenter', () => {
+            canvas.style.pointerEvents = 'none'; // Disable canvas interactions
+        });
+        element.addEventListener('mouseleave', () => {
+            canvas.style.pointerEvents = 'auto'; // Re-enable canvas interactions
+        });
+    });
 });
 
 // Handle form submission
@@ -200,12 +200,13 @@ document.getElementById('contact-form').addEventListener('submit', function(even
     const email = document.getElementById('email').value;
     const message = document.getElementById('message').value;
 
-    // Here, you can implement form submission logic, such as sending the data to a server
+    // Implement form submission logic, such as sending the data to a server
     console.log('Form submitted with:', { name, email, message });
 
-    // For now, we'll just display a simple alert
+    // Display a simple alert
     alert('Thank you for contacting me, ' + name + '! I will get back to you soon.');
 
     // Reset form fields
     document.getElementById('contact-form').reset();
 });
+
