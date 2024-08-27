@@ -32,26 +32,25 @@ canvas.connecting-dots {
     align-items: center;
 }
 
+#home {
+    position: relative;
+}
+
 .intro-text-container {
     position: absolute;
-    top: 50%;
+    top: 30%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     width: 100%;
-    z-index: 10;
-    padding: 0 20px;
-    box-sizing: border-box;
 }
 
 .intro-line {
     font-size: 2em;
     color: white;
     opacity: 0;
-    margin-bottom: 10px;
     position: relative;
-    left: 50%; /* Center the line */
-    transform: translateX(-50%); /* Adjust for the line's width */
+    margin-bottom: 10px;
 }
 
 .intro-line.left {
@@ -63,17 +62,13 @@ canvas.connecting-dots {
 }
 
 @keyframes slideInLeft {
-    0% { transform: translateX(-150%); opacity: 0; }
-    100% { transform: translateX(-50%); opacity: 1; }
+    0% { left: -100%; opacity: 0; }
+    100% { left: 0; opacity: 1; }
 }
 
 @keyframes slideInRight {
-    0% { transform: translateX(50%); opacity: 0; }
-    100% { transform: translateX(-50%); opacity: 1; }
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; }
+    0% { right: -100%; opacity: 0; }
+    100% { right: 0; opacity: 1; }
 }
 
 .highlight {
@@ -93,7 +88,11 @@ canvas.connecting-dots {
     display: inline-block;
     opacity: 0;
     animation: fadeIn 2s forwards;
-    animation-delay: 2s; /* Start after text animations complete */
+    animation-delay: 2s;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
 }
 
 .projects-button:hover {

@@ -19,21 +19,21 @@ const canvasDots = function () {
 
     if (windowSize > 1600) {
         dots = {
-            nb: 600,
+            nb: 800, // Increased from 600
             distance: 70,
             d_radius: 300,
             array: [],
         };
     } else if (windowSize > 1300) {
         dots = {
-            nb: 575,
+            nb: 700, // Increased from 575
             distance: 60,
             d_radius: 280,
             array: [],
         };
     } else {
         dots = {
-            nb: 300,
+            nb: 500, // Increased from 300
             distance: 60,
             d_radius: 200,
             array: [],
@@ -78,7 +78,7 @@ const canvasDots = function () {
                         ctx.beginPath();
                         ctx.moveTo(this.x, this.y);
                         ctx.lineTo(dot.x, dot.y);
-                        ctx.strokeStyle = 'rgba(0,0,255,0.1)';
+                        ctx.strokeStyle = 'rgba(0, 0, 255, 0.1)'; // Reverted to original color
                         ctx.stroke();
                         ctx.closePath();
                     }
@@ -136,25 +136,27 @@ const canvasDots = function () {
 
     window.addEventListener('load', () => {
         const introContainer = document.querySelector('.intro-text-container');
-
-        // Center the intro text container
-        introContainer.style.top = `${window.innerHeight / 2 - introContainer.offsetHeight / 2}px`;
-        introContainer.style.left = `${window.innerWidth / 2 - introContainer.offsetWidth / 2}px`;
+        const projectsButton = document.querySelector('.projects-button');
 
         // Resize canvas to cover the entire window
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        projectsButton.addEventListener('click', () => {
+            document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+        });
     });
 
+    // Initialize the canvas dots effect
     init();
 };
 
-// Initialize the canvas dots effect
+// Call the function to set up the canvas dots and animations
 canvasDots();
 
 // Smooth scrolling for anchor links
@@ -177,27 +179,3 @@ document.getElementById('contact-form').addEventListener('submit', function(even
     alert('Thank you for contacting me, ' + name + '! I will get back to you soon.');
     this.reset();
 });
-
-window.addEventListener('load', () => {
-    const introContainer = document.querySelector('.intro-text-container');
-    const projectsButton = document.querySelector('.projects-button');
-
-    function centerIntroText() {
-        const windowHeight = window.innerHeight;
-        const windowWidth = window.innerWidth;
-        const containerHeight = introContainer.offsetHeight;
-        const containerWidth = introContainer.offsetWidth;
-        
-        introContainer.style.top = `${(windowHeight - containerHeight) / 2}px`;
-        introContainer.style.left = `${(windowWidth - containerWidth) / 2}px`;
-        introContainer.style.transform = 'translate(-50%, -50%)';
-    }
-
-    centerIntroText();
-    window.addEventListener('resize', centerIntroText);
-
-    projectsButton.addEventListener('click', () => {
-        document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
-    });
-});
-
