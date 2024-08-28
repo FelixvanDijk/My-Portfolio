@@ -3,9 +3,18 @@ const canvasDots = function () {
         ctx = canvas.getContext('2d'),
         colorDot = ['#0000FF', '#0000FF', '#FF0000', '#FFFFFF'];
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    function setCanvasSize() {
+        canvas.width = window.innerWidth - 20; // Subtract scrollbar width
+        canvas.height = window.innerHeight;
+    }
+
+    setCanvasSize();
     canvas.style.display = 'block';
+    canvas.style.position = 'fixed'; // Change to fixed
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.zIndex = '-1'; // Ensure it's behind other content
+
     ctx.lineWidth = 0.3;
     ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
 
@@ -127,8 +136,7 @@ const canvasDots = function () {
     };
 
     window.onresize = function () {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        setCanvasSize();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         dots.array = [];
         createDots();
@@ -140,8 +148,7 @@ const canvasDots = function () {
 
         // Resize canvas to cover the entire window
         function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            setCanvasSize();
         }
 
         resizeCanvas();
@@ -179,3 +186,80 @@ document.getElementById('contact-form').addEventListener('submit', function(even
     alert('Thank you for contacting me, ' + name + '! I will get back to you soon.');
     this.reset();
 });
+
+// Add this function to handle navbar visibility
+function navFadeIn(entries, observer) {
+    const navbar = document.getElementById('navbar');
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            if (entry.target.id !== 'home') {
+                navbar.classList.add('visible');
+            } else {
+                navbar.classList.remove('visible');
+            }
+            
+            // Update active link
+            updateActiveLink(entry.target.id);
+        }
+    });
+}
+
+function updateActiveLink(sectionId) {
+    const navLinks = document.querySelectorAll('#navbar a');
+    navLinks.forEach(link => {
+        if (link.getAttribute('href') === `#${sectionId}`) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+}
+
+// Set up the Intersection Observer
+let options = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.5, // Increased threshold to ensure better accuracy
+};
+
+let observerNav = new IntersectionObserver(navFadeIn, options);
+
+// Observe all sections
+observerNav.observe(document.querySelector('#home'));
+observerNav.observe(document.querySelector('#projects'));
+observerNav.observe(document.querySelector('#about-me'));
+observerNav.observe(document.querySelector('#contact'));
+
+// Call navFadeIn once on page load to set initial state
+document.addEventListener('DOMContentLoaded', () => {
+    navFadeIn([{ isIntersecting: true, target: document.querySelector('#home') }], observerNav);
+});
+
+// Remove the old event listeners and toggleNavbar function
+window.removeEventListener('scroll', toggleNavbar);
+document.removeEventListener('DOMContentLoaded', toggleNavbar);
+// if (typeof toggleNavbar === 'function') {
+//     // Remove it or comment it out
+// }
+
+// Back to top link functionality
+// const backToTopLink = document.getElementById('back-to-top');
+// 
+// function toggleBackToTopLink() {
+//     if (window.pageYOffset > 300) {
+//         backToTopLink.classList.add('visible');
+//     } else {
+//         backToTopLink.classList.remove('visible');
+//     }
+// }
+// 
+// window.addEventListener('scroll', toggleBackToTopLink);
+
+// Remove these lines
+// function scrollToTop() {
+//     window.scrollTo({
+//         top: 0,
+//         behavior: 'smooth'
+//     });
+// }
+// backToTopButton.addEventListener('click', scrollToTop);
