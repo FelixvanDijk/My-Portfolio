@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gathouse Vets Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .project-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+        .project-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #4a90e2;
+            margin-bottom: 2rem;
+        }
+        .project-description {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+        .pdf-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .pdf-button:hover {
+            background-color: #3a7bd5;
+        }
+    </style>
+</head>
+<body>
+    <div class="project-page">
+        <h1 class="project-title">The Gathouse Vets Project</h1>
+        <p class="project-description">
+            During my journey developing this program, I carefully documented my progress. Click the button below to view the detailed PDF of the Gathouse Vets project.
+        </p>
+        <a href="assets/vets.pdf" class="pdf-button" target="_blank">View PDF</a>
+    </div>
+</body>
+</html>

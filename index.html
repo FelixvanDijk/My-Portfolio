@@ -6,10 +6,12 @@
     <title>Felix's Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
     <canvas class="connecting-dots"></canvas>
-    <nav id="navbar" class="hidden">
+    <nav id="navbar">
         <a href="#home">Home</a>
         <a href="#projects">Projects</a>
         <a href="#about-me">About Me</a>
@@ -26,12 +28,194 @@
         
         <section id="projects" class="section">
             <h2>Projects</h2>
-            <p>Here are some of my projects...</p>
+            <div class="project-container">
+                <div class="project-card">
+                    <div class="project-image-container">
+                        <img src="images/vets.png" alt="The Gathouse Vets Project Screenshot" class="project-image">
+                    </div>
+                    <div class="project-info">
+                        <h3>The Gathouse Vets</h3>
+                        <p>An old fashioned, paper based vetinray system, made digital.</p>
+                        <a href="gathouse-vets.html" class="learn-more-btn">Learn More</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image-container">
+                        <img src="images/ai.png" alt="AI Project Screenshot" class="project-image">
+                    </div>
+                    <div class="project-info">
+                        <h3>AI Project</h3>
+                        <p>An AI designed to help a character in a game called Scotland Yard makes the best possible move.</p>
+                        <a href="ai-project.html" class="learn-more-btn">Learn More</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image-container">
+                        <img src="images/sketchM.png" alt="Sketch Project Screenshot" class="project-image">
+                    </div>
+                    <div class="project-info">
+                        <h3>Sketch Project</h3>
+                        <p>Brief description of the Sketch project goes here.</p>
+                        <a href="sketch-project.html" class="learn-more-btn">Learn More</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image-container">
+                        <img src="images/portfolio.png" alt="Portfolio Project Screenshot" class="project-image">
+                    </div>
+                    <div class="project-info">
+                        <h3>Portfolio Website</h3>
+                        <p>My personal portfolio website showcasing my projects and skills.</p>
+                        <a href="https://github.com/FelixvanDijk/My-Portfolio" class="learn-more-btn github-btn" target="_blank" rel="noopener noreferrer">
+                            View on GitHub
+                            <i class="fab fa-github github-icon"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- New project card for consultant.png -->
+                <div class="project-card">
+                    <div class="project-image-container">
+                        <img src="images/consultant.png" alt="Consultant Project Screenshot" class="project-image">
+                    </div>
+                    <div class="project-info">
+                        <h3>Consultant Project</h3>
+                        <p>An online vetinray consultancy system, helping pet owners know what is wrong with their animal without having to go to a physical vet (Image is a placeholder and does not accurately describe the website).</p>
+                        <a href="consultant-project.html" class="learn-more-btn">Learn More</a>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section id="about-me" class="section">
             <h2>About Me</h2>
-            <p>Information about Felix...</p>
+            <div class="about-content">
+                <p>Hi, I'm Felix. I'm a student of Computer Science at the University of Bristol.</p>
+                <p>I have always been fascinated with the cutting edge of finance and technology and how new things work, spending many hours trying to gain understanding.</p>
+                <p>Now that I am older and more capable, I no longer wish to just see these changes, but help in making them.</p>
+            </div>
+            <div class="skills-container">
+                <div class="skills-category">
+                    <h3>Front End</h3>
+                    <div class="skills-icons">
+                        <div class="skill-item">
+                            <i class="devicon-react-original" title="React"></i>
+                            <span>React</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-nextjs-original" title="Next.js"></i>
+                            <span>Next.js</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-javascript-plain" title="JavaScript"></i>
+                            <span>JavaScript</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-typescript-plain" title="TypeScript"></i>
+                            <span>TypeScript</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-html5-plain" title="HTML5"></i>
+                            <span>HTML5</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-css3-plain" title="CSS3"></i>
+                            <span>CSS3</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-sass-original" title="Sass/SCSS"></i>
+                            <span>Sass/SCSS</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skills-category">
+                    <h3>Back End</h3>
+                    <div class="skills-icons">
+                        <div class="skill-item">
+                            <i class="devicon-go-original-wordmark" title="Golang"></i>
+                            <span>Golang</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-java-plain" title="Java"></i>
+                            <span>Java</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-c-plain" title="C"></i>
+                            <span>C</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-cplusplus-plain" title="C++"></i>
+                            <span>C++</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-postgresql-plain" title="PostgreSQL"></i>
+                            <span>PostgreSQL</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-mysql-plain" title="SQL"></i>
+                            <span>SQL</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-spring-plain" title="Spring"></i>
+                            <span>Spring</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-nodejs-plain" title="Node.js"></i>
+                            <span>Node.js</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-mongodb-plain" title="MongoDB"></i>
+                            <span>MongoDB</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-haskell-plain" title="Haskell"></i>
+                            <span>Haskell</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-python-plain" title="Python"></i>
+                            <span>Python</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skills-category">
+                    <h3>Testing/Deployment</h3>
+                    <div class="skills-icons">
+                        <div class="skill-item">
+                            <i class="devicon-junit-plain" title="JUnit"></i>
+                            <span>JUnit</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-apache-plain" title="Maven"></i>
+                            <span>Maven</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skills-category">
+                    <h3>Developer Tools</h3>
+                    <div class="skills-icons">
+                        <div class="skill-item">
+                            <i class="devicon-git-plain" title="Git"></i>
+                            <span>Git</span>
+                        </div>
+                        <div class="skill-item">
+                            <i class="devicon-github-original" title="GitHub"></i>
+                            <span>GitHub</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skills-category">
+                    <h3>Data Analysis</h3>
+                    <div class="skills-icons">
+                        <div class="skill-item">
+                            <i class="devicon-r-original" title="R"></i>
+                            <span>R</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section id="contact" class="section">

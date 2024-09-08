@@ -190,18 +190,23 @@ document.getElementById('contact-form').addEventListener('submit', function(even
 // Add this function to handle navbar visibility
 function navFadeIn(entries, observer) {
     const navbar = document.getElementById('navbar');
+    let shouldShowNavbar = false;
+
     entries.forEach((entry) => {
+        if (entry.target.id !== 'home' && entry.isIntersecting) {
+            shouldShowNavbar = true;
+        }
+        
         if (entry.isIntersecting) {
-            if (entry.target.id !== 'home') {
-                navbar.classList.add('visible');
-            } else {
-                navbar.classList.remove('visible');
-            }
-            
-            // Update active link
             updateActiveLink(entry.target.id);
         }
     });
+
+    if (shouldShowNavbar) {
+        navbar.classList.add('visible');
+    } else {
+        navbar.classList.remove('visible');
+    }
 }
 
 function updateActiveLink(sectionId) {
@@ -218,8 +223,8 @@ function updateActiveLink(sectionId) {
 // Set up the Intersection Observer
 let options = {
     root: null,
-    rootMargin: '0px',
-    threshold: 0.5, // Increased threshold to ensure better accuracy
+    rootMargin: '-20% 0px -80% 0px',
+    threshold: 0
 };
 
 let observerNav = new IntersectionObserver(navFadeIn, options);
@@ -235,31 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
     navFadeIn([{ isIntersecting: true, target: document.querySelector('#home') }], observerNav);
 });
 
-// Remove the old event listeners and toggleNavbar function
-window.removeEventListener('scroll', toggleNavbar);
-document.removeEventListener('DOMContentLoaded', toggleNavbar);
-// if (typeof toggleNavbar === 'function') {
-//     // Remove it or comment it out
-// }
-
-// Back to top link functionality
-// const backToTopLink = document.getElementById('back-to-top');
-// 
-// function toggleBackToTopLink() {
-//     if (window.pageYOffset > 300) {
-//         backToTopLink.classList.add('visible');
-//     } else {
-//         backToTopLink.classList.remove('visible');
-//     }
-// }
-// 
-// window.addEventListener('scroll', toggleBackToTopLink);
-
-// Remove these lines
-// function scrollToTop() {
-//     window.scrollTo({
-//         top: 0,
-//         behavior: 'smooth'
-//     });
-// }
-// backToTopButton.addEventListener('click', scrollToTop);
+// Remove any old event listeners if they exist
+if (typeof toggleNavbar === 'function') {
+    window.removeEventListener('scroll', toggleNavbar);
+    document.removeEventListener('DOMContentLoaded', toggleNavbar);
+}
