@@ -633,3 +633,93 @@ html {
     animation: none;
     transform: scale(1.05);
 }
+
+.footer {
+    background-color: #2a2a2a;
+    padding: 15px 0;
+    text-align: center;
+    position: relative;
+    z-index: 3;
+}
+
+.email-link {
+    color: #ffffff;
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+
+.email-link:hover {
+    color: #ff4d4d;
+}
+
+/* Contact form styles */
+#contact-form {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+#contact-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #ff4d4d;
+}
+
+#contact-form input[type="text"],
+#contact-form input[type="email"],
+#contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #ff4d4d;
+    background: transparent;
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+#contact-form input[type="text"]:focus,
+#contact-form input[type="email"]:focus,
+#contact-form textarea:focus {
+    outline: none;
+    border-bottom-color: #ff8080;
+}
+
+.submit-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.submit-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #ff4d4d;
+    transform: scaleX(0.3);
+    transform-origin: bottom left;
+    transition: transform 0.3s ease;
+}
+
+.submit-btn:hover::after {
+    transform: scaleX(1);
+}
+
+.submit-btn:active {
+    transform: translateY(2px);
+}

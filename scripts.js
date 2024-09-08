@@ -245,3 +245,33 @@ if (typeof toggleNavbar === 'function') {
     window.removeEventListener('scroll', toggleNavbar);
     document.removeEventListener('DOMContentLoaded', toggleNavbar);
 }
+
+// Smooth scrolling for navigation links
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing code (if any) ...
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('#navbar a, .projects-button').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Smooth scrolling for "Back to Top" button
+    document.querySelector('#back-to-top').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+});
