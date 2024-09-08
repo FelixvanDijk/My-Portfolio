@@ -183,7 +183,7 @@ document.getElementById('contact-form').addEventListener('submit', function(even
     const email = document.getElementById('email').value;
     const message = document.getElementById('message').value;
     console.log('Form submitted with:', { name, email, message });
-    alert('Thank you for contacting me, ' + name + '! I will get back to you soon.');
+    alert('Thank you for contacting me, ' + name + '! I will get back to you soon. You can also contact directly via the email icon below. Alternatively, you can contact me via my LinkedIn profile.');
     this.reset();
 });
 
