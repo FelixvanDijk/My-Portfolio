@@ -177,14 +177,37 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Handle form submission
-document.getElementById('contact-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-    console.log('Form submitted with:', { name, email, message });
-    alert('Thank you for contacting me, ' + name + '! I will get back to you soon. You can also contact directly via the email icon below. Alternatively, you can contact me via my LinkedIn profile.');
-    this.reset();
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contact-form');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Thank you for your message. I will get back to you soon!');
+                form.reset();
+            } else {
+                response.json().then(data => {
+                    if (Object.hasOwn(data, 'errors')) {
+                        alert(data["errors"].map(error => error["message"]).join(", "));
+                    } else {
+                        alert("Oops! There was a problem submitting your form");
+                    }
+                })
+            }
+        }).catch(error => {
+            alert("Oops! There was a problem submitting your form");
+        });
+    });
 });
 
 // Add this function to handle navbar visibility
