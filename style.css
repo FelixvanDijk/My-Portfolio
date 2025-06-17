@@ -1336,33 +1336,36 @@ body.business-page #navbar a:hover {
     }
     
     .testimonial {
-        padding: 1.5rem;
-        min-height: 400px;
+        padding: 1.5rem 1rem 2rem 1rem;
+        min-height: 450px;
     }
     
     .testimonial-content {
-        padding: 0 0.5rem;
+        padding: 0 0.5rem 1rem 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
     
     .testimonial p {
         font-size: 1em;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.2rem;
         padding: 0 0.5rem;
     }
     
     .testimonial-author {
         flex-direction: column;
         gap: 0.5rem;
-        margin-top: 1rem;
+        margin-top: auto;
         padding: 0 1rem;
         justify-content: center;
         align-items: center;
     }
     
     .testimonial-logo {
-        width: 50px;
-        height: 50px;
-        margin-bottom: 0.5rem;
+        width: 60px;
+        height: 60px;
+        margin-bottom: 0.6rem;
     }
     
     .author-info {
@@ -1391,7 +1394,7 @@ body.business-page #navbar a:hover {
     }
     
     .testimonial-slider {
-        min-height: 380px;
+        min-height: 460px;
     }
     
     /* Reset service card centering on mobile */
@@ -1605,19 +1608,19 @@ body.business-page #navbar a:hover {
 
 @media (max-width: 768px) {
     .testimonial {
-        padding: 1.5rem;
-        min-height: 400px;
+        padding: 1.5rem 1rem 2rem 1rem;
+        min-height: 450px;
     }
     
     .testimonial p {
         font-size: 1em;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.2rem;
     }
     
     .testimonial-author {
         flex-direction: column;
         gap: 0.5rem;
-        margin-top: 1rem;
+        margin-top: auto;
     }
     
     .author-info {
@@ -1636,11 +1639,11 @@ body.business-page #navbar a:hover {
     }
     
     .testimonial-slider {
-        min-height: 380px;
+        min-height: 460px;
     }
     
     .testimonial-content {
-        padding: 0 0.5rem;
+        padding: 0 0.5rem 1rem 0.5rem;
     }
     
     .testimonial p {
@@ -1650,7 +1653,7 @@ body.business-page #navbar a:hover {
     .testimonial-author {
         flex-direction: column;
         gap: 0.5rem;
-        margin-top: 1rem;
+        margin-top: auto;
     }
     
     .author-info {
@@ -1669,7 +1672,7 @@ body.business-page #navbar a:hover {
     }
     
     .testimonial-slider {
-        min-height: 380px;
+        min-height: 460px;
     }
     
     .service-card:last-child {
@@ -1755,24 +1758,24 @@ body:not(.business-page) #contact h2::before {
     }
     
     .testimonial {
-        padding: 1.5rem;
-        min-height: 400px;
+        padding: 1.5rem 1rem 2rem 1rem;
+        min-height: 450px;
     }
     
     .testimonial-content {
-        padding: 0 0.5rem;
+        padding: 0 0.5rem 1rem 0.5rem;
     }
     
     .testimonial p {
         font-size: 1em;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.2rem;
         padding: 0 0.5rem;
     }
     
     .testimonial-author {
         flex-direction: column;
         gap: 0.5rem;
-        margin-top: 1rem;
+        margin-top: auto;
     }
     
     .author-info {
@@ -1791,7 +1794,7 @@ body:not(.business-page) #contact h2::before {
     }
     
     .testimonial-slider {
-        min-height: 380px;
+        min-height: 460px;
     }
     
     /* Reset service card centering on mobile */

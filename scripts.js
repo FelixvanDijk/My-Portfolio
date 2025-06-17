@@ -418,7 +418,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function startAutoScroll() {
-        testimonialInterval = setInterval(nextTestimonial, 5000); // Change every 5 seconds
+        // Clear any existing interval first to prevent duplicates
+        stopAutoScroll();
+        testimonialInterval = setInterval(nextTestimonial, 7000); // Change every 7 seconds
     }
 
     function stopAutoScroll() {
