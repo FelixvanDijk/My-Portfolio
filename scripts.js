@@ -154,9 +154,14 @@ const canvasDots = function () {
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        projectsButton.addEventListener('click', () => {
-            document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
-        });
+        if (projectsButton) {
+            projectsButton.addEventListener('click', () => {
+                const projectsSection = document.getElementById('projects');
+                if (projectsSection) {
+                    projectsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
     });
 
     // Initialize the canvas dots effect
@@ -179,7 +184,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // Handle form submission
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('contact-form');
-    
+    if (!form) return; // exit if no contact form on current page
+
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         
@@ -210,13 +216,50 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Handle business contact form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const businessForm = document.getElementById('business-contact-form');
+    if (!businessForm) return; // exit if no business contact form on current page
+
+    businessForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(businessForm);
+        
+        fetch(businessForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Thank you for your inquiry. We will get back to you soon!');
+                businessForm.reset();
+            } else {
+                response.json().then(data => {
+                    if (Object.hasOwn(data, 'errors')) {
+                        alert(data["errors"].map(error => error["message"]).join(", "));
+                    } else {
+                        alert("Oops! There was a problem submitting your form");
+                    }
+                })
+            }
+        }).catch(error => {
+            alert("Oops! There was a problem submitting your form");
+        });
+    });
+});
+
 // Add this function to handle navbar visibility
 function navFadeIn(entries, observer) {
     const navbar = document.getElementById('navbar');
+    if (!navbar) return; // SAFETY: abort if page has no navbar
     let shouldShowNavbar = false;
 
     entries.forEach((entry) => {
-        if (entry.target.id !== 'home' && entry.isIntersecting) {
+        // Show navbar when not on hero/home section
+        if (entry.target.id !== 'home' && entry.target.id !== 'hero' && entry.isIntersecting) {
             shouldShowNavbar = true;
         }
         
@@ -234,6 +277,15 @@ function navFadeIn(entries, observer) {
 
 function updateActiveLink(sectionId) {
     const navLinks = document.querySelectorAll('#navbar a');
+    const isBusinessPage = document.querySelector('#hero') !== null; // detect business page
+    
+    // Add business-page class to body for theme detection
+    if (isBusinessPage) {
+        document.body.classList.add('business-page');
+    } else {
+        document.body.classList.remove('business-page');
+    }
+    
     navLinks.forEach(link => {
         if (link.getAttribute('href') === `#${sectionId}`) {
             link.classList.add('active');
@@ -241,6 +293,24 @@ function updateActiveLink(sectionId) {
             link.classList.remove('active');
         }
     });
+    
+    // Apply blue theme styling for business page
+    if (isBusinessPage) {
+        const navbar = document.getElementById('navbar');
+        if (navbar) {
+            // Update pseudo-element colors via CSS injection for blue underlines only
+            const style = document.createElement('style');
+            style.textContent = `
+                #navbar a::after { background-color: #4a90e2 !important; }
+                #navbar a.active::after { background-color: #4a90e2 !important; }
+                #navbar a:hover::after { background-color: #4a90e2 !important; }
+            `;
+            if (!document.querySelector('style[data-business-theme]')) {
+                style.setAttribute('data-business-theme', 'true');
+                document.head.appendChild(style);
+            }
+        }
+    }
 }
 
 // Set up the Intersection Observer
@@ -252,15 +322,26 @@ let options = {
 
 let observerNav = new IntersectionObserver(navFadeIn, options);
 
-// Observe all sections
-observerNav.observe(document.querySelector('#home'));
-observerNav.observe(document.querySelector('#projects'));
-observerNav.observe(document.querySelector('#about-me'));
-observerNav.observe(document.querySelector('#contact'));
+// Observe all sections IF they exist on the page
+['#home', '#hero', '#projects', '#about', '#about-me', '#services', '#work', '#testimonials', '#contact'].forEach(selector => {
+    const el = document.querySelector(selector);
+    if (el) observerNav.observe(el);
+});
 
-// Call navFadeIn once on page load to set initial state
+// Call navFadeIn once on page load to set initial state (only if #home exists)
 document.addEventListener('DOMContentLoaded', () => {
-    navFadeIn([{ isIntersecting: true, target: document.querySelector('#home') }], observerNav);
+    // Set business page class immediately on page load
+    const isBusinessPage = document.querySelector('#hero') !== null;
+    if (isBusinessPage) {
+        document.body.classList.add('business-page');
+    } else {
+        document.body.classList.remove('business-page');
+    }
+    
+    const homeSection = document.querySelector('#home') || document.querySelector('#hero');
+    if (homeSection) {
+        navFadeIn([{ isIntersecting: true, target: homeSection }], observerNav);
+    }
 });
 
 // Remove any old event listeners if they exist
@@ -303,4 +384,66 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+});
+
+// Testimonials Auto-Scroll Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const testimonials = document.querySelectorAll('.testimonial');
+    const dots = document.querySelectorAll('.dot');
+    let currentTestimonial = 0;
+    let testimonialInterval;
+
+    if (testimonials.length === 0) return; // Exit if no testimonials on page
+
+    function showTestimonial(index) {
+        // Remove active class from all testimonials and dots
+        testimonials.forEach((testimonial, i) => {
+            testimonial.classList.remove('active', 'prev');
+            if (i === currentTestimonial && i !== index) {
+                testimonial.classList.add('prev');
+            }
+        });
+        dots.forEach(dot => dot.classList.remove('active'));
+
+        // Add active class to current testimonial and dot
+        testimonials[index].classList.add('active');
+        dots[index].classList.add('active');
+        
+        currentTestimonial = index;
+    }
+
+    function nextTestimonial() {
+        const next = (currentTestimonial + 1) % testimonials.length;
+        showTestimonial(next);
+    }
+
+    function startAutoScroll() {
+        testimonialInterval = setInterval(nextTestimonial, 5000); // Change every 5 seconds
+    }
+
+    function stopAutoScroll() {
+        if (testimonialInterval) {
+            clearInterval(testimonialInterval);
+        }
+    }
+
+    // Add click handlers to dots
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            stopAutoScroll();
+            showTestimonial(index);
+            startAutoScroll(); // Restart auto-scroll after manual interaction
+        });
+    });
+
+    // Pause auto-scroll when user hovers over testimonials
+    const testimonialContainer = document.querySelector('.testimonials-container');
+    if (testimonialContainer) {
+        testimonialContainer.addEventListener('mouseenter', stopAutoScroll);
+        testimonialContainer.addEventListener('mouseleave', startAutoScroll);
+    }
+
+    // Initialize first testimonial and start auto-scroll
+    showTestimonial(0);
+    startAutoScroll();
 });

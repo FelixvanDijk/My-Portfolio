@@ -77,6 +77,10 @@ canvas.connecting-dots {
     color: red;
 }
 
+.highlight-blue {
+    color: #4a90e2;
+}
+
 .projects-button {
     margin-top: 20px;
     padding: 10px 20px;
@@ -101,6 +105,84 @@ canvas.connecting-dots {
 .projects-button:hover {
     background: red;
     color: #202020;
+}
+
+.business-button {
+    border-color: #4a90e2;
+    color: #4a90e2;
+}
+
+.business-button:hover {
+    background: #4a90e2;
+    color: #202020;
+}
+
+/* Business page specific styles */
+.business-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.business-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+.business-text h2 {
+    color: #4a90e2;
+    font-size: 2.5em;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.business-text h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 0;
+    height: 4px;
+    background-color: #4a90e2;
+    transition: width 0.5s ease;
+}
+
+.business-text h2:hover::after {
+    width: 100%;
+}
+
+.business-text h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 100%;
+    height: 4px;
+    background-color: rgba(74, 144, 226, 0.3);
+}
+
+.business-text p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    .business-logo {
+        width: 150px;
+    }
+    
+    .business-text h2 {
+        font-size: 2em;
+    }
 }
 
 #contact-form {
@@ -195,11 +277,20 @@ html {
     transform: scaleX(1);
 }
 
+/* Business page navbar - blue text when active/underlined */
+body.business-page #navbar a.active {
+    color: #4a90e2;
+}
+
+body.business-page #navbar a:hover {
+    color: #4a90e2;
+}
+
 #back-to-top {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    background-color: #ff4d4d;
+    background-color: #4a90e2;
     color: white;
     text-decoration: none;
     border-radius: 50%;
@@ -222,7 +313,7 @@ html {
 }
 
 #back-to-top:hover {
-    background-color: #ff3333;
+    background-color: #3a7bd5;
 }
 
 #back-to-top:hover::before {
@@ -780,4 +871,907 @@ html {
 
 .back-btn:hover .back-btn-arrow {
     transform: translateX(-3px);
+}
+
+/* ===== Landing Page Choice Buttons ===== */
+.landing-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 2;
+}
+
+.choice-button {
+    display: inline-block;
+    margin: 20px 30px;
+    padding: 15px 40px;
+    font-size: 1.5em;
+    font-weight: 700;
+    border-radius: 50px;
+    border: 3px solid currentColor;
+    color: #ffffff;
+    background: transparent;
+    text-decoration: none;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+}
+
+.choice-button:hover {
+    transform: translateY(-3px);
+}
+
+@keyframes enterLeft {
+    0%   { transform: translateX(-200%) scale(0.5) rotate(-15deg); opacity: 0; }
+    60%  { transform: translateX(20px)  scale(1.1) rotate(2deg);  opacity: 1; }
+    80%  { transform: translateX(-10px) scale(0.97) rotate(-1deg); }
+    100% { transform: translateX(0)     scale(1)   rotate(0deg);  opacity: 1; }
+}
+
+@keyframes enterRight {
+    0%   { transform: translateX(200%) scale(0.5) rotate(15deg); opacity: 0; }
+    60%  { transform: translateX(-20px) scale(1.1) rotate(-2deg); opacity: 1; }
+    80%  { transform: translateX(10px)  scale(0.97) rotate(1deg); }
+    100% { transform: translateX(0)     scale(1)   rotate(0deg);  opacity: 1; }
+}
+
+.personal-btn {
+    color: #ff4d4d;
+    animation: enterLeft 1.2s cubic-bezier(0.68,-0.55,0.27,1.55) 0.2s forwards;
+}
+
+.business-btn {
+    color: #4a90e2;
+    animation: enterRight 1.2s cubic-bezier(0.68,-0.55,0.27,1.55) 0.4s forwards;
+}
+
+.personal-btn:hover {
+    background: #ff4d4d;
+    color: #202020;
+}
+
+.business-btn:hover {
+    background: #4a90e2;
+    color: #202020;
+}
+
+/* Business page specific styles */
+.business-tagline {
+    font-size: 1.2em;
+    color: #4a90e2;
+    margin-top: 20px;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+    animation-delay: 4s;
+}
+
+.services-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Create rows for symmetrical layout */
+.services-row {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.services-row.top-row {
+    /* First 3 cards */
+    max-width: 1000px;
+}
+
+.services-row.middle-row {
+    /* Next 2 cards centered */
+    max-width: 700px;
+}
+
+.services-row.bottom-row {
+    /* Last 2 cards centered */
+    max-width: 700px;
+}
+
+.service-card {
+    background: rgba(74, 144, 226, 0.1);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex: 1;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(74, 144, 226, 0.2);
+    border-color: #4a90e2;
+}
+
+.service-icon {
+    font-size: 3em;
+    margin-bottom: 1rem;
+}
+
+.service-card h3 {
+    color: #4a90e2;
+    font-size: 1.5em;
+    margin-bottom: 1rem;
+}
+
+.service-card p {
+    line-height: 1.6;
+    color: #ffffff;
+}
+
+.case-study {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    background: rgba(74, 144, 226, 0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    margin-bottom: 3rem;
+}
+
+.case-study h3 {
+    color: #4a90e2;
+    font-size: 1.8em;
+    margin-bottom: 1rem;
+}
+
+.case-study p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #ffffff;
+}
+
+.work-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.case-study-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.client-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.client-logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+}
+
+.case-study-header h3 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #4a90e2;
+}
+
+.impact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.impact-item {
+    background: rgba(74, 144, 226, 0.05);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(74, 144, 226, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.impact-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.2);
+    border-color: rgba(74, 144, 226, 0.4);
+}
+
+.impact-item h4 {
+    color: #4a90e2;
+    font-size: 1.2em;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+}
+
+.impact-item p {
+    margin: 0;
+    font-size: 1em;
+    line-height: 1.6;
+    color: #ffffff;
+}
+
+.outcomes {
+    background: rgba(74, 144, 226, 0.08);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(74, 144, 226, 0.3);
+    margin-top: 2rem;
+    text-align: left;
+}
+
+.outcomes h4 {
+    color: #4a90e2;
+    font-size: 1.3em;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.outcomes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.outcomes li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.8rem;
+    color: #ffffff;
+    font-size: 1em;
+    line-height: 1.5;
+}
+
+.outcomes li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #4a90e2;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+@media (max-width: 768px) {
+    .case-study-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .client-logo {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .case-study-header h3 {
+        font-size: 1.5em;
+        text-align: center;
+    }
+    
+    .impact-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .case-study {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .impact-item,
+    .outcomes {
+        padding: 1rem;
+    }
+}
+
+.business-contact {
+    display: flex;
+    gap: 3rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    align-items: flex-start;
+}
+
+.business-contact form {
+    flex: 1;
+    background: rgba(74, 144, 226, 0.05);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 2px solid rgba(74, 144, 226, 0.2);
+}
+
+.business-contact .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.business-contact label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a90e2;
+    font-size: 1.1em;
+}
+
+.business-contact input[type="text"],
+.business-contact input[type="email"],
+.business-contact textarea {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.business-contact input[type="text"]:focus,
+.business-contact input[type="email"]:focus,
+.business-contact textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    background: rgba(74, 144, 226, 0.1);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.business-contact input::placeholder,
+.business-contact textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.business-contact textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.contact-info {
+    flex: 1;
+    padding: 2rem;
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 15px;
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    height: fit-content;
+}
+
+.contact-info p {
+    font-size: 1.1em;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.business-submit {
+    background: linear-gradient(135deg, transparent, rgba(74, 144, 226, 0.1));
+    color: #4a90e2;
+    border: 2px solid #4a90e2;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.business-submit:hover {
+    background: #4a90e2;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+}
+
+.business-submit::after {
+    display: none;
+}
+
+/* Blue underlines for business section headers */
+#services h2::after,
+#work h2::after,
+#about h2::after,
+#testimonials h2::after,
+#contact h2::after {
+    background-color: #4a90e2;
+}
+
+#services h2::before,
+#work h2::before,
+#about h2::before,
+#testimonials h2::before,
+#contact h2::before {
+    background-color: rgba(74, 144, 226, 0.3);
+}
+
+@media (max-width: 768px) {
+    .services-container {
+        gap: 1.5rem;
+    }
+    
+    .services-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    .service-card {
+        max-width: 100%;
+        min-width: auto;
+    }
+    
+    .testimonials-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+    
+    .business-contact {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
+    .business-contact form,
+    .contact-info {
+        padding: 1.5rem;
+    }
+    
+    .testimonial {
+        padding: 1.5rem;
+        min-height: 350px;
+    }
+    
+    .testimonial-content {
+        padding: 0 0.5rem;
+    }
+    
+    .testimonial p {
+        font-size: 1em;
+        margin-bottom: 1.5rem;
+        padding: 0 0.5rem;
+    }
+    
+    .testimonial-author {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .author-info {
+        text-align: center;
+    }
+    
+    .consultation-offer {
+        margin: 1.5rem auto;
+        padding: 1rem;
+        font-size: 1em;
+    }
+    
+    .quote-icon {
+        font-size: 2.5em;
+        margin-bottom: 0.5rem;
+    }
+    
+    .testimonial-slider {
+        min-height: 320px;
+    }
+}
+
+/* Testimonials Section */
+.testimonials-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    width: 95%;
+}
+
+.testimonial-slider {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(74, 144, 226, 0.1);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    min-height: 400px;
+    width: 100%;
+}
+
+.testimonial {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 100%;
+    padding: 2rem;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.testimonial.active {
+    left: 0;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.testimonial.prev {
+    left: -100%;
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.testimonial-content {
+    text-align: center;
+    position: relative;
+    max-width: 900px;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.quote-icon {
+    font-size: 3em;
+    color: #4a90e2;
+    line-height: 1;
+    margin-bottom: 1rem;
+    font-family: serif;
+    opacity: 0.7;
+    text-align: center;
+}
+
+.testimonial p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    font-style: italic;
+    text-align: center;
+    margin: 0 auto 2rem auto;
+    max-width: 800px;
+    padding: 0 1rem;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.testimonial-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+    border: 2px solid rgba(74, 144, 226, 0.3);
+}
+
+.author-info h4 {
+    color: #4a90e2;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.author-info span {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9em;
+    font-weight: 300;
+}
+
+.testimonial-dots {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(74, 144, 226, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.dot.active {
+    background: #4a90e2;
+    transform: scale(1.2);
+}
+
+.dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(74, 144, 226, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dot:hover::after {
+    opacity: 1;
+}
+
+/* Auto-scroll animation */
+@keyframes testimonialProgress {
+    0% { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+}
+
+.dot.active::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 2px solid #4a90e2;
+    border-radius: 50%;
+    animation: testimonialProgress 5s linear;
+    transform-origin: center;
+}
+
+/* Consultation offer styling */
+.consultation-offer {
+    background: rgba(74, 144, 226, 0.1);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 2rem auto;
+    max-width: 600px;
+    text-align: center;
+    font-size: 1.1em;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+.consultation-offer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.consultation-offer strong {
+    color: #4a90e2;
+}
+
+@media (max-width: 768px) {
+    .testimonial {
+        padding: 1.5rem;
+        min-height: 350px;
+    }
+    
+    .testimonial p {
+        font-size: 1em;
+        margin-bottom: 1.5rem;
+    }
+    
+    .testimonial-author {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .author-info {
+        text-align: center;
+    }
+    
+    .consultation-offer {
+        margin: 1.5rem auto;
+        padding: 1rem;
+        font-size: 1em;
+    }
+    
+    .quote-icon {
+        font-size: 2.5em;
+        margin-bottom: 0.5rem;
+    }
+    
+    .testimonial-slider {
+        min-height: 320px;
+    }
+    
+    .testimonial-content {
+        padding: 0 0.5rem;
+    }
+    
+    .testimonial p {
+        padding: 0 0.5rem;
+    }
+    
+    .testimonial-author {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .author-info {
+        text-align: center;
+    }
+    
+    .consultation-offer {
+        margin: 1.5rem auto;
+        padding: 1rem;
+        font-size: 1em;
+    }
+    
+    .quote-icon {
+        font-size: 2.5em;
+        margin-bottom: 0.5rem;
+    }
+    
+    .testimonial-slider {
+        min-height: 320px;
+    }
+    
+    .service-card:last-child {
+        grid-column: auto;
+        max-width: none;
+        margin: 0;
+    }
+}
+
+/* Red theme for personal page back-to-top */
+body:not(.business-page) #back-to-top {
+    background-color: #ff4d4d;
+}
+
+body:not(.business-page) #back-to-top:hover {
+    background-color: #ff3333;
+}
+
+/* Blue theme for business page back-to-top */
+body.business-page #back-to-top {
+    background-color: #4a90e2;
+}
+
+body.business-page #back-to-top:hover {
+    background-color: #3a7bd5;
+}
+
+/* Red underlines for personal page contact section */
+body:not(.business-page) #contact h2::after {
+    background-color: #ff4d4d;
+}
+
+body:not(.business-page) #contact h2::before {
+    background-color: rgba(255, 77, 77, 0.3);
+}
+
+/* Make the last service card (bespoke challenges) span center when on its own row */
+.service-card:last-child {
+    grid-column: 1 / -1;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Reset for when all cards fit in same row */
+@media (min-width: 1400px) {
+    .service-card:last-child {
+        grid-column: auto;
+        max-width: none;
+        margin: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .services-container {
+        gap: 1.5rem;
+    }
+    
+    .services-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    .service-card {
+        max-width: 100%;
+        min-width: auto;
+    }
+    
+    .testimonials-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+    
+    .business-contact {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
+    .business-contact form,
+    .contact-info {
+        padding: 1.5rem;
+    }
+    
+    .testimonial {
+        padding: 1.5rem;
+        min-height: 350px;
+    }
+    
+    .testimonial-content {
+        padding: 0 0.5rem;
+    }
+    
+    .testimonial p {
+        font-size: 1em;
+        margin-bottom: 1.5rem;
+        padding: 0 0.5rem;
+    }
+    
+    .testimonial-author {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .author-info {
+        text-align: center;
+    }
+    
+    .consultation-offer {
+        margin: 1.5rem auto;
+        padding: 1rem;
+        font-size: 1em;
+    }
+    
+    .quote-icon {
+        font-size: 2.5em;
+        margin-bottom: 0.5rem;
+    }
+    
+    .testimonial-slider {
+        min-height: 320px;
+    }
+    
+    /* Reset service card centering on mobile */
+    .service-card:last-child {
+        grid-column: auto;
+        max-width: none;
+        margin: 0;
+    }
 }
