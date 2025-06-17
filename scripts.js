@@ -409,6 +409,13 @@ document.addEventListener('DOMContentLoaded', function() {
         testimonials[index].classList.add('active');
         dots[index].classList.add('active');
         
+        // Dynamically set slider height to fit content
+        const slider = document.querySelector('.testimonial-slider');
+        if (slider) {
+            const contentHeight = testimonials[index].scrollHeight;
+            slider.style.height = contentHeight + 'px';
+        }
+        
         currentTestimonial = index;
     }
 
