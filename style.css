@@ -1337,7 +1337,7 @@ body.business-page #navbar a:hover {
     
     .testimonial {
         padding: 1.5rem;
-        min-height: 350px;
+        min-height: 400px;
     }
     
     .testimonial-content {
@@ -1354,10 +1354,29 @@ body.business-page #navbar a:hover {
         flex-direction: column;
         gap: 0.5rem;
         margin-top: 1rem;
+        padding: 0 1rem;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .testimonial-logo {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 0.5rem;
     }
     
     .author-info {
         text-align: center;
+        margin-top: 0.5rem;
+    }
+    
+    .author-info h4 {
+        margin-bottom: 0.3rem;
+        font-size: 1em;
+    }
+    
+    .author-info span {
+        font-size: 0.85em;
     }
     
     .consultation-offer {
@@ -1372,7 +1391,14 @@ body.business-page #navbar a:hover {
     }
     
     .testimonial-slider {
-        min-height: 320px;
+        min-height: 380px;
+    }
+    
+    /* Reset service card centering on mobile */
+    .service-card:last-child {
+        grid-column: auto;
+        max-width: none;
+        margin: 0;
     }
 }
 
@@ -1580,7 +1606,7 @@ body.business-page #navbar a:hover {
 @media (max-width: 768px) {
     .testimonial {
         padding: 1.5rem;
-        min-height: 350px;
+        min-height: 400px;
     }
     
     .testimonial p {
@@ -1610,7 +1636,7 @@ body.business-page #navbar a:hover {
     }
     
     .testimonial-slider {
-        min-height: 320px;
+        min-height: 380px;
     }
     
     .testimonial-content {
@@ -1643,7 +1669,7 @@ body.business-page #navbar a:hover {
     }
     
     .testimonial-slider {
-        min-height: 320px;
+        min-height: 380px;
     }
     
     .service-card:last-child {
@@ -1730,7 +1756,7 @@ body:not(.business-page) #contact h2::before {
     
     .testimonial {
         padding: 1.5rem;
-        min-height: 350px;
+        min-height: 400px;
     }
     
     .testimonial-content {
@@ -1765,7 +1791,7 @@ body:not(.business-page) #contact h2::before {
     }
     
     .testimonial-slider {
-        min-height: 320px;
+        min-height: 380px;
     }
     
     /* Reset service card centering on mobile */
@@ -1773,5 +1799,62 @@ body:not(.business-page) #contact h2::before {
         grid-column: auto;
         max-width: none;
         margin: 0;
+    }
+}
+
+/* Mobile navbar fixes */
+@media (max-width: 768px) {
+    #navbar {
+        padding: 10px 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    #navbar a {
+        margin: 5px 8px;
+        font-size: 0.9em;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    #navbar {
+        padding: 8px 10px;
+        gap: 3px;
+    }
+    
+    #navbar a {
+        margin: 3px 5px;
+        font-size: 0.8em;
+    }
+}
+
+/* Extra small screens - force smaller text and tighter spacing */
+@media (max-width: 390px) {
+    #navbar {
+        padding: 5px 8px;
+        gap: 2px;
+    }
+    
+    #navbar a {
+        margin: 2px 3px;
+        font-size: 0.75em;
+        padding: 5px 3px;
+    }
+}
+
+/* For very wide navbar content, use two rows on smallest screens */
+@media (max-width: 350px) {
+    #navbar {
+        min-height: 50px;
+        align-items: flex-start;
+        padding-top: 8px;
+    }
+    
+    #navbar a {
+        margin: 2px 2px;
+        font-size: 0.7em;
+        line-height: 1.2;
     }
 }
