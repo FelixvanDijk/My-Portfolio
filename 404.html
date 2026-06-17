@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — felix.c</title>
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#0A0E1A">
+    <link rel="icon" href="/assets/alphabet.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css?v=20260612">
+    <style>
+        .err-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .err-terminal {
+            width: min(640px, 100%);
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+        }
+        .err-body {
+            font-family: var(--mono);
+            font-size: 15px;
+            line-height: 2.1;
+            padding: 28px 32px;
+        }
+        .err-line-error { color: var(--destructive); }
+        .err-line-muted { color: var(--muted); }
+        .err-body a { color: var(--accent); text-decoration: none; }
+        .err-body a:hover { text-decoration: underline; }
+        .err-caret {
+            display: inline-block;
+            width: 0.6em;
+            height: 1.1em;
+            background: var(--accent);
+            vertical-align: text-bottom;
+            animation: caret-blink 1.06s steps(1) infinite;
+        }
+    </style>
+</head>
+<body>
+    <main class="err-page">
+        <div class="err-terminal">
+            <div class="proc-chrome">
+                <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="proc-title mono">felix.c — compiler output</span>
+            </div>
+            <div class="err-body">
+                <div>$ gcc felix.c -o page</div>
+                <div class="err-line-error">felix.c:404: error: page not found</div>
+                <div class="err-line-muted">&nbsp;&nbsp;404 | // this route doesn't compile</div>
+                <div class="err-line-muted">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+                <div style="margin-top:12px">did you mean:</div>
+                <div>&nbsp;&nbsp;<a href="/">cd ~ (boot menu)</a></div>
+                <div>&nbsp;&nbsp;<a href="/personal.html">cd ~/felix.c (personal)</a></div>
+                <div>&nbsp;&nbsp;<a href="/business.html">cd ~/fvandijk.ltd (business)</a></div>
+                <div>&nbsp;&nbsp;<a href="/personal.html#contact">cd ~/contact</a></div>
+                <div style="margin-top:12px">$ <span class="err-caret"></span></div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

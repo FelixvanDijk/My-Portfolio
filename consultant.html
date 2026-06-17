@@ -3,77 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultant Project - Felix's Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        .project-content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .project-title {
-            font-size: 2.5rem;
-            color: #ff4d4d;
-            margin-bottom: 1rem;
-        }
-
-        .project-description {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            color: #ffffff;
-        }
-
-        .back-button {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 10px 20px;
-            background-color: #ff4d4d;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .back-button:hover {
-            background-color: #ff3333;
-        }
-    </style>
+    <title>Consultant Project — Felix van Dijk</title>
+    <meta name="description" content="Consultant Project — an online veterinary consultancy system for pet owners, currently in development by Felix van Dijk.">
+    <meta name="theme-color" content="#0A0E1A">
     <link rel="icon" href="assets/alphabet.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=20260612">
+    <style>
+        .subpage {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: calc(var(--topbar-h) + 40px) 24px 64px;
+        }
+        .case-window {
+            width: min(720px, 100%);
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+        }
+        .case-body { padding: 36px 40px; }
+        .case-cmd { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+        .case-body h1 { font-family: var(--mono); font-size: clamp(1.6rem, 4vw, 2.3rem); letter-spacing: -0.02em; }
+        .case-body h1::after { content: ';'; color: var(--accent); opacity: 0.6; }
+        .case-desc { color: var(--fg-mid); font-size: 17px; max-width: 58ch; }
+        .build-log {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--muted);
+            background: var(--bg);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 24px 0;
+            line-height: 2;
+        }
+        .build-log .ok { color: var(--accent); }
+        .build-log .wip { color: var(--amber); }
+        .case-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 28px; }
+        @media (max-width: 560px) { .case-body { padding: 24px 20px; } }
+    </style>
 </head>
 <body>
-    <canvas class="connecting-dots"></canvas>
-    <nav id="navbar">
-        <a href="personal.html#home">Home</a>
-        <a href="personal.html#projects">Projects</a>
-        <a href="personal.html#about-me">About Me</a>
-        <a href="personal.html#contact">Contact</a>
-    </nav>
-    <div id="content">
-        <section class="section">
-            <div class="project-content">
-                <h1 class="project-title">Consultant Project</h1>
-                <p class="project-description">This project is currently under development, please check back for updates on progress!</p>
-                <a href="personal.html#projects" class="back-button">Back to Projects</a>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header id="topbar">
+        <a class="file-tab" href="personal.html" style="text-decoration:none" title="Back to felix.c">
+            <span class="tab-glyph" aria-hidden="true">←</span>
+            <span class="tab-name">cd ~/felix.c</span>
+        </a>
+        <div class="topbar-actions">
+            <a class="btn-pill btn-pill-ghost" href="personal.html#projects">All projects</a>
+            <a class="btn-pill btn-pill-solid" href="personal.html#contact">Hire me</a>
+        </div>
+    </header>
+
+    <main id="main" class="subpage">
+        <article class="case-window">
+            <div class="proc-chrome">
+                <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="proc-title mono">~/projects/consultant — build in progress</span>
+                <span class="status-badge status-running">IN&nbsp;PROGRESS</span>
             </div>
-        </section>
-    </div>
+            <div class="case-body">
+                <p class="case-cmd" aria-hidden="true">$ ./consultant --status</p>
+                <h1>Consultant Project</h1>
+                <p class="case-desc">An online veterinary consultancy system for pet owners — helping people understand what may be wrong with their animal before visiting a physical vet.</p>
+                <div class="build-log" aria-hidden="true">
+                    <div>core triage flow ............ <span class="ok">[OK]</span></div>
+                    <div>consultation pages ........... <span class="ok">[OK]</span></div>
+                    <div>booking &amp; payments ........... <span class="wip">[BUILDING]</span></div>
+                    <div>launch ....................... <span class="wip">[QUEUED]</span></div>
+                </div>
+                <p class="case-desc">This project is currently under development — check back for updates on progress, or open the live preview to see where it stands today.</p>
+                <div class="case-actions">
+                    <a class="btn btn-solid" href="https://felixvandijk.github.io/JanConsultancy/" target="_blank" rel="noopener noreferrer">Open live preview</a>
+                    <a class="btn btn-ghost mono" href="personal.html#projects">cd ../projects</a>
+                </div>
+            </div>
+        </article>
+    </main>
 
-    <footer class="footer">
-        <a href="mailto:felixvandijkk@gmail.com" class="social-link email-link" title="Email me">
-            <i class="fas fa-envelope"></i>
-        </a>
-        <a href="https://www.linkedin.com/in/felix-van-dijk-81a1ba2ba/" class="social-link linkedin-link" title="Connect on LinkedIn" target="_blank" rel="noopener noreferrer">
-            <i class="fab fa-linkedin"></i>
-        </a>
+    <footer id="footer" style="border-top:none; text-align:center;">
+        <p class="footer-meta">© 2026 Felix van Dijk ·
+            <a href="mailto:felixvandijkk@gmail.com">felixvandijkk@gmail.com</a> ·
+            <a href="https://www.linkedin.com/in/felix-van-dijk-81a1ba2ba/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        </p>
     </footer>
-
-    <script src="scripts.js"></script>
 </body>
 </html>

@@ -3,219 +3,611 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Felix's Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Felix van Dijk — Software Developer · CS @ Bristol</title>
+    <meta name="description" content="Felix van Dijk — Computer Science student at the University of Bristol. I build software, and websites for businesses that need them.">
+    <link rel="canonical" href="https://felixvandijk.dev/personal.html">
+    <meta property="og:title" content="Felix van Dijk — Software Developer">
+    <meta property="og:description" content="CS student at the University of Bristol. I build software — and websites for businesses that need them.">
+    <meta property="og:url" content="https://felixvandijk.dev/personal.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://felixvandijk.dev/images/portfolio.png">
+    <meta name="theme-color" content="#0A0E1A">
+    <meta name="color-scheme" content="dark">
     <link rel="icon" href="assets/alphabet.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=20260612">
+    <script>document.documentElement.classList.add('js');</script>
 </head>
-<body>
-    <canvas class="connecting-dots"></canvas>
-    <nav id="navbar">
-        <a href="#home">Home</a>
-        <a href="#projects">Projects</a>
-        <a href="#about-me">About Me</a>
-        <a href="#contact">Contact</a>
-    </nav>
-    <div id="content">
-        <section id="home" class="section">
-            <div class="intro-text-container">
-                <div class="intro-line left">Hello, I'm <span class="highlight">Felix</span>.</div>
-                <div class="intro-line right">I'm a <span class="highlight">CS</span> student at the University of Bristol.</div>
-                <a href="#projects" class="projects-button">My projects ↓</a>
-            </div>
-        </section>
-        <section id="projects" class="section">
-            <h2>Projects</h2>
-            <div class="project-container">
-                <div class="project-card">
-                    <div class="project-image-container">
-                        <img src="images/vets.png" alt="The Gathouse Vets Project Screenshot" class="project-image">
-                    </div>
-                    <div class="project-info">
-                        <h3>The Gathouse Vets</h3>
-                        <p>An old fashioned, paper based, veterinary system made digital.</p>
-                        <a href="gathouse-vets.html" class="learn-more-btn">Learn More</a>
-                    </div>
-                </div>
+<body class="has-gutter">
+    <a class="skip-link" href="#main">Skip to content</a>
 
-                <div class="project-card">
-                    <div class="project-image-container">
-                        <img src="images/ai.png" alt="AI Project Screenshot" class="project-image">
-                    </div>
-                    <div class="project-info">
-                        <h3>AI Project</h3>
-                        <p>An AI designed to help a character in a game, called Scotland Yard, make the best possible move.</p>
-                        <a href="https://github.com/marek727/cw-ai" class="learn-more-btn github-btn" target="_blank" rel="noopener noreferrer">
-                            View on GitHub
-                            <i class="fab fa-github github-icon"></i>
-                        </a>
-                    </div>
-                </div>
+    <!-- ambient "memory space" glyph field -->
+    <canvas id="memory-canvas" aria-hidden="true"></canvas>
 
-                <div class="project-card">
-                    <div class="project-image-container">
-                        <img src="images/sketchM.png" alt="Sketch Project Screenshot" class="project-image">
-                    </div>
-                    <div class="project-info">
-                        <h3>Sketch Project</h3>
-                        <p>A C program for image manipulation and sketching.</p>
-                        <a href="https://github.com/FelixvanDijk/Sketch" class="learn-more-btn github-btn" target="_blank" rel="noopener noreferrer">
-                            View on GitHub
-                            <i class="fab fa-github github-icon"></i>
-                        </a>
-                    </div>
-                </div>
+    <!-- non-blocking boot log (corner overlay, once per session) -->
+    <div id="boot-log" aria-hidden="true"></div>
 
-                <div class="project-card">
-                    <div class="project-image-container">
-                        <img src="images/portfolio.png" alt="Portfolio Project Screenshot" class="project-image">
-                    </div>
-                    <div class="project-info">
-                        <h3>Portfolio Website</h3>
-                        <p>My personal portfolio website showcasing my projects and skills.</p>
-                        <a href="https://github.com/FelixvanDijk/My-Portfolio" class="learn-more-btn github-btn" target="_blank" rel="noopener noreferrer">
-                            View on GitHub
-                            <i class="fab fa-github github-icon"></i>
-                        </a>
-                    </div>
-                </div>
+    <!-- ============ top bar: editor tab strip + plain nav ============ -->
+    <header id="topbar">
+        <button id="file-tab" class="file-tab" type="button" title="felix.c">
+            <span class="tab-glyph" aria-hidden="true">●</span>
+            <span class="tab-name">felix.c</span>
+        </button>
+        <a class="file-tab file-tab-idle" href="business.html" title="Switch to F van Dijk Ltd — business side">
+            <span class="tab-glyph tab-glyph-biz" aria-hidden="true">●</span>
+            <span class="tab-name">fvandijk.ltd</span>
+        </a>
+        <nav id="site-nav" aria-label="Primary">
+            <a href="#about" data-section="about">About</a>
+            <a href="#skills" data-section="skills">Skills</a>
+            <a href="#projects" data-section="projects">Projects</a>
+            <a href="#journey" data-section="journey">Journey</a>
+            <a href="#contact" data-section="contact">Contact</a>
+        </nav>
+        <div class="topbar-actions">
+            <button id="palette-btn" type="button" class="palette-btn" aria-haspopup="dialog" title="Command palette (Ctrl+K)">
+                <span aria-hidden="true">⌘</span>K
+            </button>
+            <a class="btn-pill btn-pill-ghost" href="#projects">View work</a>
+            <a class="btn-pill btn-pill-solid" href="#contact">Hire me</a>
+            <button id="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+                <span class="menu-bar" aria-hidden="true"></span>
+                <span class="menu-bar" aria-hidden="true"></span>
+            </button>
+        </div>
+    </header>
 
-                <div class="project-card">
-                    <div class="project-image-container">
-                        <img src="images/consultant.png" alt="Consultant Project Screenshot" class="project-image">
-                    </div>
-                    <div class="project-info">
-                        <h3>Consultant Project</h3>
-                        <p>An online veterinary consultancy system, helping pet owners find out what is wrong with their animal without having to go to a physical vet <br> NOTE - This project is currently under development meaning the website includes many things that are placeholders or will be changed before completion.</p>
-                        <a href="https://felixvandijk.github.io/JanConsultancy/" class="learn-more-btn" target="_blank" rel="noopener noreferrer">Learn More</a>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-image-container">
-                        <img src="images/S&F.png" alt="S&F Barbers Booking System Screenshot" class="project-image">
-                    </div>
-                    <div class="project-info">
-                        <h3>S&F Barbers Booking System</h3>
-                        <p>A comprehensive web-based booking management system for S&F Barbers featuring user authentication, appointment scheduling, admin controls, and automated email notifications. Built with Python Flask, SQLite, and Bootstrap 5.</p>
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <a href="https://nath-booking-p6ty.onrender.com" class="learn-more-btn" target="_blank" rel="noopener noreferrer">Live Demo</a>
-                            <a href="https://github.com/FelixvanDijk/SF-Barbers" class="learn-more-btn github-btn" target="_blank" rel="noopener noreferrer">
-                                View on GitHub
-                                <i class="fab fa-github github-icon"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-image-container">
-                        <img src="images/cold_email.png" alt="Cold Emailer Project Screenshot" class="project-image">
-                    </div>
-                    <div class="project-info">
-                        <h3>Cold Emailer System</h3>
-                        <p>A comprehensive Python cold email outreach system that reads leads from Apollo-exported CSV files and sends personalized cold emails with intelligent follow-up sequences via SMTP. Features rotating templates, HTML formatting, smart delays, and automatic follow-up management.</p>
-                        <a href="https://github.com/FelixvanDijk/COLD_EMAILER" class="learn-more-btn github-btn" target="_blank" rel="noopener noreferrer">
-                            View on GitHub
-                            <i class="fab fa-github github-icon"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="about-me" class="section">
-            <h2>About Me</h2>
-            <div class="about-content">
-                <p>Hi, I'm Felix. I'm a student of Computer Science at the University of Bristol.</p>
-                <p>I have always been fascinated with the cutting edge of finance and technology and how new things work, spending many hours trying to gain understanding.</p>
-                <p>Now that I am older and more capable, I no longer wish to just see these changes, but help in making them.</p>
-            </div>
-            <div class="skills-container">
-                <div class="skills-category">
-                    <h3>Front End</h3>
-                    <div class="skills-icons">
-                        <div class="skill-item"><i class="devicon-react-original" title="React"></i><span>React</span></div>
-                        <div class="skill-item"><i class="devicon-nextjs-original" title="Next.js"></i><span>Next.js</span></div>
-                        <div class="skill-item"><i class="devicon-javascript-plain" title="JavaScript"></i><span>JavaScript</span></div>
-                        <div class="skill-item"><i class="devicon-typescript-plain" title="TypeScript"></i><span>TypeScript</span></div>
-                        <div class="skill-item"><i class="devicon-html5-plain" title="HTML5"></i><span>HTML5</span></div>
-                        <div class="skill-item"><i class="devicon-css3-plain" title="CSS3"></i><span>CSS3</span></div>
-                        <div class="skill-item"><i class="devicon-sass-original" title="Sass/SCSS"></i><span>Sass/SCSS</span></div>
-                    </div>
-                </div>
-                <div class="skills-category">
-                    <h3>Back End</h3>
-                    <div class="skills-icons">
-                        <div class="skill-item"><i class="devicon-go-original-wordmark" title="Golang"></i><span>Golang</span></div>
-                        <div class="skill-item"><i class="devicon-java-plain" title="Java"></i><span>Java</span></div>
-                        <div class="skill-item"><i class="devicon-c-plain" title="C"></i><span>C</span></div>
-                        <div class="skill-item"><i class="devicon-cplusplus-plain" title="C++"></i><span>C++</span></div>
-                        <div class="skill-item"><i class="devicon-postgresql-plain" title="PostgreSQL"></i><span>PostgreSQL</span></div>
-                        <div class="skill-item"><i class="devicon-mysql-plain" title="SQL"></i><span>SQL</span></div>
-                        <div class="skill-item"><i class="devicon-spring-plain" title="Spring"></i><span>Spring</span></div>
-                        <div class="skill-item"><i class="devicon-nodejs-plain" title="Node.js"></i><span>Node.js</span></div>
-                        <div class="skill-item"><i class="devicon-mongodb-plain" title="MongoDB"></i><span>MongoDB</span></div>
-                        <div class="skill-item"><i class="devicon-haskell-plain" title="Haskell"></i><span>Haskell</span></div>
-                        <div class="skill-item"><i class="devicon-python-plain" title="Python"></i><span>Python</span></div>
-                    </div>
-                </div>
-                <div class="skills-category">
-                    <h3>Testing/Deployment</h3>
-                    <div class="skills-icons">
-                        <div class="skill-item"><i class="devicon-junit-plain" title="JUnit"></i><span>JUnit</span></div>
-                        <div class="skill-item"><i class="devicon-apache-plain" title="Maven"></i><span>Maven</span></div>
-                    </div>
-                </div>
-                <div class="skills-category">
-                    <h3>Developer Tools</h3>
-                    <div class="skills-icons">
-                        <div class="skill-item"><i class="devicon-git-plain" title="Git"></i><span>Git</span></div>
-                        <div class="skill-item"><i class="devicon-github-original" title="GitHub"></i><span>GitHub</span></div>
-                    </div>
-                </div>
-                <div class="skills-category">
-                    <h3>Data Analysis</h3>
-                    <div class="skills-icons">
-                        <div class="skill-item"><i class="devicon-r-original" title="R"></i><span>R</span></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="section">
-            <h2>Contact Me</h2>
-            <form id="contact-form" action="https://formspree.io/f/mkgwawld" method="POST">
-                <p>If you would like to get in touch, please fill out the form below:</p>
-                <div class="form-group">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message:</label>
-                    <textarea id="message" name="message" rows="4" required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Send Message</button>
-            </form>
-            <a href="#home" id="back-to-top" title="Back to Top">⇮</a>
-        </section>
+    <!-- mobile full-screen menu -->
+    <div id="mobile-menu" hidden>
+        <nav aria-label="Mobile">
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#projects">Projects</a>
+            <a href="#journey">Journey</a>
+            <a href="#contact">Contact</a>
+            <a class="mm-cta" href="#contact">Hire me</a>
+        </nav>
+        <div class="mm-links">
+            <a href="business.html">→ F van Dijk Ltd (business side)</a>
+            <a href="mailto:felixvandijkk@gmail.com">felixvandijkk@gmail.com</a>
+            <a href="https://www.linkedin.com/in/felix-van-dijk-81a1ba2ba/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        </div>
     </div>
 
-    <footer class="footer">
-        <a href="mailto:felixvandijkk@gmail.com" class="social-link email-link" title="Email me">
-            <i class="fas fa-envelope"></i>
-        </a>
-        <a href="https://www.linkedin.com/in/felix-van-dijk-81a1ba2ba/" class="social-link linkedin-link" title="Connect on LinkedIn" target="_blank" rel="noopener noreferrer">
-            <i class="fab fa-linkedin"></i>
-        </a>
+    <!-- ============ IDE gutter: line numbers + breakpoint nav (desktop) ============ -->
+    <div id="gutter" aria-hidden="true">
+        <div id="gutter-caret"><span class="caret-arrow">▶</span></div>
+    </div>
+    <nav id="breakpoints" aria-label="Section shortcuts">
+        <a href="#hero"     class="bp" data-section="hero"><span class="bp-dot" aria-hidden="true"></span><span class="bp-label">Top</span></a>
+        <a href="#about"    class="bp" data-section="about"><span class="bp-dot" aria-hidden="true"></span><span class="bp-label">About</span></a>
+        <a href="#skills"   class="bp" data-section="skills"><span class="bp-dot" aria-hidden="true"></span><span class="bp-label">Skills</span></a>
+        <a href="#projects" class="bp" data-section="projects"><span class="bp-dot" aria-hidden="true"></span><span class="bp-label">Projects</span></a>
+        <a href="#journey"  class="bp" data-section="journey"><span class="bp-dot" aria-hidden="true"></span><span class="bp-label">Journey</span></a>
+        <a href="#contact"  class="bp" data-section="contact"><span class="bp-dot" aria-hidden="true"></span><span class="bp-label">Contact</span></a>
+    </nav>
+
+    <main id="main" tabindex="-1">
+
+        <!-- ============ HERO — hello.c ============ -->
+        <section id="hero" class="section" data-ln="001">
+            <div class="hero-stage">
+                <p class="sr-only" id="hero-sr">Hello, I'm Felix. I'm a CS student at the University of Bristol. I build software — and websites for businesses that need them.</p>
+                <pre class="hero-pre" id="hero-pre" aria-hidden="true"><code><span class="ln"><span class="tok tok-pp">#include</span> <span class="tok tok-str">&lt;bristol.h&gt;</span></span>
+<span class="ln ln-empty"> </span>
+<span class="ln"><span class="tok tok-kw">int</span> <span class="tok tok-fn">main</span><span class="tok tok-pun">(</span><span class="tok tok-kw">void</span><span class="tok tok-pun">)</span> <span class="tok tok-pun">{</span></span>
+<span class="ln">    <span class="tok tok-fn">printf</span><span class="tok tok-pun">(</span><span class="tok tok-q">"</span><span class="hero-literal" id="hero-literal">Hello, I'm Felix.</span><span class="tok tok-q">"</span><span class="tok tok-pun">);</span><span class="hero-caret" id="hero-caret"></span></span>
+<span class="ln">    <span class="tok tok-kw">return</span> <span class="tok tok-num">0</span><span class="tok tok-pun">;</span></span>
+<span class="ln"><span class="tok tok-pun">}</span></span></code></pre>
+
+                <div class="hero-rendered" id="hero-rendered">
+                    <h1 id="hero-headline"><span id="h1-line1">Hello, I'm <span class="accent">Felix</span>.</span><br>
+                        <span class="h1-line2">CS student at the University of Bristol.</span></h1>
+                    <p class="hero-sub">I build software — and websites for businesses that need them, through my company <a href="business.html" class="biz-link">F van Dijk Ltd</a>.</p>
+                    <div class="hero-ctas">
+                        <a class="btn btn-solid" href="#projects">View projects</a>
+                        <a class="btn btn-ghost mono" href="#contact">./contact</a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="scroll-cue" id="scroll-cue" aria-hidden="true">
+                <span class="cue-text">// scroll to compile</span>
+                <span class="cue-chevron">⌄</span>
+            </div>
+        </section>
+
+        <!-- ============ ABOUT — the docstring ============ -->
+        <section id="about" class="section" data-ln="014">
+            <div class="section-head">
+                <p class="kicker" aria-hidden="true">$ cat about.md</p>
+                <h2>About</h2>
+            </div>
+            <div class="about-grid">
+                <div class="docblock">
+                    <p class="doc-fence" aria-hidden="true">/**</p>
+                    <p class="doc-line"><span class="doc-syntax" aria-hidden="true">&nbsp;*&nbsp;</span><span class="doc-text">Hi, I'm Felix. I'm a student of Computer Science at the University of Bristol.</span></p>
+                    <p class="doc-line"><span class="doc-syntax" aria-hidden="true">&nbsp;*&nbsp;</span><span class="doc-text">I have always been fascinated with the cutting edge of finance and technology and how new things work, spending many hours trying to gain understanding.</span></p>
+                    <p class="doc-line"><span class="doc-syntax" aria-hidden="true">&nbsp;*&nbsp;</span><span class="doc-text">Now that I am older and more capable, I no longer wish to just see these changes, but <span class="thesis">help in making them</span>.</span></p>
+                    <p class="doc-fence" aria-hidden="true">&nbsp;*/</p>
+                </div>
+                <div class="id-card-wrap">
+                    <div class="id-card" id="id-card">
+                        <div class="id-card-top">
+                            <span class="id-chip" aria-hidden="true"></span>
+                            <span class="id-org">felixvandijk.dev</span>
+                        </div>
+                        <p class="id-name">FELIX VAN DIJK</p>
+                        <p class="id-role">BSc Computer Science</p>
+                        <p class="id-uni">University of Bristol</p>
+                        <p class="id-est mono">est. 2023 · main ✓</p>
+                        <div class="id-barcode" aria-hidden="true"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ SKILLS — package install ============ -->
+        <section id="skills" class="section" data-ln="038">
+            <div class="section-head">
+                <p class="kicker" aria-hidden="true">$ install --all</p>
+                <h2>Skills</h2>
+            </div>
+            <div class="pkg-grid">
+                <div class="pkg-group" data-pkg="frontend">
+                    <p class="pkg-header mono"><span class="pkg-resolve">resolving <strong>frontend</strong>@2026…</span> <span class="pkg-ok" aria-hidden="true">[OK]</span></p>
+                    <h3 class="pkg-title">Front End</h3>
+                    <ul class="chip-list">
+                        <li><button class="chip" type="button" data-tip="used in: this site &amp; consultancy build" data-project="4">React</button></li>
+                        <li><button class="chip" type="button" data-tip="app router era" data-project="4">Next.js</button></li>
+                        <li><button class="chip" type="button" data-tip="used in: every project with a browser" data-project="1">JavaScript</button></li>
+                        <li><button class="chip" type="button" data-tip="types are documentation" data-project="4">TypeScript</button></li>
+                        <li><button class="chip" type="button" data-tip="semantic &amp; accessible" data-project="4">HTML5</button></li>
+                        <li><button class="chip" type="button" data-tip="this site is hand-rolled CSS" data-project="4">CSS3</button></li>
+                        <li><button class="chip" type="button" data-tip="nested with care">Sass/SCSS</button></li>
+                    </ul>
+                </div>
+                <div class="pkg-group" data-pkg="backend">
+                    <p class="pkg-header mono"><span class="pkg-resolve">resolving <strong>backend</strong>@2026…</span> <span class="pkg-ok" aria-hidden="true">[OK]</span></p>
+                    <h3 class="pkg-title">Back End</h3>
+                    <ul class="chip-list">
+                        <li><button class="chip" type="button" data-tip="fast, typed services">Golang</button></li>
+                        <li><button class="chip" type="button" data-tip="used in: Scotland Yard AI" data-project="2">Java</button></li>
+                        <li><button class="chip" type="button" data-tip="used in: Sketch renderer" data-project="3">C</button></li>
+                        <li><button class="chip" type="button" data-tip="with respect and valgrind">C++</button></li>
+                        <li><button class="chip" type="button" data-tip="relational by default">PostgreSQL</button></li>
+                        <li><button class="chip" type="button" data-tip="SELECT skills FROM felix">SQL</button></li>
+                        <li><button class="chip" type="button" data-tip="dependency injection enjoyer">Spring</button></li>
+                        <li><button class="chip" type="button" data-tip="JS on the server too">Node.js</button></li>
+                        <li><button class="chip" type="button" data-tip="documents when they fit">MongoDB</button></li>
+                        <li><button class="chip" type="button" data-tip="yes, really">Haskell</button></li>
+                        <li><button class="chip" type="button" data-tip="used in: S&amp;F Barbers &amp; Cold Emailer" data-project="5">Python</button></li>
+                    </ul>
+                </div>
+                <div class="pkg-group" data-pkg="testing">
+                    <p class="pkg-header mono"><span class="pkg-resolve">resolving <strong>testing</strong>@2026…</span> <span class="pkg-ok" aria-hidden="true">[OK]</span></p>
+                    <h3 class="pkg-title">Testing &amp; Deployment</h3>
+                    <ul class="chip-list">
+                        <li><button class="chip" type="button" data-tip="red, green, refactor">JUnit</button></li>
+                        <li><button class="chip" type="button" data-tip="builds that build">Maven</button></li>
+                    </ul>
+                </div>
+                <div class="pkg-group" data-pkg="tools">
+                    <p class="pkg-header mono"><span class="pkg-resolve">resolving <strong>tools</strong>@2026…</span> <span class="pkg-ok" aria-hidden="true">[OK]</span></p>
+                    <h3 class="pkg-title">Developer Tools</h3>
+                    <ul class="chip-list">
+                        <li><button class="chip" type="button" data-tip="commit early, commit often">Git</button></li>
+                        <li><button class="chip" type="button" data-tip="where the code lives">GitHub</button></li>
+                    </ul>
+                </div>
+                <div class="pkg-group" data-pkg="data">
+                    <p class="pkg-header mono"><span class="pkg-resolve">resolving <strong>data</strong>@2026…</span> <span class="pkg-ok" aria-hidden="true">[OK]</span></p>
+                    <h3 class="pkg-title">Data Analysis</h3>
+                    <ul class="chip-list">
+                        <li><button class="chip" type="button" data-tip="statistics, visualised">R</button></li>
+                    </ul>
+                </div>
+            </div>
+            <p class="pkg-footer mono" id="pkg-footer" aria-hidden="true">added 23 packages in 2.4s — 0 vulnerabilities</p>
+        </section>
+
+        <!-- ============ PROJECTS — five processes ============ -->
+        <section id="projects" class="section" data-ln="072">
+            <div class="section-head">
+                <p class="kicker" aria-hidden="true">$ ps aux | grep felix</p>
+                <h2>Projects</h2>
+            </div>
+
+            <div class="proc-stage" id="proc-stage">
+                <aside class="proc-list" id="proc-list" aria-label="Project list">
+                    <p class="proc-list-head mono" aria-hidden="true">PID&nbsp;&nbsp;PROCESS</p>
+                    <button class="proc-row is-active" type="button" data-index="0"><span class="pid mono">1001</span><span class="proc-name">gathouse-vets</span><span class="proc-state mono">running</span></button>
+                    <button class="proc-row" type="button" data-index="1"><span class="pid mono">1002</span><span class="proc-name">consultant</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="2"><span class="pid mono">1003</span><span class="proc-name">scotland-yard-ai</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="3"><span class="pid mono">1004</span><span class="proc-name">sketch</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="4"><span class="pid mono">1005</span><span class="proc-name">portfolio</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="5"><span class="pid mono">1006</span><span class="proc-name">sf-barbers</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="6"><span class="pid mono">1007</span><span class="proc-name">cold-emailer</span><span class="proc-state mono">queued</span></button>
+                </aside>
+
+                <div class="proc-viewport" id="proc-viewport">
+
+                    <article class="proc-card" id="proj-0" data-index="0">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/gathouse-vets</span>
+                            <span class="status-badge status-shipped">SHIPPED</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./gathouse-vets --run</p>
+                                <h3>The Gathouse Vets</h3>
+                                <p class="proc-desc">An old fashioned, paper based, veterinary system made digital. Turning traditional clinic workflows into something faster, clearer, and easier to use — with the full development journey documented in a dedicated project PDF.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="health">Health Tech</li>
+                                    <li data-tech="design">System Design</li>
+                                    <li data-tech="docs">Documentation</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="gathouse-vets.html"><span class="flag mono">--case-study</span><span class="flag-en">Full story</span></a>
+                                    <a class="btn-flag" href="assets/vets.pdf" target="_blank" rel="noopener"><span class="flag mono">--pdf</span><span class="flag-en">Read the PDF</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>gathouse-vets.local</div>
+                                    <div class="shot-wrap"><img src="images/vets.png" alt="The Gathouse Vets — screenshot of the digital veterinary system" loading="eager"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="proc-card" id="proj-1" data-index="1">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/consultant</span>
+                            <span class="status-badge status-running">IN&nbsp;PROGRESS</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./consultant --run</p>
+                                <h3>Consultant Project</h3>
+                                <p class="proc-desc">An online veterinary consultancy system for pet owners — helping people understand what may be wrong with their animal before visiting a physical vet. Still under active development, so some parts are placeholders and will change.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="health">Health Tech</li>
+                                    <li data-tech="js">Web App</li>
+                                    <li data-tech="wip">In Progress</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="https://felixvandijk.github.io/JanConsultancy/" target="_blank" rel="noopener noreferrer"><span class="flag mono">--live</span><span class="flag-en">Open live site</span></a>
+                                    <a class="btn-flag" href="consultant.html"><span class="flag mono">--notes</span><span class="flag-en">Project page</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>janconsultancy.preview</div>
+                                    <div class="shot-wrap"><img src="images/consultant.png" alt="Consultant Project — screenshot of the online veterinary consultancy" loading="lazy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="proc-card" id="proj-2" data-index="2">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/scotland-yard-ai</span>
+                            <span class="status-badge status-shipped">SHIPPED</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./scotland-yard-ai --run</p>
+                                <h3>AI Project</h3>
+                                <p class="proc-desc">An AI designed to help a character in Scotland Yard make the best possible move — sharper move selection, strategy under pressure, and better decision making each turn, built around a problem where one decision can change the whole game.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="java">Java</li>
+                                    <li data-tech="ai">Artificial Intelligence</li>
+                                    <li data-tech="strategy">Game Strategy</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="https://github.com/marek727/cw-ai" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>github.com/marek727/cw-ai</div>
+                                    <div class="shot-wrap"><img src="images/ai.png" alt="AI Project — Scotland Yard game board visualisation" loading="lazy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="proc-card" id="proj-3" data-index="3">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/sketch</span>
+                            <span class="status-badge status-shipped">SHIPPED</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./sketch --run</p>
+                                <h3>Sketch Project</h3>
+                                <p class="proc-desc">A C program for image manipulation and sketching. Hands-on graphics work with image edits, sketch features, and direct control over the implementation — a systems-level project where the visual output comes from low-level decisions.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="c">C</li>
+                                    <li data-tech="graphics">Image Manipulation</li>
+                                    <li data-tech="graphics">Graphics</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="https://github.com/FelixvanDijk/Sketch" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>sketch.c — compiled</div>
+                                    <div class="shot-wrap"><img src="images/sketchM.png" alt="Sketch Project — C image manipulation output" loading="lazy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="proc-card" id="proj-4" data-index="4">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/portfolio</span>
+                            <span class="status-badge status-shipped">LIVE</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./portfolio --run</p>
+                                <h3>Portfolio Website</h3>
+                                <p class="proc-desc">My personal portfolio website showcasing my projects and skills — presenting technical work with motion, structure, and a style that feels personal. Part project, part ongoing design system for how I want my work to be seen.</p>
+                                <p class="proc-warn mono" aria-hidden="true">warning: recursive reference — you are here.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="js">Frontend</li>
+                                    <li data-tech="design">Presentation</li>
+                                    <li data-tech="web">Personal Site</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="https://github.com/FelixvanDijk/My-Portfolio" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>felixvandijk.dev</div>
+                                    <div class="shot-wrap"><img src="images/portfolio.png" alt="Portfolio Website — screenshot of this site" loading="lazy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="proc-card" id="proj-5" data-index="5">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/sf-barbers</span>
+                            <span class="status-badge status-shipped">SHIPPED</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./sf-barbers --run</p>
+                                <h3>S&amp;F Barbers Booking System</h3>
+                                <p class="proc-desc">A comprehensive web-based booking management system for S&amp;F Barbers featuring user authentication, appointment scheduling, admin controls, and automated email notifications. Built with Python Flask, SQLite, and Bootstrap 5.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="python">Python · Flask</li>
+                                    <li data-tech="db">SQLite</li>
+                                    <li data-tech="web">Bootstrap 5</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="https://nath-booking-p6ty.onrender.com" target="_blank" rel="noopener noreferrer"><span class="flag mono">--live</span><span class="flag-en">Live demo</span></a>
+                                    <a class="btn-flag" href="https://github.com/FelixvanDijk/SF-Barbers" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>nath-booking.onrender.com</div>
+                                    <div class="shot-wrap"><img src="images/S%26F.png" alt="S&amp;F Barbers Booking System — screenshot" loading="lazy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="proc-card" id="proj-6" data-index="6">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/cold-emailer</span>
+                            <span class="status-badge status-shipped">SHIPPED</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./cold-emailer --run</p>
+                                <h3>Cold Emailer System</h3>
+                                <p class="proc-desc">A comprehensive Python cold email outreach system that reads leads from Apollo-exported CSV files and sends personalised cold emails with intelligent follow-up sequences via SMTP. Features rotating templates, HTML formatting, smart delays, and automatic follow-up management.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="python">Python</li>
+                                    <li data-tech="auto">Automation</li>
+                                    <li data-tech="smtp">SMTP</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="https://github.com/FelixvanDijk/COLD_EMAILER" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>~/tools/cold-emailer</div>
+                                    <div class="shot-wrap"><img src="images/cold_email.png" alt="Cold Emailer System — screenshot" loading="lazy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ JOURNEY — git log ============ -->
+        <section id="journey" class="section" data-ln="118">
+            <div class="section-head">
+                <p class="kicker" aria-hidden="true">$ git log --reverse --graph</p>
+                <h2>Journey</h2>
+            </div>
+            <div class="git-graph">
+                <svg class="git-line-svg" id="git-line-svg" viewBox="0 0 4 1000" preserveAspectRatio="none" aria-hidden="true">
+                    <path id="git-line-path" d="M 2 0 L 2 1000" stroke="currentColor" stroke-width="3" fill="none"/>
+                </svg>
+                <ol class="commits">
+                    <li class="commit" data-commit="0">
+                        <span class="commit-dot" aria-hidden="true"></span>
+                        <div class="commit-card">
+                            <p class="commit-meta mono"><span class="hash" data-blame="git blame: parents (thanks)">a1f2e3d</span> · init</p>
+                            <h3>The Alun School</h3>
+                            <p class="commit-date mono">2016 – 2021</p>
+                            <p class="commit-body">Where it started — GCSEs, first lines of code, and a habit of taking things apart to see how they work.</p>
+                        </div>
+                    </li>
+                    <li class="commit" data-commit="1">
+                        <span class="commit-dot" aria-hidden="true"></span>
+                        <div class="commit-card">
+                            <p class="commit-meta mono"><span class="hash">b4c5d6e</span> · feat</p>
+                            <h3>The Alun Sixth Form</h3>
+                            <p class="commit-date mono">2021 – 2023</p>
+                            <p class="commit-body">A-Levels, and the decision to take software seriously enough to make it the plan.</p>
+                        </div>
+                    </li>
+                    <li class="commit is-head" data-commit="2">
+                        <span class="commit-dot" aria-hidden="true"></span>
+                        <div class="commit-card">
+                            <p class="commit-meta mono"><span class="hash">f7e8d9c</span> · feat! <span class="head-badge mono">HEAD → main</span></p>
+                            <h3>University of Bristol</h3>
+                            <p class="commit-date mono">2023 – present</p>
+                            <p class="commit-body">BSc Computer Science. Currently merging: degree + real-world projects.</p>
+                        </div>
+                    </li>
+                    <li class="commit commit-biz" data-commit="3">
+                        <span class="commit-dot" aria-hidden="true"></span>
+                        <div class="commit-card">
+                            <p class="commit-meta mono"><span class="hash">c0ffee1</span> · feat <span class="branch-badge mono">branch: business</span></p>
+                            <h3>Founded F van Dijk Ltd</h3>
+                            <p class="commit-date mono">running alongside the degree</p>
+                            <p class="commit-body">My software consultancy — automation &amp; software solutions for ambitious businesses.</p>
+                            <a class="btn-flag commit-flag" href="business.html"><span class="flag mono">--checkout business</span><span class="flag-en">Visit the business side</span></a>
+                        </div>
+                    </li>
+                    <li class="commit commit-ghost" data-commit="4" aria-hidden="true">
+                        <span class="commit-dot" aria-hidden="true"></span>
+                        <div class="commit-card">
+                            <p class="commit-meta mono"><span class="hash">???????</span> · next</p>
+                            <h3>Your company here</h3>
+                            <p class="commit-body mono">git commit --allow-empty -m "let's talk"</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ============ CONTACT — the function call ============ -->
+        <section id="contact" class="section" data-ln="161">
+            <div class="section-head">
+                <p class="kicker" aria-hidden="true">$ felix.contact --help</p>
+                <h2>Contact</h2>
+                <p class="section-sub">Want a website, an app, or an engineer? Send a message — I reply fast.</p>
+            </div>
+            <div class="contact-grid">
+                <form id="contact-form" action="https://formspree.io/f/mkgwawld" method="POST" novalidate>
+                    <p class="code-frame-line mono" aria-hidden="true">felix.<span class="fn-accent">contact</span>({</p>
+                    <div class="form-fields">
+                        <div class="form-group">
+                            <label for="name" class="mono">name:</label>
+                            <input type="text" id="name" name="name" autocomplete="name" aria-describedby="name-error" required>
+                            <p class="field-error" id="name-error" hidden><span class="err-code mono">! expected type: string</span><span class="err-plain">Please enter your name.</span></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="mono">email:</label>
+                            <input type="email" id="email" name="email" autocomplete="email" aria-describedby="email-error" required>
+                            <p class="field-error" id="email-error" hidden><span class="err-code mono">! expected type: email</span><span class="err-plain">Please enter a valid email address.</span></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="message" class="mono">message:</label>
+                            <textarea id="message" name="message" rows="5" aria-describedby="message-error" required></textarea>
+                            <p class="field-error" id="message-error" hidden><span class="err-code mono">! expected type: string (non-empty)</span><span class="err-plain">Please write a short message.</span></p>
+                        </div>
+                    </div>
+                    <p class="code-frame-line mono" aria-hidden="true">})</p>
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-solid" id="submit-btn"><span class="submit-label">▶ Run</span><span class="submit-hint">— send message</span></button>
+                        <p class="form-result mono" id="form-result" role="status" aria-live="polite"></p>
+                    </div>
+                </form>
+                <aside class="ghost-preview" id="ghost-preview" aria-hidden="true">
+                    <p class="ghost-title mono">// live preview</p>
+                    <pre class="mono"><code>felix.contact({
+  name:    <span class="ghost-val" id="ghost-name">""</span>,
+  email:   <span class="ghost-val" id="ghost-email">""</span>,
+  message: <span class="ghost-val" id="ghost-message">""</span>
+})</code></pre>
+                </aside>
+            </div>
+            <div class="contact-hatches">
+                <span class="hatch">
+                    <a href="mailto:felixvandijkk@gmail.com" class="hatch-link" id="email-link">felixvandijkk@gmail.com</a>
+                    <button type="button" class="copy-btn mono" id="copy-email" title="Copy email address">copy</button>
+                </span>
+                <span class="hatch">
+                    <a href="https://www.linkedin.com/in/felix-van-dijk-81a1ba2ba/" class="hatch-link" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+                </span>
+            </div>
+        </section>
+    </main>
+
+    <!-- ============ FOOTER — exit 0 ============ -->
+    <footer id="footer">
+        <pre class="exec-trace mono" id="exec-trace" aria-hidden="true"></pre>
+        <p class="exit-line mono">Process finished with exit code 0</p>
+        <p class="footer-meta">© 2026 Felix van Dijk · built by hand — no frameworks were harmed ·
+            <a href="https://github.com/FelixvanDijk/My-Portfolio" target="_blank" rel="noopener noreferrer">view source</a>
+        </p>
     </footer>
 
-    <script src="scripts.js"></script>
+    <!-- ============ status bar ============ -->
+    <div id="statusbar" aria-hidden="true">
+        <span class="sb-item mono sb-branch">⎇ main ✓</span>
+        <span class="sb-item mono sb-file">felix.c</span>
+        <span class="sb-spacer"></span>
+        <span class="sb-item mono" id="sb-section">Ln 001 · hero</span>
+        <span class="sb-item mono">UTF-8</span>
+        <span class="sb-item mono" id="sb-build">BUILD 0%</span>
+    </div>
+
+    <!-- ============ command palette ============ -->
+    <div id="palette" role="dialog" aria-modal="true" aria-label="Command palette" hidden>
+        <div class="palette-panel">
+            <input type="text" id="palette-input" placeholder="Type a command… (e.g. projects, email, github)" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list">
+            <ul id="palette-list" role="listbox" aria-label="Commands"></ul>
+            <p class="palette-hint mono">↑↓ navigate · ↵ run · esc close</p>
+        </div>
+    </div>
+
+    <!-- ============ keyboard help ============ -->
+    <div id="kbd-help" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" hidden>
+        <div class="kbd-panel">
+            <p class="kbd-title mono">// keyboard map</p>
+            <dl>
+                <div><dt><kbd>1</kbd>–<kbd>6</kbd></dt><dd>Jump to section</dd></div>
+                <div><dt><kbd>Ctrl</kbd>+<kbd>K</kbd></dt><dd>Command palette</dd></div>
+                <div><dt><kbd>?</kbd></dt><dd>This help</dd></div>
+                <div><dt><kbd>Esc</kbd></dt><dd>Close overlays</dd></div>
+                <div><dt><kbd>↑↑↓↓←→←→BA</kbd></dt><dd>??? </dd></div>
+            </dl>
+            <button type="button" class="btn btn-ghost" id="kbd-close">Close</button>
+        </div>
+    </div>
+
+    <div id="toasts" aria-live="polite"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
+    <script src="scripts.js?v=20260612" defer></script>
 </body>
 </html>

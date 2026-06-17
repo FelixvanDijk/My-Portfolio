@@ -1,0 +1,5 @@
+# Local Claude Code tooling / preview config
+.claude/
+
+# Dev scripts, automation, and secrets — NEVER deploy to the live site
+images/Python Scripts/

@@ -3,62 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Gathouse Vets Project</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>The Gathouse Vets — Felix van Dijk</title>
+    <meta name="description" content="The Gathouse Vets project — an old fashioned, paper based, veterinary system made digital. Full case study by Felix van Dijk.">
+    <meta name="theme-color" content="#0A0E1A">
+    <link rel="icon" href="assets/alphabet.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=20260612">
     <style>
-        .project-page {
+        .subpage {
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 2rem;
-            text-align: center;
-            position: relative;
-            z-index: 1;
+            justify-content: center;
+            padding: calc(var(--topbar-h) + 40px) 24px 64px;
         }
-        .project-title {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #4a90e2;
-            margin-bottom: 2rem;
+        .case-window {
+            width: min(760px, 100%);
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
         }
-        .project-description {
-            font-size: 1.2rem;
-            max-width: 800px;
-            margin-bottom: 2rem;
+        .case-body { padding: 36px 40px; }
+        .case-cmd { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+        .case-body h1 { font-family: var(--mono); font-size: clamp(1.6rem, 4vw, 2.3rem); letter-spacing: -0.02em; }
+        .case-body h1::after { content: ';'; color: var(--accent); opacity: 0.6; }
+        .case-desc { color: var(--fg-mid); font-size: 17px; max-width: 58ch; }
+        .case-shot {
+            margin: 26px 0;
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            overflow: hidden;
         }
-        .pdf-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #4a90e2;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        .pdf-button:hover {
-            background-color: #3a7bd5;
-        }
+        .case-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 28px; }
+        @media (max-width: 560px) { .case-body { padding: 24px 20px; } }
     </style>
-    <link rel="icon" href="assets/alphabet.png" type="image/png">
 </head>
 <body>
-    <canvas class="connecting-dots"></canvas>
-    <a href="personal.html#projects" class="back-btn" title="Back to Projects">
-        <span class="back-btn-circle"></span>
-        <span class="back-btn-arrow">&#8592;</span>
-    </a>
-    <div class="project-page">
-        <h1 class="project-title">The Gathouse Vets Project</h1>
-        <p class="project-description">
-            During my journey developing this program, I carefully documented my progress. Click the button below to view the detailed PDF of the Gathouse Vets project.
-        </p>
-        <a href="assets/vets.pdf" class="pdf-button" target="_blank">View PDF</a>
-    </div>
+    <a class="skip-link" href="#main">Skip to content</a>
 
-    <script src="scripts.js"></script>
+    <header id="topbar">
+        <a class="file-tab" href="personal.html" style="text-decoration:none" title="Back to felix.c">
+            <span class="tab-glyph" aria-hidden="true">←</span>
+            <span class="tab-name">cd ~/felix.c</span>
+        </a>
+        <div class="topbar-actions">
+            <a class="btn-pill btn-pill-ghost" href="personal.html#projects">All projects</a>
+            <a class="btn-pill btn-pill-solid" href="personal.html#contact">Hire me</a>
+        </div>
+    </header>
+
+    <main id="main" class="subpage">
+        <article class="case-window">
+            <div class="proc-chrome">
+                <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="proc-title mono">~/projects/gathouse-vets — case study</span>
+                <span class="status-badge status-shipped">SHIPPED</span>
+            </div>
+            <div class="case-body">
+                <p class="case-cmd" aria-hidden="true">$ cat gathouse-vets/README.md</p>
+                <h1>The Gathouse Vets</h1>
+                <p class="case-desc">An old fashioned, paper based, veterinary system made digital. During my journey developing this program, I carefully documented my progress — the full development story lives in the project PDF below.</p>
+                <div class="case-shot">
+                    <img src="images/vets.png" alt="The Gathouse Vets — screenshot of the digital veterinary system">
+                </div>
+                <div class="case-actions">
+                    <a class="btn btn-solid" href="assets/vets.pdf" target="_blank" rel="noopener">View the PDF</a>
+                    <a class="btn btn-ghost mono" href="personal.html#projects">cd ../projects</a>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer id="footer" style="border-top:none; text-align:center;">
+        <p class="footer-meta">© 2026 Felix van Dijk ·
+            <a href="mailto:felixvandijkk@gmail.com">felixvandijkk@gmail.com</a> ·
+            <a href="https://www.linkedin.com/in/felix-van-dijk-81a1ba2ba/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        </p>
+    </footer>
 </body>
 </html>
