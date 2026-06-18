@@ -1,0 +1,347 @@
+/* ============================================================
+   felix.os — "Walk inside the running program"
+   3D motherboard-city layer (Three.js). Progressive enhancement
+   over the classic personal.html. Reuses :root tokens from style.css.
+   ============================================================ */
+
+/* ---- when the world is active, hide the classic document ---- */
+html.world-on { overflow: hidden; }
+html.world-on body { overflow: hidden; }
+html.world-on #topbar,
+html.world-on #gutter,
+html.world-on #breakpoints,
+html.world-on #main,
+html.world-on #footer,
+html.world-on #statusbar,
+html.world-on #memory-canvas,
+html.world-on #boot-log,
+html.world-on .skip-link { display: none !important; }
+
+#world-root { display: none; }
+html.world-on #world-root {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: #05070e;
+}
+
+#world-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+}
+
+/* ---- HUD overlay (transparent; children re-enable pointer events) ---- */
+#world-hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    font-family: var(--sans);
+    z-index: 2;
+}
+#world-hud > * { pointer-events: auto; }
+
+/* top bar */
+.world-topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 16px;
+    background: linear-gradient(180deg, rgba(5,7,14,0.82), rgba(5,7,14,0));
+    pointer-events: none;
+}
+.world-topbar > * { pointer-events: auto; }
+.wt-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--fg);
+}
+.wt-brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.wt-side {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--border-soft);
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: color .15s, border-color .15s;
+}
+.wt-side:hover { color: #6BA6E9; border-color: #4A90E2; }
+.wt-spacer { flex: 1; }
+.wbtn {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--fg);
+    background: rgba(15,23,42,0.7);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s, background .15s;
+}
+.wbtn:hover { border-color: var(--accent); color: var(--accent); }
+.wbtn-accent { border-color: var(--accent); color: var(--accent); }
+
+/* projected district labels */
+#world-labels { position: absolute; inset: 0; pointer-events: none; }
+.wlabel {
+    position: absolute;
+    top: 0; left: 0;
+    transform: translate(-50%, -50%);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    pointer-events: auto;
+    cursor: pointer;
+    background: none;
+    border: none;
+    will-change: transform;
+    transition: opacity .25s;
+}
+.wlabel .wl-pill {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    color: var(--fg);
+    background: rgba(8,12,22,0.78);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 12px;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: border-color .15s, color .15s, box-shadow .15s, transform .15s;
+}
+.wlabel .wl-sub {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity .15s;
+}
+.wlabel:hover .wl-pill,
+.wlabel.is-current .wl-pill {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 16px rgba(34,197,94,.28);
+    transform: translateY(-1px);
+}
+.wlabel:hover .wl-sub { opacity: 1; }
+.wlabel.is-cpu .wl-pill { border-color: var(--accent); color: var(--accent); }
+.wlabel.is-biz .wl-pill { border-color: #4A90E2; color: #9fc6ff; }
+.wlabel.is-biz:hover .wl-pill { box-shadow: 0 0 16px rgba(74,144,226,.35); }
+
+/* bottom dock */
+#world-dock {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    background: rgba(8,12,22,0.7);
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    max-width: calc(100vw - 24px);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+#world-dock::-webkit-scrollbar { display: none; }
+.dock-btn {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--fg-mid);
+    background: none;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .15s, background .15s;
+}
+.dock-btn:hover { color: var(--fg); background: rgba(34,197,94,.1); }
+.dock-btn.is-current { color: var(--accent); background: rgba(34,197,94,.14); }
+
+/* hint */
+#world-hint {
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    pointer-events: none;
+    text-align: center;
+    transition: opacity .4s;
+}
+
+/* minimap */
+#world-minimap {
+    position: absolute;
+    top: 62px;
+    right: 16px;
+    width: 132px;
+    height: 92px;
+    background: rgba(8,12,22,0.66);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    pointer-events: none;
+    overflow: hidden;
+}
+#world-minimap canvas { width: 100%; height: 100%; display: block; }
+
+/* ---- content panel ---- */
+#world-panel {
+    position: absolute;
+    top: 0; right: 0;
+    height: 100%;
+    width: min(560px, 92vw);
+    background: rgba(9, 13, 23, 0.93);
+    border-left: 1px solid var(--border-soft);
+    box-shadow: -30px 0 80px rgba(0,0,0,.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transform: translateX(105%);
+    transition: transform .5s cubic-bezier(.22,1,.36,1);
+    display: flex;
+    flex-direction: column;
+    z-index: 4;
+}
+#world-panel.is-open { transform: translateX(0); }
+.wpanel-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-soft);
+    flex: 0 0 auto;
+}
+.wpanel-kicker { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.wpanel-title { font-family: var(--mono); font-size: 18px; color: var(--fg); margin: 0; }
+.wpanel-title::after { content: ';'; color: var(--accent); opacity: .6; }
+.wpanel-close {
+    margin-left: auto;
+    width: 34px; height: 34px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(30,41,59,.5);
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    color: var(--fg-mid);
+    font-size: 18px;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+}
+.wpanel-close:hover { color: var(--accent); border-color: var(--accent); }
+.wpanel-body {
+    padding: 22px 24px 40px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
+/* tame cloned classic layouts inside the narrow panel */
+.wpanel-body .about-grid,
+.wpanel-body .contact-grid,
+.wpanel-body .proc-body { grid-template-columns: 1fr !important; gap: 22px; }
+.wpanel-body .pkg-grid { grid-template-columns: 1fr !important; gap: 26px; }
+.wpanel-body .proc-stage { display: block !important; padding: 0 !important; }
+.wpanel-body .proc-viewport { position: static !important; }
+.wpanel-body .proc-card { position: static !important; margin-bottom: 18px; opacity: 1 !important; transform: none !important; }
+.wpanel-body .proc-media { order: -1; }
+.wpanel-body .ghost-preview,
+.wpanel-body .proc-list,
+.wpanel-body .git-line-svg { display: none !important; }
+.wpanel-body .commits { padding-left: 6px; }
+.wpanel-body .commit { opacity: 1 !important; transform: none !important; }
+.wpanel-body .chip-list li { opacity: 1 !important; transform: none !important; }
+.wpanel-body .id-card-wrap { max-width: 320px; }
+.wpanel-body .hero-ctas .btn-ghost { display: none; }
+
+/* ---- boot / loading veil ---- */
+#world-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    background: #05070e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-family: var(--mono);
+    color: var(--accent);
+    transition: opacity .8s ease;
+}
+#world-loading.is-hidden { opacity: 0; pointer-events: none; }
+.wl-logo { font-size: 20px; letter-spacing: .1em; color: var(--fg); }
+.wl-logo b { color: var(--accent); }
+.wl-bar { width: 220px; height: 3px; background: rgba(34,197,94,.15); border-radius: 2px; overflow: hidden; }
+.wl-bar i { display: block; height: 100%; width: 30%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: wl-load 1s ease-in-out infinite; }
+@keyframes wl-load { 0% { transform: translateX(-110%); } 100% { transform: translateX(380%); } }
+.wl-msg { font-size: 11px; color: var(--muted); }
+
+/* ---- "Explore in 3D" invite on the classic view ---- */
+#explore-btn {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 60;
+    display: none;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: #06230f;
+    background: var(--accent);
+    border: none;
+    border-radius: 999px;
+    padding: 11px 18px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(34,197,94,.35);
+    transition: transform .15s, box-shadow .15s;
+}
+#explore-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(34,197,94,.5); }
+#explore-btn .eb-ico { font-size: 15px; }
+html.world-on #explore-btn { display: none !important; }
+
+/* mobile: panel becomes a bottom sheet, dock scrolls */
+@media (max-width: 760px) {
+    #world-panel {
+        top: auto;
+        bottom: 0;
+        right: 0; left: 0;
+        width: 100%;
+        height: 82vh;
+        border-left: none;
+        border-top: 1px solid var(--border-soft);
+        border-radius: 16px 16px 0 0;
+        transform: translateY(105%);
+        box-shadow: 0 -30px 80px rgba(0,0,0,.55);
+    }
+    #world-panel.is-open { transform: translateY(0); }
+    #world-minimap { display: none; }
+    #world-hint { bottom: 76px; }
+    .world-topbar { height: 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #world-panel { transition: none; }
+    .wl-bar i { animation: none; }
+}

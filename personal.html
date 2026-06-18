@@ -18,10 +18,72 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=20260612">
-    <script>document.documentElement.classList.add('js');</script>
+    <link rel="stylesheet" href="world.css?v=20260613">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+    <script>
+    document.documentElement.classList.add('js');
+    (function () {
+        var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var coarse = matchMedia('(pointer: coarse)').matches;
+        var small = innerWidth < 900;
+        var pref = null; try { pref = localStorage.getItem('felix-view'); } catch (e) {}
+        var webgl = (function () { try { var c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); } catch (e) { return false; } })();
+        var cores = navigator.hardwareConcurrency || 4;
+        var lite = coarse || small || cores <= 4;
+        var shouldBoot;
+        if (pref === 'classic') shouldBoot = false;
+        else if (pref === 'world') shouldBoot = webgl && !rm;
+        else shouldBoot = webgl && !rm && !small && !coarse;
+        window.__FELIX = { shouldBoot: shouldBoot, webgl: webgl, reducedMotion: rm, lite: lite };
+        if (shouldBoot) {
+            document.documentElement.classList.add('world-on');
+            // safety net: if the 3D module never boots (no import-map support / CDN blocked), reveal the classic site
+            setTimeout(function () { if (!document.documentElement.classList.contains('world-ready')) document.documentElement.classList.remove('world-on'); }, 6000);
+        }
+    })();
+    </script>
 </head>
 <body class="has-gutter">
     <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- ============ felix.os — 3D motherboard world (progressive enhancement) ============ -->
+    <div id="world-root">
+        <canvas id="world-canvas"></canvas>
+        <div id="world-hud">
+            <div class="world-topbar">
+                <span class="wt-brand"><span class="dot" aria-hidden="true"></span>felix.os</span>
+                <a class="wt-side" href="business.html">fvandijk.ltd ↗</a>
+                <span class="wt-spacer"></span>
+                <button class="wbtn wbtn-accent" id="world-classic-btn" type="button" title="Switch to the classic site">⤓ Classic view</button>
+            </div>
+            <div id="world-labels"></div>
+            <nav id="world-dock" aria-label="Districts"></nav>
+            <p id="world-hint">drag to roam · click a chip to open it · right-drag to orbit · scroll to zoom</p>
+        </div>
+        <aside id="world-panel" aria-label="District details">
+            <div class="wpanel-head">
+                <div>
+                    <div class="wpanel-kicker mono"></div>
+                    <h2 class="wpanel-title"></h2>
+                </div>
+                <button class="wpanel-close" type="button" aria-label="Close panel">×</button>
+            </div>
+            <div class="wpanel-body"></div>
+        </aside>
+        <div id="world-loading">
+            <div class="wl-logo">felix<b>.os</b></div>
+            <div class="wl-bar"><i></i></div>
+            <div class="wl-msg">booting…</div>
+        </div>
+    </div>
+    <button id="explore-btn" type="button" title="Explore the 3D motherboard"><span class="eb-ico" aria-hidden="true">▶</span> Explore in 3D</button>
 
     <!-- ambient "memory space" glyph field -->
     <canvas id="memory-canvas" aria-hidden="true"></canvas>
@@ -609,5 +671,6 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
     <script src="scripts.js?v=20260612" defer></script>
+    <script type="module" src="world.js?v=20260613"></script>
 </body>
 </html>
