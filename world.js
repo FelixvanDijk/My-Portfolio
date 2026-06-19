@@ -832,12 +832,12 @@ function addListeners() {
     view.radius = clamp(view.radius + Math.sign(e.deltaY) * 2.4, 12, 78);
     requestRender();
   }, { passive: true });
-  // while a panel is open, the wheel scrolls the panel even if the cursor is over the board
+  // while a panel is open, the wheel ALWAYS drives the panel — over the board or the panel —
+  // so scrolling is consistent everywhere and the world never zooms underneath it
   window.addEventListener('wheel', (e) => {
     if (!panelOpen()) return;
     var body = $('#world-panel .wpanel-body');
     if (!body) return;
-    if (body.contains(e.target)) return; // cursor already over the panel → let it scroll natively
     var d = e.deltaY;
     if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= body.clientHeight;
     body.scrollTop += d;
