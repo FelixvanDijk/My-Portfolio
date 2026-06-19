@@ -254,6 +254,9 @@ html.world-on #world-root {
     padding: 22px 24px 40px;
     overflow-y: auto;
     flex: 1 1 auto;
+    min-height: 0;                 /* let the flex child actually shrink + scroll */
+    overscroll-behavior: contain;  /* no scroll-chaining to the page/world */
+    -webkit-overflow-scrolling: touch;
 }
 /* tame cloned classic layouts inside the narrow panel */
 .wpanel-body .about-grid,

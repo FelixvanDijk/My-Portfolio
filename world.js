@@ -547,6 +547,10 @@ function wireHeroCtas(clone) {
   clone.querySelectorAll('a[href="#contact"]').forEach((a) => { a.addEventListener('click', (e) => { e.preventDefault(); goTo('contact', true); }); });
 }
 
+function panelOpen() {
+  var p = $('#world-panel');
+  return !!(p && p.classList.contains('is-open'));
+}
 function openPanel(d) {
   populatePanel(d);
   $('#world-panel').classList.add('is-open');
@@ -824,9 +828,21 @@ function addListeners() {
   window.addEventListener('pointerup', onPointerUp);
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   canvas.addEventListener('wheel', (e) => {
+    if (panelOpen()) return; // a panel is open → the wheel belongs to the panel, never the world
     view.radius = clamp(view.radius + Math.sign(e.deltaY) * 2.4, 12, 78);
     requestRender();
   }, { passive: true });
+  // while a panel is open, the wheel scrolls the panel even if the cursor is over the board
+  window.addEventListener('wheel', (e) => {
+    if (!panelOpen()) return;
+    var body = $('#world-panel .wpanel-body');
+    if (!body) return;
+    if (body.contains(e.target)) return; // cursor already over the panel → let it scroll natively
+    var d = e.deltaY;
+    if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= body.clientHeight;
+    body.scrollTop += d;
+    e.preventDefault();
+  }, { passive: false });
   window.addEventListener('resize', onResize);
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) running = false;
