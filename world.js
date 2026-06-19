@@ -517,6 +517,12 @@ function populatePanel(d) {
     const clone = src.cloneNode(true);
     remapIds(clone, 'w-' + d.id + '-');
     clone.removeAttribute('id');
+    clone.removeAttribute('aria-hidden');
+    // the classic source may be mid-GSAP (opacity:0 / visibility:hidden from a reveal that
+    // never fired while hidden) — strip that inline state so the panel always shows in full
+    var unhide = function (el) { if (el.style) { el.style.removeProperty('opacity'); el.style.removeProperty('visibility'); el.style.removeProperty('transform'); } };
+    unhide(clone);
+    clone.querySelectorAll('*').forEach(unhide);
     body.appendChild(clone);
     if (d.id === 'contact') wireClonedForm(clone);
     if (d.id === 'cpu') wireHeroCtas(clone);
@@ -596,8 +602,9 @@ function goTo(id, openIt) {
   flyTo(districtView(d));
   hideHintSoon();
   if (openIt) {
-    if (window.gsap && !reduceMotion) window.gsap.delayedCall(0.55, () => openPanel(d));
-    else openPanel(d);
+    // plain setTimeout (not gsap.delayedCall) so the panel opens even if the rAF ticker is throttled
+    if (reduceMotion) openPanel(d);
+    else setTimeout(() => openPanel(d), 520);
   }
   if (location.hash !== '#/' + id) history.replaceState(null, '', '#/' + id);
 }
@@ -606,6 +613,8 @@ function goTo(id, openIt) {
 const raycaster = new THREE.Raycaster();
 const ndc = new THREE.Vector2();
 let dragging = false, moved = false, lastX = 0, lastY = 0, dragBtn = 0;
+const pointers = new Map();   // active pointers, for multitouch pinch
+let pinchDist = 0;
 
 /* drag-to-pan: move the look-at target across the board, aligned to the view angle */
 function panBy(dx, dy) {
@@ -620,20 +629,41 @@ function panBy(dx, dy) {
   panVel.x = mx; panVel.z = mz;
 }
 
+function twoPointerDist() {
+  const p = [...pointers.values()];
+  return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+}
+
 function onPointerDown(e) {
-  dragging = true; moved = false; dragBtn = e.button;
-  lastX = e.clientX; lastY = e.clientY;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   if (window.gsap) { window.gsap.killTweensOf(view); window.gsap.killTweensOf(view.target); }
   isFlying = false;
   panVel.x = panVel.z = 0; orbitVel = 0;
+  if (pointers.size === 1) {
+    dragging = true; moved = false; dragBtn = e.button;
+    lastX = e.clientX; lastY = e.clientY;
+  } else if (pointers.size === 2) {
+    dragging = false;        // second finger down → pinch, not pan
+    pinchDist = twoPointerDist();
+  }
 }
 function onPointerMove(e) {
+  if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  // pinch-to-zoom (two fingers)
+  if (pointers.size >= 2) {
+    const d = twoPointerDist();
+    if (pinchDist > 0 && d > 0) {
+      view.radius = clamp(view.radius * (pinchDist / d), 12, 78); // spread fingers → zoom in
+      requestRender();
+    }
+    pinchDist = d;
+    return;
+  }
   if (!dragging) return;
   const dx = e.clientX - lastX, dy = e.clientY - lastY;
   if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
   lastX = e.clientX; lastY = e.clientY;
   if (dragBtn === 2 || e.shiftKey) {
-    // orbit
     view.theta -= dx * 0.005;
     view.phi = clamp(view.phi - dy * 0.004, 0.16, 1.22);
     orbitVel = -dx * 0.005;
@@ -643,9 +673,22 @@ function onPointerMove(e) {
   requestRender();
 }
 function onPointerUp(e) {
+  const hadOne = pointers.size === 1;
   const wasDrag = moved;
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinchDist = 0;
+  if (pointers.size === 1) {
+    // dropped from pinch to one finger → resume panning from the remaining finger
+    const rem = [...pointers.entries()][0];
+    dragging = true; moved = true; dragBtn = 0; lastX = rem[1].x; lastY = rem[1].y;
+    return;
+  }
+  if (pointers.size > 0) return;
   dragging = false;
-  if (wasDrag) return;
+  if (wasDrag || !hadOne) return;   // a real drag, or the tail of a multitouch → not a tap
+  doPick(e);
+}
+function doPick(e) {
   const rect = renderer.domElement.getBoundingClientRect();
   ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
   ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
