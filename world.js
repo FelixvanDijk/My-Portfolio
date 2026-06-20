@@ -86,6 +86,7 @@ let camFov = 55;
 let introActive = false; // sky hero-shot + instructions before the drop-in
 const visited = new Set();
 let wasBoost = false;
+const shards = []; let fragsTaken = 0; let turbo = false;
 
 /* ---------- procedural Web-Audio (no asset files; unlocked by the drop gesture) ---------- */
 let actx = null, masterGain = null, audioMuted = false, audioReady = false;
@@ -420,6 +421,7 @@ function buildScene() {
 
   buildBusinessFork();
   buildPacket();
+  buildCollectibles();
 
   if (useBloom) setupComposer();
   built = true;
@@ -847,6 +849,27 @@ function doPick(e) {
 /* ============================================================
    felix.run — pilot the packet (arcade hover, hand-rolled feel)
    ============================================================ */
+const SHARD_POS = [[0, -8], [-12, 3], [12, 3], [-9, -16], [9, -16], [0, 24], [25, 18]];
+function buildCollectibles() {
+  const geo = new THREE.OctahedronGeometry(0.62, 0);
+  SHARD_POS.forEach((p) => {
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x07201f, emissive: 0x3ce0c6, emissiveIntensity: 1.5, metalness: 0.5, roughness: 0.3 }));
+    m.position.set(p[0], 1.2, p[1]);
+    scene.add(m);
+    shards.push({ mesh: m, x: p[0], z: p[1], taken: false });
+  });
+}
+function updateFrags() {
+  const el = $('#world-frags');
+  if (el) { el.textContent = '◆ ' + fragsTaken + ' / 7'; el.classList.add('is-on'); if (fragsTaken > 0) el.classList.add('got'); }
+  if (fragsTaken >= shards.length && !turbo) {
+    turbo = true;
+    if (packet && packet.children[0]) packet.children[0].material.emissive.setHex(0xffd66a);
+    const h = $('#world-hint'); if (h) { h.textContent = 'all 7 fragments collected — turbo unlocked ⚡'; h.style.opacity = '1'; }
+    dockChime();
+  }
+}
+
 function buildPacket() {
   const g = new THREE.Group();
   // chamfered glowing core
@@ -903,8 +926,8 @@ function updateDrive(dt) {
   wasBoost = wantBoost;
   drive.boost += ((wantBoost ? 1 : 0) - drive.boost) * Math.min(1, dt * 6);
 
-  const MAX = 26 + drive.boost * 16;
-  const ACC = 34 + drive.boost * 26;
+  const MAX = (turbo ? 34 : 26) + drive.boost * 16;
+  const ACC = (turbo ? 42 : 34) + drive.boost * 26;
   // longitudinal speed
   drive.speed += thrust * ACC * dt;
   drive.speed *= (1 - 1.6 * dt);                 // drag
@@ -962,6 +985,15 @@ function updateDrive(dt) {
       s.mesh.scale.set(sc, sc, sc);
     }
   });
+
+  // ----- collect data-fragments -----
+  for (let i = 0; i < shards.length; i++) {
+    const s = shards[i];
+    if (s.taken) continue;
+    if (Math.hypot(drive.pos.x - s.x, drive.pos.z - s.z) < 2.6) {
+      s.taken = true; s.mesh.visible = false; fragsTaken++; collectChime(); updateFrags();
+    }
+  }
 
   // ----- docking: arrive at a district → boot it (nearest-within-port, hysteresis on exit) -----
   let near = null, nd = 1e9;
@@ -1045,6 +1077,14 @@ function frame() {
   for (let i = 0; i < traceMats.length; i++) {
     const m = traceMats[i];
     if (m && m.uniforms && m.uniforms.uTime) m.uniforms.uTime.value = t;
+  }
+
+  // spin/bob the collectible fragments
+  for (let i = 0; i < shards.length; i++) {
+    const s = shards[i];
+    if (s.taken) continue;
+    s.mesh.rotation.y = t * 1.5; s.mesh.rotation.x = t * 0.8;
+    s.mesh.position.y = 1.2 + Math.sin(t * 2 + s.x) * 0.25;
   }
 
   // drifting void
