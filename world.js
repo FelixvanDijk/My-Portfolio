@@ -664,6 +664,7 @@ function populatePanel(d) {
     body.appendChild(clone);
     if (d.id === 'contact') wireClonedForm(clone);
     if (d.id === 'cpu') wireHeroCtas(clone);
+    if (d.id === 'projects') mountAStarInProjects(clone);
   }
   body.scrollTop = 0;
 }
@@ -684,6 +685,84 @@ function wireClonedForm(clone) {
       })
       .catch(() => { if (result) { result.className = 'form-result mono err'; result.innerHTML = '=> { status: 500 } — try again or <a href="mailto:felixvandijkk@gmail.com">email me</a>.'; } });
   });
+}
+
+/* live A* pathfinder — injected into the Scotland Yard AI project card (real CS, not art) */
+function mountAStarInProjects(root) {
+  const cards = Array.prototype.slice.call(root.querySelectorAll('.proc-card'));
+  const ai = cards.find((c) => /scotland|AI Project/i.test(c.textContent));
+  if (!ai) return;
+  const wrap = ai.querySelector('.shot-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const cv = document.createElement('canvas');
+  cv.width = 480; cv.height = 270; cv.style.width = '100%'; cv.style.display = 'block';
+  wrap.appendChild(cv);
+  const bar = ai.querySelector('.mini-bar');
+  if (bar) { const tn = Array.prototype.slice.call(bar.childNodes).find((n) => n.nodeType === 3 && n.textContent.trim()); if (tn) tn.textContent = 'scotland-yard-ai — live A* search'; }
+  runAStar(cv);
+}
+function runAStar(canvas) {
+  const ctx = canvas.getContext('2d');
+  const COLS = 26, ROWS = 15;
+  const idx = (x, y) => y * COLS + x;
+  let walls, openList, came, gScore, fScore, closed, start, goal, done, path, pauseT;
+  const hh = (x, y) => Math.abs(x - goal.x) + Math.abs(y - goal.y);
+  function reset() {
+    walls = new Uint8Array(COLS * ROWS);
+    for (let i = 0; i < walls.length; i++) if (Math.random() < 0.27) walls[i] = 1;
+    start = { x: 1, y: ROWS >> 1 }; goal = { x: COLS - 2, y: ROWS >> 1 };
+    walls[idx(start.x, start.y)] = 0; walls[idx(goal.x, goal.y)] = 0;
+    openList = [start]; came = {}; gScore = {}; fScore = {}; closed = new Uint8Array(COLS * ROWS);
+    gScore[idx(start.x, start.y)] = 0; fScore[idx(start.x, start.y)] = hh(start.x, start.y);
+    done = false; path = null; pauseT = 0;
+  }
+  function step() {
+    if (!openList.length) { done = true; path = []; return; }
+    let bi = 0; for (let i = 1; i < openList.length; i++) if (fScore[idx(openList[i].x, openList[i].y)] < fScore[idx(openList[bi].x, openList[bi].y)]) bi = i;
+    const cur = openList.splice(bi, 1)[0];
+    if (cur.x === goal.x && cur.y === goal.y) {
+      done = true; path = []; let cx = cur.x, cy = cur.y;
+      while (came[idx(cx, cy)] !== undefined) { path.push(idx(cx, cy)); const p = came[idx(cx, cy)]; cx = p.x; cy = p.y; }
+      path.push(idx(start.x, start.y)); return;
+    }
+    closed[idx(cur.x, cur.y)] = 1;
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach((d) => {
+      const nx = cur.x + d[0], ny = cur.y + d[1];
+      if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) return;
+      const ni = idx(nx, ny);
+      if (walls[ni] || closed[ni]) return;
+      const tg = gScore[idx(cur.x, cur.y)] + 1;
+      if (gScore[ni] === undefined || tg < gScore[ni]) {
+        came[ni] = { x: cur.x, y: cur.y }; gScore[ni] = tg; fScore[ni] = tg + hh(nx, ny);
+        if (!openList.some((o) => o.x === nx && o.y === ny)) openList.push({ x: nx, y: ny });
+      }
+    });
+  }
+  function draw() {
+    const w = canvas.width, hgt = canvas.height, cw = w / COLS, chh = hgt / ROWS;
+    ctx.fillStyle = '#06100b'; ctx.fillRect(0, 0, w, hgt);
+    const onOpen = new Uint8Array(COLS * ROWS); openList.forEach((o) => { onOpen[idx(o.x, o.y)] = 1; });
+    const onPath = new Uint8Array(COLS * ROWS); if (path) path.forEach((i) => { onPath[i] = 1; });
+    for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+      const i = idx(x, y); let c = null;
+      if (walls[i]) c = '#0e1922';
+      else if (onPath[i]) c = '#ffd66a';
+      else if (closed[i]) c = 'rgba(34,197,94,0.30)';
+      else if (onOpen[i]) c = 'rgba(125,211,252,0.5)';
+      if (c) { ctx.fillStyle = c; ctx.fillRect(x * cw + 1, y * chh + 1, cw - 2, chh - 2); }
+    }
+    ctx.fillStyle = '#22c55e'; ctx.fillRect(start.x * cw + 1, start.y * chh + 1, cw - 2, chh - 2);
+    ctx.fillStyle = '#ef4444'; ctx.fillRect(goal.x * cw + 1, goal.y * chh + 1, cw - 2, chh - 2);
+  }
+  function loop() {
+    if (!canvas.isConnected) return; // panel closed → stop the loop
+    if (!done) { step(); step(); }
+    else if (++pauseT > 80) reset();
+    draw();
+    requestAnimationFrame(loop);
+  }
+  reset(); loop();
 }
 
 function wireHeroCtas(clone) {
