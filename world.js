@@ -43,6 +43,8 @@ const drive = {
 const keys = Object.create(null);
 let dockedZone = 'cpu';  // spawn at the CPU (home/whoami) without auto-opening it
 let camFov = 55;
+let introActive = false; // sky hero-shot + instructions before the drop-in
+const visited = new Set();
 const LITE = !!(window.__FELIX && window.__FELIX.lite);
 const useBloom = !LITE;
 let benchStart = 0, benchFrames = 0, benchStage = 0;
@@ -510,6 +512,7 @@ function buildHud() {
   home.textContent = '⌂ Home';
   home.addEventListener('click', () => { closePanel(); flyTo(OVERVIEW); setCurrent(null); });
   dock.insertBefore(home, dock.firstChild);
+  buildChecklist();
 }
 
 /* remap ids inside a cloned subtree so they don't collide with the hidden classic DOM */
@@ -615,6 +618,7 @@ function goTo(id, openIt) {
   const d = DISTRICTS.find((x) => x.id === id);
   if (!d) return;
   setCurrent(id);
+  markVisited(id);
   // menu/keyboard/auto navigation warps the packet to the port so driving resumes coherently
   if (packet && id !== dockedZone) {
     const c = chips[id];
@@ -923,7 +927,12 @@ function frame() {
   // drifting void
   if (starfield) starfield.rotation.y += dt * 0.012;
 
-  if (driveMode && packet && !isFlying && !panelOpen()) {
+  if (introActive && packet) {
+    // sky hero shot: packet hovers/spins above the board, camera slowly orbits
+    packet.rotation.y += dt * 0.5;
+    packet.position.set(0, 42 + Math.sin(t * 1.2) * 0.7, 9);
+    view.theta += dt * 0.06;
+  } else if (driveMode && packet && !isFlying && !panelOpen()) {
     // felix.run: drive the packet; the chase cam feeds the same view model
     updateDrive(dt);
     updateChaseCam(dt);
@@ -988,8 +997,71 @@ function bootSequence() {
     view.target.copy(OVERVIEW.target);
   }
   setTimeout(() => { if (veil) veil.classList.add('is-hidden'); }, reduceMotion ? 200 : 1100);
-  // hand off from the cinematic boot to driving (reduced-motion stays in click/overview mode)
-  if (!reduceMotion) setTimeout(() => { driveMode = true; }, 2400);
+  // hand off from the cinematic boot to the sky intro (reduced-motion stays in click/overview mode)
+  if (!reduceMotion) setTimeout(startIntro, 2400);
+}
+
+/* ---------- intro: hover in the sky over a hero view, then drop in ---------- */
+function startIntro() {
+  if (driveMode) return;
+  introActive = true;
+  if (window.gsap) { window.gsap.killTweensOf(view); window.gsap.killTweensOf(view.target); }
+  if (packet) packet.position.set(0, 42, 9);
+  view.target.set(0, 2, 0); view.radius = 76; view.theta = 0; view.phi = 0.5;
+  const el = $('#world-intro'); if (el) { el.hidden = false; el.style.opacity = ''; }
+  requestRender();
+}
+
+function startDrop() {
+  if (!introActive) return;
+  introActive = false;
+  const el = $('#world-intro');
+  if (el) { el.style.transition = 'opacity .4s'; el.style.opacity = '0'; setTimeout(() => { el.hidden = true; }, 420); }
+  isFlying = true;
+  if (window.gsap && !reduceMotion) {
+    window.gsap.killTweensOf(view); window.gsap.killTweensOf(view.target);
+    window.gsap.to(packet.position, { y: 0.9, duration: 1.2, ease: 'bounce.out', onUpdate: requestRender });
+    window.gsap.to(view, { radius: 13, theta: Math.PI, phi: 0.92, duration: 1.2, ease: 'power2.inOut', onUpdate: requestRender });
+    window.gsap.to(view.target, { x: 0, y: 1.6, z: 12, duration: 1.2, ease: 'power2.inOut', onUpdate: requestRender, onComplete: finishDrop });
+    setTimeout(landingFlash, 850);
+  } else { finishDrop(); }
+}
+
+function finishDrop() {
+  drive.pos.set(0, 0.9, 9); drive.heading = 0; drive.vel.set(0, 0, 0); drive.speed = 0;
+  dockedZone = 'cpu'; driveMode = true; isFlying = false;
+  const cl = $('#world-checklist'); if (cl) cl.classList.add('is-on');
+  const h = $('#world-hint'); if (h) { h.style.opacity = '1'; hideHintSoon(); }
+}
+
+function landingFlash() {
+  if (!scene) return;
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(0.5, 0.85, 36),
+    new THREE.MeshBasicMaterial({ color: GREEN, transparent: true, opacity: 0.9, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  ring.rotation.x = -Math.PI / 2; ring.position.set(0, 0.18, 9); scene.add(ring);
+  if (window.gsap) {
+    window.gsap.to(ring.scale, { x: 16, y: 16, z: 16, duration: 0.9, ease: 'power2.out', onUpdate: requestRender });
+    window.gsap.to(ring.material, { opacity: 0, duration: 0.9, ease: 'power2.out', onComplete: () => { scene.remove(ring); ring.geometry.dispose(); ring.material.dispose(); } });
+  }
+}
+
+/* ---------- exploration checklist ---------- */
+function buildChecklist() {
+  const el = $('#world-checklist'); if (!el) return;
+  el.innerHTML = '<p class="cl-head mono">EXPLORE <span id="cl-count">0/' + DISTRICTS.length + '</span></p>' +
+    DISTRICTS.map((d) => `<div class="cl-row" data-cl="${d.id}"><span class="cl-box" aria-hidden="true">▢</span><span class="cl-name">${d.cpu ? 'felix.c' : d.name}</span></div>`).join('');
+}
+function markVisited(id) {
+  if (visited.has(id) || !DISTRICTS.find((d) => d.id === id)) return;
+  visited.add(id);
+  const row = document.querySelector('.cl-row[data-cl="' + id + '"]');
+  if (row) { row.classList.add('is-done'); const b = row.querySelector('.cl-box'); if (b) b.textContent = '☑'; }
+  const cnt = $('#cl-count'); if (cnt) cnt.textContent = visited.size + '/' + DISTRICTS.length;
+  if (visited.size === DISTRICTS.length) {
+    const head = $('#world-checklist .cl-head'); if (head) { head.classList.add('cl-complete'); head.firstChild.textContent = 'EXPLORED ✓ '; }
+  }
 }
 
 let hintTimer = 0;
@@ -1071,11 +1143,15 @@ function addListeners() {
   });
   $('#world-classic-btn').addEventListener('click', exitWorld);
   $('#world-panel .wpanel-close').addEventListener('click', closePanel);
+  const introEl = $('#world-intro');
+  if (introEl) introEl.addEventListener('click', () => { if (introActive) startDrop(); });
   // driving keys
   window.addEventListener('keydown', (e) => {
     if (!document.documentElement.classList.contains('world-on')) return;
     if (e.target && e.target.matches && e.target.matches('input, textarea')) return;
     const k = e.key.toLowerCase();
+    if (introActive) { if (k === 'c') { exitWorld(); return; } e.preventDefault(); startDrop(); return; }
+    if (k === 'c') { exitWorld(); return; }
     if (e.key === 'Escape') { closePanel(); return; }
     if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift',' '].includes(k)) {
       keys[k === ' ' ? 'space' : k] = true;
