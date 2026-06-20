@@ -452,3 +452,49 @@ html.world-on #explore-btn { display: none !important; }
 #world-frags.is-on { opacity: 0.92; transform: none; }
 #world-frags.got { color: #3ce0c6; border-color: rgba(60,224,198,0.4); }
 @media (max-width: 760px) { #world-frags { top: auto; bottom: 120px; } }
+
+/* ---- touch controls: virtual joystick + boost (only on coarse pointers while driving) ---- */
+#world-joy, #world-boost { display: none; }
+html.world-touch.world-driving #world-joy {
+    display: block;
+    position: absolute;
+    left: 22px;
+    bottom: 88px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, rgba(34,197,94,0.08), rgba(8,12,22,0.5));
+    border: 1px solid var(--border-soft);
+    touch-action: none;
+    z-index: 5;
+}
+#world-joy .joy-knob {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(34,197,94,0.32);
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 16px rgba(34,197,94,0.4);
+    pointer-events: none;
+}
+html.world-touch.world-driving #world-boost {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    position: absolute;
+    right: 22px;
+    bottom: 104px;
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    color: var(--accent);
+    background: rgba(8,12,22,0.55);
+    border: 1px solid var(--accent);
+    touch-action: none;
+    z-index: 5;
+    -webkit-tap-highlight-color: transparent;
+}
+#world-boost:active { background: rgba(34,197,94,0.22); }

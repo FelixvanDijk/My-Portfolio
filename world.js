@@ -81,6 +81,7 @@ const drive = {
   boost: 0,              // 0..1 smoothed
 };
 const keys = Object.create(null);
+let joyX = 0, joyY = 0;  // touch joystick: steer (+right), thrust (+forward)
 let dockedZone = null;   // spawn in open space — nothing docked, free to roam
 let camFov = 55;
 let introActive = false; // sky hero-shot + instructions before the drop-in
@@ -1053,8 +1054,8 @@ let trailTick = 0;
 
 function updateDrive(dt) {
   // ----- input → controls -----
-  const thrust = (keys['w'] || keys['arrowup'] ? 1 : 0) - (keys['s'] || keys['arrowdown'] ? 0.7 : 0);
-  const steer = (keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0);
+  const thrust = clamp(((keys['w'] || keys['arrowup'] ? 1 : 0) - (keys['s'] || keys['arrowdown'] ? 0.7 : 0)) + joyY, -1, 1);
+  const steer = clamp(((keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0)) + joyX, -1, 1);
   const wantBoost = !!(keys['shift'] && thrust > 0);
   if (wantBoost && !wasBoost) boostWhoosh();
   wasBoost = wantBoost;
@@ -1318,6 +1319,11 @@ function startIntro() {
   if (packet) packet.position.set(0, 42, -16);
   view.target.set(0, 2, 0); view.radius = 76; view.theta = 0; view.phi = 0.5;
   const el = $('#world-intro'); if (el) { el.hidden = false; el.style.opacity = ''; }
+  // touch devices: relabel the keyboard-centric prompts
+  if (matchMedia('(pointer: coarse)').matches) {
+    const go = $('#world-intro .intro-go'); if (go) go.textContent = 'tap to drop in ▾';
+    const hint = $('#world-hint'); if (hint) hint.textContent = 'left stick to drive · BOOST to dash · arrive at a chip to open it · dock below to jump';
+  }
   requestRender();
 }
 
@@ -1341,6 +1347,7 @@ function startDrop() {
 function finishDrop() {
   drive.pos.set(0, 0.9, -16); drive.heading = 0; drive.vel.set(0, 0, 0); drive.speed = 0;
   dockedZone = null; driveMode = true; isFlying = false;
+  document.documentElement.classList.add('world-driving'); // reveal touch joystick
   const cl = $('#world-checklist'); if (cl) cl.classList.add('is-on');
   const h = $('#world-hint'); if (h) { h.style.opacity = '1'; hideHintSoon(); }
 }
@@ -1418,7 +1425,7 @@ function autoExitClassic() {
 }
 
 function exitWorld() {
-  document.documentElement.classList.remove('world-on');
+  document.documentElement.classList.remove('world-on', 'world-driving');
   try { localStorage.setItem('felix-view', 'classic'); } catch (e) {}
   running = false;
   closePanel();
@@ -1458,6 +1465,29 @@ function addListeners() {
   if (introEl) introEl.addEventListener('click', () => { if (introActive) startDrop(); });
   const muteBtn = $('#world-mute');
   if (muteBtn) muteBtn.addEventListener('click', toggleMute);
+
+  // touch controls: virtual joystick + boost button
+  if (matchMedia('(pointer: coarse)').matches) document.documentElement.classList.add('world-touch');
+  const joy = $('#world-joy'); const knob = joy && joy.querySelector('.joy-knob');
+  if (joy) {
+    let jid = null, jcx = 0, jcy = 0; const R = 42;
+    const moveJoy = (e) => {
+      let dx = e.clientX - jcx, dy = e.clientY - jcy; const m = Math.hypot(dx, dy);
+      if (m > R) { dx = dx / m * R; dy = dy / m * R; }
+      joyX = clamp(dx / R, -1, 1); joyY = clamp(-dy / R, -1, 1);
+      if (knob) knob.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+    };
+    const endJoy = (e) => { if (e.pointerId === jid) { jid = null; joyX = 0; joyY = 0; if (knob) knob.style.transform = 'translate(-50%,-50%)'; } };
+    joy.addEventListener('pointerdown', (e) => { jid = e.pointerId; const r = joy.getBoundingClientRect(); jcx = r.left + r.width / 2; jcy = r.top + r.height / 2; try { joy.setPointerCapture(jid); } catch (er) {} moveJoy(e); e.preventDefault(); });
+    joy.addEventListener('pointermove', (e) => { if (e.pointerId === jid) moveJoy(e); });
+    joy.addEventListener('pointerup', endJoy); joy.addEventListener('pointercancel', endJoy);
+  }
+  const boostBtn = $('#world-boost');
+  if (boostBtn) {
+    boostBtn.addEventListener('pointerdown', (e) => { keys['shift'] = true; e.preventDefault(); });
+    const bEnd = () => { keys['shift'] = false; };
+    boostBtn.addEventListener('pointerup', bEnd); boostBtn.addEventListener('pointercancel', bEnd); boostBtn.addEventListener('pointerleave', bEnd);
+  }
   // driving keys
   window.addEventListener('keydown', (e) => {
     if (!document.documentElement.classList.contains('world-on')) return;
