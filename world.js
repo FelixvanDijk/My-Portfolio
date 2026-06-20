@@ -1055,7 +1055,9 @@ let trailTick = 0;
 function updateDrive(dt) {
   // ----- input → controls -----
   const thrust = clamp(((keys['w'] || keys['arrowup'] ? 1 : 0) - (keys['s'] || keys['arrowdown'] ? 0.7 : 0)) + joyY, -1, 1);
-  const steer = clamp(((keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0)) + joyX, -1, 1);
+  // chase cam looks toward +z, which mirrors world-x on screen: positive steer => screen-left.
+  // So left input (A / joystick-left) must produce positive steer for "left = turns left".
+  const steer = clamp(((keys['a'] || keys['arrowleft'] ? 1 : 0) - (keys['d'] || keys['arrowright'] ? 1 : 0)) - joyX, -1, 1);
   const wantBoost = !!(keys['shift'] && thrust > 0);
   if (wantBoost && !wasBoost) boostWhoosh();
   wasBoost = wantBoost;
