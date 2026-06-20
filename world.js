@@ -28,6 +28,21 @@ const DISTRICTS = [
 let renderer, scene, camera, composer, raf = 0, built = false, running = false;
 let clock;
 let bgGrid, starfield;
+
+/* ---------- felix.run: drive-the-packet state ---------- */
+let driveMode = false;
+let packet = null, packetLight = null;
+const trail = [];
+const drive = {
+  pos: new THREE.Vector3(0, 0.9, 9),
+  heading: 0,            // yaw; forward = (sin h, cos h)
+  vel: new THREE.Vector3(),
+  speed: 0,
+  boost: 0,              // 0..1 smoothed
+};
+const keys = Object.create(null);
+let dockedZone = 'cpu';  // spawn at the CPU (home/whoami) without auto-opening it
+let camFov = 55;
 const LITE = !!(window.__FELIX && window.__FELIX.lite);
 const useBloom = !LITE;
 let benchStart = 0, benchFrames = 0, benchStage = 0;
@@ -291,6 +306,7 @@ function buildScene() {
   });
 
   buildBusinessFork();
+  buildPacket();
 
   if (useBloom) setupComposer();
   built = true;
@@ -599,6 +615,14 @@ function goTo(id, openIt) {
   const d = DISTRICTS.find((x) => x.id === id);
   if (!d) return;
   setCurrent(id);
+  // menu/keyboard/auto navigation warps the packet to the port so driving resumes coherently
+  if (packet && id !== dockedZone) {
+    const c = chips[id];
+    drive.pos.set(c.pos.x, drive.pos.y, c.pos.z - (d.d / 2 + 3));
+    drive.heading = 0; drive.vel.set(0, 0, 0); drive.speed = 0;
+    packet.position.copy(drive.pos);
+    dockedZone = id;
+  }
   flyTo(districtView(d));
   hideHintSoon();
   if (openIt) {
@@ -702,6 +726,154 @@ function doPick(e) {
   goTo(hit.object.userData.zone, true);
 }
 
+/* ============================================================
+   felix.run — pilot the packet (arcade hover, hand-rolled feel)
+   ============================================================ */
+function buildPacket() {
+  const g = new THREE.Group();
+  // chamfered glowing core
+  const core = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.85, 0),
+    new THREE.MeshStandardMaterial({ color: 0x0a1f14, emissive: GREEN, emissiveIntensity: 0.9, metalness: 0.7, roughness: 0.25 })
+  );
+  g.add(core);
+  // bright wire shell
+  g.add(new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(0.95, 0)),
+    new THREE.LineBasicMaterial({ color: 0xaaffcc, transparent: true, opacity: 0.9 })
+  ));
+  // under-glow disc (hover pad)
+  const glow = new THREE.Mesh(
+    new THREE.CircleGeometry(1.4, 24),
+    new THREE.MeshBasicMaterial({ color: GREEN, transparent: true, opacity: 0.28, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  glow.rotation.x = -Math.PI / 2; glow.position.y = -0.8;
+  g.add(glow);
+  packetLight = new THREE.PointLight(GREEN, 2.2, 14, 2);
+  packetLight.position.y = 0.4;
+  g.add(packetLight);
+  g.position.copy(drive.pos);
+  scene.add(g);
+  packet = g;
+
+  // contrail: a short ribbon of fading quads
+  const tmat = new THREE.MeshBasicMaterial({ color: 0x6effa6, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  for (let i = 0; i < 14; i++) {
+    const seg = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7), tmat.clone());
+    seg.rotation.x = -Math.PI / 2; seg.visible = false;
+    scene.add(seg);
+    trail.push({ mesh: seg, life: 0 });
+  }
+}
+
+function lerpAngle(a, b, t) {
+  let d = (b - a) % (Math.PI * 2);
+  if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2;
+  return a + d * t;
+}
+
+const PORT_R = 6, EXIT_R = 9;
+const _fwd = new THREE.Vector3();
+let trailTick = 0;
+
+function updateDrive(dt) {
+  // ----- input → controls -----
+  const thrust = (keys['w'] || keys['arrowup'] ? 1 : 0) - (keys['s'] || keys['arrowdown'] ? 0.7 : 0);
+  const steer = (keys['a'] || keys['arrowleft'] ? 1 : 0) - (keys['d'] || keys['arrowright'] ? 1 : 0);
+  const wantBoost = !!(keys['shift'] && thrust > 0);
+  drive.boost += ((wantBoost ? 1 : 0) - drive.boost) * Math.min(1, dt * 6);
+
+  const MAX = 26 + drive.boost * 16;
+  const ACC = 34 + drive.boost * 26;
+  // longitudinal speed
+  drive.speed += thrust * ACC * dt;
+  drive.speed *= (1 - 1.6 * dt);                 // drag
+  drive.speed = clamp(drive.speed, -10, MAX);
+  if (Math.abs(drive.speed) < 0.02) drive.speed = 0;
+
+  // steering scales with speed (can't pivot when parked); reverse flips it
+  const steerAuth = clamp(Math.abs(drive.speed) / 10, 0, 1) * (drive.speed < 0 ? -1 : 1);
+  drive.heading += steer * 2.4 * dt * steerAuth;
+
+  // velocity with a little grip/slip for drift feel
+  _fwd.set(Math.sin(drive.heading), 0, Math.cos(drive.heading));
+  const desired = _fwd.clone().multiplyScalar(drive.speed);
+  drive.vel.x += (desired.x - drive.vel.x) * Math.min(1, dt * 8);
+  drive.vel.z += (desired.z - drive.vel.z) * Math.min(1, dt * 8);
+  drive.pos.x += drive.vel.x * dt;
+  drive.pos.z += drive.vel.z * dt;
+
+  // keep on the board
+  if (drive.pos.x < -34 || drive.pos.x > 34) { drive.pos.x = clamp(drive.pos.x, -34, 34); drive.vel.x *= -0.3; }
+  if (drive.pos.z < -24 || drive.pos.z > 30) { drive.pos.z = clamp(drive.pos.z, -24, 30); drive.vel.z *= -0.3; }
+
+  // push out of chip footprints (simple AABB)
+  DISTRICTS.forEach((d) => {
+    const hw = d.w / 2 + 1, hd = d.d / 2 + 1;
+    const dx = drive.pos.x - d.x, dz = drive.pos.z - d.z;
+    if (Math.abs(dx) < hw && Math.abs(dz) < hd) {
+      if (hw - Math.abs(dx) < hd - Math.abs(dz)) { drive.pos.x = d.x + Math.sign(dx || 1) * hw; drive.vel.x *= -0.2; }
+      else { drive.pos.z = d.z + Math.sign(dz || 1) * hd; drive.vel.z *= -0.2; }
+    }
+  });
+
+  // visuals
+  const bob = Math.sin(clock.elapsedTime * 6) * 0.06;
+  packet.position.set(drive.pos.x, drive.pos.y + bob, drive.pos.z);
+  packet.rotation.y = drive.heading;
+  packet.rotation.z = -steer * steerAuth * 0.35;          // lean into turns
+  packet.children[0].rotation.x += dt * 2;                 // spin core
+  if (packetLight) packetLight.intensity = 2.0 + drive.boost * 2.5;
+
+  // contrail
+  trailTick += dt;
+  if (trailTick > 0.03 && Math.abs(drive.speed) > 3) {
+    trailTick = 0;
+    const seg = trail.find((s) => s.life <= 0) || trail[0];
+    seg.mesh.position.set(drive.pos.x, 0.2, drive.pos.z);
+    seg.life = 1;
+  }
+  trail.forEach((s) => {
+    if (s.life > 0) {
+      s.life -= dt * 1.8;
+      s.mesh.visible = s.life > 0;
+      s.mesh.material.opacity = Math.max(0, s.life) * 0.5;
+      const sc = 0.4 + (1 - s.life) * 1.0;
+      s.mesh.scale.set(sc, sc, sc);
+    }
+  });
+
+  // ----- docking: arrive at a district → boot it (nearest-within-port, hysteresis on exit) -----
+  let near = null, nd = 1e9;
+  for (const d of DISTRICTS) {
+    const c = chips[d.id];
+    const dist = Math.hypot(drive.pos.x - c.pos.x, drive.pos.z - c.pos.z);
+    if (dist < nd) { nd = dist; near = d.id; }
+  }
+  if (near && nd < PORT_R) {
+    if (dockedZone !== near) { dockedZone = near; drive.speed *= 0.3; goTo(near, true); }
+  } else if (nd > EXIT_R) {
+    dockedZone = null;
+  }
+}
+
+const _ct = new THREE.Vector3();
+function updateChaseCam(dt) {
+  _fwd.set(Math.sin(drive.heading), 0, Math.cos(drive.heading));
+  const sp = clamp(Math.abs(drive.speed) / 26, 0, 1);
+  // target = packet + slight up + look-ahead in travel direction
+  _ct.set(drive.pos.x + _fwd.x * (2 + sp * 4), drive.pos.y + 1.6, drive.pos.z + _fwd.z * (2 + sp * 4));
+  view.target.lerp(_ct, Math.min(1, dt * 4));
+  view.theta = lerpAngle(view.theta, drive.heading + Math.PI, Math.min(1, dt * 3.5));
+  const targetR = 13 + sp * 3 + drive.boost * 2;
+  view.radius += (targetR - view.radius) * Math.min(1, dt * 3);
+  view.phi += (0.92 - view.phi) * Math.min(1, dt * 3);
+  // speed → FOV punch
+  const targetFov = 55 + sp * 8 + drive.boost * 6;
+  camFov += (targetFov - camFov) * Math.min(1, dt * 3);
+  if (Math.abs(camera.fov - camFov) > 0.05) { camera.fov = camFov; camera.updateProjectionMatrix(); }
+}
+
 /* ---------- render loop (render-on-demand-ish; animates pulses) ---------- */
 let renderReq = true;
 function requestRender() { renderReq = true; }
@@ -751,8 +923,12 @@ function frame() {
   // drifting void
   if (starfield) starfield.rotation.y += dt * 0.012;
 
-  // momentum for drag-to-pan / orbit when the user lets go
-  if (!dragging && !isFlying) {
+  if (driveMode && packet && !isFlying && !panelOpen()) {
+    // felix.run: drive the packet; the chase cam feeds the same view model
+    updateDrive(dt);
+    updateChaseCam(dt);
+  } else if (!dragging && !isFlying) {
+    // momentum for drag-to-pan / orbit when the user lets go (overview mode)
     if (Math.abs(panVel.x) + Math.abs(panVel.z) > 1e-4) {
       view.target.x += panVel.x; view.target.z += panVel.z;
       panVel.x *= 0.9; panVel.z *= 0.9; clampTarget();
@@ -812,6 +988,8 @@ function bootSequence() {
     view.target.copy(OVERVIEW.target);
   }
   setTimeout(() => { if (veil) veil.classList.add('is-hidden'); }, reduceMotion ? 200 : 1100);
+  // hand off from the cinematic boot to driving (reduced-motion stays in click/overview mode)
+  if (!reduceMotion) setTimeout(() => { driveMode = true; }, 2400);
 }
 
 let hintTimer = 0;
@@ -893,14 +1071,26 @@ function addListeners() {
   });
   $('#world-classic-btn').addEventListener('click', exitWorld);
   $('#world-panel .wpanel-close').addEventListener('click', closePanel);
-  // number keys 1-6 jump
+  // driving keys
   window.addEventListener('keydown', (e) => {
     if (!document.documentElement.classList.contains('world-on')) return;
-    if (e.target.matches('input, textarea')) return;
+    if (e.target && e.target.matches && e.target.matches('input, textarea')) return;
+    const k = e.key.toLowerCase();
     if (e.key === 'Escape') { closePanel(); return; }
+    if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift',' '].includes(k)) {
+      keys[k === ' ' ? 'space' : k] = true;
+      if (k.startsWith('arrow') || k === ' ') e.preventDefault();
+      hideHintSoon();
+      return;
+    }
     const n = parseInt(e.key, 10);
     if (n >= 1 && n <= DISTRICTS.length) goTo(DISTRICTS[n - 1].id, true);
   });
+  window.addEventListener('keyup', (e) => {
+    const k = e.key.toLowerCase();
+    keys[k === ' ' ? 'space' : k] = false;
+  });
+  // dropping a panel resumes driving from the port (don't re-dock immediately handled by dockedZone)
 }
 
 /* ---------- bootstrap ---------- */
