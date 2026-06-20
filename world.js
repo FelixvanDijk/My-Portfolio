@@ -33,6 +33,23 @@ const GradeShader = {
 };
 let gradePass = null;
 
+/* flowing-energy road material: bright bands stream along each copper trace */
+function roadMaterial(color) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 }, uColor: { value: new THREE.Color(color) }, uBright: { value: 1 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: [
+      'varying vec2 vUv; uniform float uTime, uBright; uniform vec3 uColor;',
+      'void main(){',
+      '  float flow = fract(vUv.x * 5.0 - uTime * 0.55);',
+      '  float band = smoothstep(0.0, 0.10, flow) * smoothstep(0.42, 0.10, flow);',
+      '  vec3 col = uColor * (0.30 + band * 2.4) * uBright;',
+      '  gl_FragColor = vec4(col, 1.0);',
+      '}',
+    ].join('\n'),
+  });
+}
+
 const GREEN = 0x22c55e;
 const BLUE = 0x4a90e2;
 const COPPER = 0xc9a25e;
@@ -328,10 +345,8 @@ function buildTrace(from, to, color) {
     new THREE.Vector3(to.x, y, to.z),
   ];
   const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.2);
-  const geo = new THREE.TubeGeometry(curve, 40, 0.1, 7, false);
-  const mat = new THREE.MeshStandardMaterial({
-    color, emissive: color, emissiveIntensity: 0.7, metalness: 0.9, roughness: 0.4,
-  });
+  const geo = new THREE.TubeGeometry(curve, 60, 0.12, 8, false);
+  const mat = roadMaterial(color);
   const tube = new THREE.Mesh(geo, mat);
   scene.add(tube);
   traceMats.push(mat);
@@ -459,7 +474,7 @@ function setBootDark() {
     c.top.material.emissiveIntensity = 0;
     c.edge.material.opacity = 0.06;
     c.led.material.emissiveIntensity = 0;
-    if (c.traceMat) c.traceMat.emissiveIntensity = 0.04;
+    if (c.traceMat) { if (c.traceMat.uniforms) c.traceMat.uniforms.uBright.value = 0.12; else c.traceMat.emissiveIntensity = 0.04; }
   });
 }
 function powerChip(c, isCpu) {
@@ -476,7 +491,8 @@ function bootPulse(c, delay) {
   const tl = window.gsap.timeline({ delay });
   tl.set(dot, { visible: true });
   tl.to(o, { t: 1, duration: 0.42, ease: 'power2.in', onUpdate: () => { c.traceCurve.getPointAt(o.t, dot.position); requestRender(); } });
-  tl.to(c.traceMat, { emissiveIntensity: 0.7, duration: 0.4 }, '<0.05');
+  if (c.traceMat && c.traceMat.uniforms) tl.to(c.traceMat.uniforms.uBright, { value: 1, duration: 0.4 }, '<0.05');
+  else if (c.traceMat) tl.to(c.traceMat, { emissiveIntensity: 0.7, duration: 0.4 }, '<0.05');
   tl.add(() => { scene.remove(dot); dot.geometry.dispose(); dot.material.dispose(); powerChip(c, false); });
 }
 function runBootCascade() {
@@ -1024,6 +1040,12 @@ function frame() {
   Object.values(chips).forEach((c) => {
     if (c.led.userData.blink) c.led.material.emissiveIntensity = 0.6 + Math.sin(t * 3) * 0.7;
   });
+
+  // flowing-energy roads
+  for (let i = 0; i < traceMats.length; i++) {
+    const m = traceMats[i];
+    if (m && m.uniforms && m.uniforms.uTime) m.uniforms.uTime.value = t;
+  }
 
   // drifting void
   if (starfield) starfield.rotation.y += dt * 0.012;
