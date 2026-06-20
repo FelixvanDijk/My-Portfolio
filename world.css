@@ -429,3 +429,5 @@ html.world-on #explore-btn { display: none !important; }
     .cl-row .cl-name { display: none; }
     .cl-head { margin-bottom: 6px; }
 }
+
+.wbtn.is-off { opacity: 0.5; }

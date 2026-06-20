@@ -9,6 +9,29 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+
+/* cinematic grade: vignette + chromatic aberration (boost-reactive) + film grain */
+const GradeShader = {
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0012 }, uVignette: { value: 1.15 }, uGrain: { value: 0.055 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+  fragmentShader: [
+    'varying vec2 vUv; uniform sampler2D tDiffuse; uniform float uTime, uAberration, uVignette, uGrain;',
+    'float rand(vec2 c){ return fract(sin(dot(c, vec2(12.9898,78.233))) * 43758.5453); }',
+    'void main(){',
+    '  vec2 d = vUv - 0.5;',
+    '  float r = texture2D(tDiffuse, vUv - d * uAberration).r;',
+    '  float g = texture2D(tDiffuse, vUv).g;',
+    '  float b = texture2D(tDiffuse, vUv + d * uAberration).b;',
+    '  vec3 col = vec3(r, g, b);',
+    '  float vig = smoothstep(0.95, 0.25, length(d) * uVignette);',
+    '  col *= mix(0.5, 1.0, vig);',
+    '  col += (rand(vUv + fract(uTime)) - 0.5) * uGrain;',
+    '  gl_FragColor = vec4(col, 1.0);',
+    '}',
+  ].join('\n'),
+};
+let gradePass = null;
 
 const GREEN = 0x22c55e;
 const BLUE = 0x4a90e2;
@@ -34,17 +57,90 @@ let driveMode = false;
 let packet = null, packetLight = null;
 const trail = [];
 const drive = {
-  pos: new THREE.Vector3(0, 0.9, 9),
+  pos: new THREE.Vector3(0, 0.9, -16),  // open south edge, facing into the board
   heading: 0,            // yaw; forward = (sin h, cos h)
   vel: new THREE.Vector3(),
   speed: 0,
   boost: 0,              // 0..1 smoothed
 };
 const keys = Object.create(null);
-let dockedZone = 'cpu';  // spawn at the CPU (home/whoami) without auto-opening it
+let dockedZone = null;   // spawn in open space — nothing docked, free to roam
 let camFov = 55;
 let introActive = false; // sky hero-shot + instructions before the drop-in
 const visited = new Set();
+let wasBoost = false;
+
+/* ---------- procedural Web-Audio (no asset files; unlocked by the drop gesture) ---------- */
+let actx = null, masterGain = null, audioMuted = false, audioReady = false;
+let engOsc = null, engSub = null, engGain = null, engFilter = null;
+function initAudio() {
+  if (actx) { if (actx.state === 'suspended') actx.resume(); return; }
+  try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+  masterGain = actx.createGain();
+  masterGain.gain.value = 0;
+  masterGain.connect(actx.destination);
+  // ambient pad: a soft low chord through a slow-sweeping lowpass
+  const padGain = actx.createGain(); padGain.gain.value = 0;
+  const padFilt = actx.createBiquadFilter(); padFilt.type = 'lowpass'; padFilt.frequency.value = 600; padFilt.Q.value = 0.7;
+  padGain.connect(padFilt); padFilt.connect(masterGain);
+  [110, 164.81, 220, 277.18].forEach((f, i) => {
+    const o = actx.createOscillator(); o.type = i > 1 ? 'sine' : 'triangle'; o.frequency.value = f; o.detune.value = (i - 1.5) * 5;
+    o.connect(padGain); o.start();
+  });
+  padGain.gain.setTargetAtTime(0.13, actx.currentTime, 3);
+  const lfo = actx.createOscillator(); lfo.frequency.value = 0.045;
+  const lfoG = actx.createGain(); lfoG.gain.value = 260; lfo.connect(lfoG); lfoG.connect(padFilt.frequency); lfo.start();
+  // engine: sub + sawtooth through a lowpass, modulated by speed
+  engGain = actx.createGain(); engGain.gain.value = 0;
+  engFilter = actx.createBiquadFilter(); engFilter.type = 'lowpass'; engFilter.frequency.value = 400;
+  engGain.connect(masterGain);
+  engOsc = actx.createOscillator(); engOsc.type = 'sawtooth'; engOsc.frequency.value = 55; engOsc.connect(engFilter);
+  engSub = actx.createOscillator(); engSub.type = 'sine'; engSub.frequency.value = 40; engSub.connect(engFilter);
+  engFilter.connect(engGain);
+  engOsc.start(); engSub.start();
+  audioReady = true;
+  applyMute();
+  masterGain.gain.setTargetAtTime(audioMuted ? 0 : 0.85, actx.currentTime, 0.6);
+}
+function applyMute() {
+  const btn = $('#world-mute'); if (btn) { btn.textContent = audioMuted ? '♪ off' : '♪ on'; btn.classList.toggle('is-off', audioMuted); }
+  if (masterGain && actx) masterGain.gain.setTargetAtTime(audioMuted ? 0 : 0.85, actx.currentTime, 0.2);
+}
+function toggleMute() { audioMuted = !audioMuted; try { localStorage.setItem('felix-muted', audioMuted ? '1' : '0'); } catch (e) {} applyMute(); }
+function updateEngineAudio(speed, boost) {
+  if (!audioReady) return;
+  const sp = Math.min(Math.abs(speed) / 26, 1);
+  const now = actx.currentTime;
+  engOsc.frequency.setTargetAtTime(55 + sp * 130 + boost * 50, now, 0.08);
+  engSub.frequency.setTargetAtTime(38 + sp * 30, now, 0.08);
+  engFilter.frequency.setTargetAtTime(300 + sp * 1500 + boost * 600, now, 0.08);
+  engGain.gain.setTargetAtTime(0.03 + sp * 0.11, now, 0.12);
+}
+function blip(freqs, dur, vol) {
+  if (!audioReady) return;
+  freqs.forEach((f, i) => {
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.value = f; o.connect(g); g.connect(masterGain);
+    const t0 = actx.currentTime + i * 0.1;
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol || 0.18, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0008, t0 + (dur || 0.5));
+    o.start(t0); o.stop(t0 + (dur || 0.5) + 0.05);
+  });
+}
+function dockChime() { blip([493.88, 659.25, 783.99], 0.55, 0.16); }
+function collectChime() { blip([880, 1318.5], 0.3, 0.14); }
+function boostWhoosh() {
+  if (!audioReady) return;
+  const dur = 0.5, sr = actx.sampleRate, buf = actx.createBuffer(1, sr * dur, sr), ch = buf.getChannelData(0);
+  for (let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / ch.length);
+  const src = actx.createBufferSource(); src.buffer = buf;
+  const f = actx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 600; f.Q.value = 1.2;
+  const g = actx.createGain(); g.gain.value = 0.18;
+  src.connect(f); f.connect(g); g.connect(masterGain);
+  f.frequency.setValueAtTime(500, actx.currentTime); f.frequency.exponentialRampToValueAtTime(2600, actx.currentTime + dur);
+  g.gain.setValueAtTime(0.18, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+  src.start();
+}
 const LITE = !!(window.__FELIX && window.__FELIX.lite);
 const useBloom = !LITE;
 let benchStart = 0, benchFrames = 0, benchStage = 0;
@@ -484,6 +580,8 @@ function setupComposer() {
   composer.addPass(new RenderPass(scene, camera));
   const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.85, 0.55, 0.8);
   composer.addPass(bloom);
+  gradePass = new ShaderPass(GradeShader);
+  composer.addPass(gradePass); // last pass → renders to screen
 }
 
 /* ---------- DOM: labels, dock, panel ---------- */
@@ -785,6 +883,8 @@ function updateDrive(dt) {
   const thrust = (keys['w'] || keys['arrowup'] ? 1 : 0) - (keys['s'] || keys['arrowdown'] ? 0.7 : 0);
   const steer = (keys['a'] || keys['arrowleft'] ? 1 : 0) - (keys['d'] || keys['arrowright'] ? 1 : 0);
   const wantBoost = !!(keys['shift'] && thrust > 0);
+  if (wantBoost && !wasBoost) boostWhoosh();
+  wasBoost = wantBoost;
   drive.boost += ((wantBoost ? 1 : 0) - drive.boost) * Math.min(1, dt * 6);
 
   const MAX = 26 + drive.boost * 16;
@@ -855,10 +955,11 @@ function updateDrive(dt) {
     if (dist < nd) { nd = dist; near = d.id; }
   }
   if (near && nd < PORT_R) {
-    if (dockedZone !== near) { dockedZone = near; drive.speed *= 0.3; goTo(near, true); }
+    if (dockedZone !== near) { dockedZone = near; drive.speed *= 0.3; dockChime(); goTo(near, true); }
   } else if (nd > EXIT_R) {
     dockedZone = null;
   }
+  updateEngineAudio(drive.speed, drive.boost);
 }
 
 const _ct = new THREE.Vector3();
@@ -950,6 +1051,7 @@ function frame() {
   spherical(camera.position, view.target, view.radius, view.theta, view.phi);
   camera.lookAt(view.target);
 
+  if (gradePass) { gradePass.uniforms.uTime.value = t; gradePass.uniforms.uAberration.value = 0.0011 + drive.boost * 0.004; }
   if (composer) composer.render(); else renderer.render(scene, camera);
   updateLabels();
 }
@@ -1006,7 +1108,7 @@ function startIntro() {
   if (driveMode) return;
   introActive = true;
   if (window.gsap) { window.gsap.killTweensOf(view); window.gsap.killTweensOf(view.target); }
-  if (packet) packet.position.set(0, 42, 9);
+  if (packet) packet.position.set(0, 42, -16);
   view.target.set(0, 2, 0); view.radius = 76; view.theta = 0; view.phi = 0.5;
   const el = $('#world-intro'); if (el) { el.hidden = false; el.style.opacity = ''; }
   requestRender();
@@ -1015,6 +1117,8 @@ function startIntro() {
 function startDrop() {
   if (!introActive) return;
   introActive = false;
+  try { const m = localStorage.getItem('felix-muted'); audioMuted = m === '1' || (m === null && reduceMotion); } catch (e) { audioMuted = reduceMotion; }
+  initAudio(); // the drop gesture unlocks WebAudio
   const el = $('#world-intro');
   if (el) { el.style.transition = 'opacity .4s'; el.style.opacity = '0'; setTimeout(() => { el.hidden = true; }, 420); }
   isFlying = true;
@@ -1022,14 +1126,14 @@ function startDrop() {
     window.gsap.killTweensOf(view); window.gsap.killTweensOf(view.target);
     window.gsap.to(packet.position, { y: 0.9, duration: 1.2, ease: 'bounce.out', onUpdate: requestRender });
     window.gsap.to(view, { radius: 13, theta: Math.PI, phi: 0.92, duration: 1.2, ease: 'power2.inOut', onUpdate: requestRender });
-    window.gsap.to(view.target, { x: 0, y: 1.6, z: 12, duration: 1.2, ease: 'power2.inOut', onUpdate: requestRender, onComplete: finishDrop });
+    window.gsap.to(view.target, { x: 0, y: 1.6, z: -13, duration: 1.2, ease: 'power2.inOut', onUpdate: requestRender, onComplete: finishDrop });
     setTimeout(landingFlash, 850);
   } else { finishDrop(); }
 }
 
 function finishDrop() {
-  drive.pos.set(0, 0.9, 9); drive.heading = 0; drive.vel.set(0, 0, 0); drive.speed = 0;
-  dockedZone = 'cpu'; driveMode = true; isFlying = false;
+  drive.pos.set(0, 0.9, -16); drive.heading = 0; drive.vel.set(0, 0, 0); drive.speed = 0;
+  dockedZone = null; driveMode = true; isFlying = false;
   const cl = $('#world-checklist'); if (cl) cl.classList.add('is-on');
   const h = $('#world-hint'); if (h) { h.style.opacity = '1'; hideHintSoon(); }
 }
@@ -1040,7 +1144,7 @@ function landingFlash() {
     new THREE.RingGeometry(0.5, 0.85, 36),
     new THREE.MeshBasicMaterial({ color: GREEN, transparent: true, opacity: 0.9, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })
   );
-  ring.rotation.x = -Math.PI / 2; ring.position.set(0, 0.18, 9); scene.add(ring);
+  ring.rotation.x = -Math.PI / 2; ring.position.set(0, 0.18, -16); scene.add(ring);
   if (window.gsap) {
     window.gsap.to(ring.scale, { x: 16, y: 16, z: 16, duration: 0.9, ease: 'power2.out', onUpdate: requestRender });
     window.gsap.to(ring.material, { opacity: 0, duration: 0.9, ease: 'power2.out', onComplete: () => { scene.remove(ring); ring.geometry.dispose(); ring.material.dispose(); } });
@@ -1145,6 +1249,8 @@ function addListeners() {
   $('#world-panel .wpanel-close').addEventListener('click', closePanel);
   const introEl = $('#world-intro');
   if (introEl) introEl.addEventListener('click', () => { if (introActive) startDrop(); });
+  const muteBtn = $('#world-mute');
+  if (muteBtn) muteBtn.addEventListener('click', toggleMute);
   // driving keys
   window.addEventListener('keydown', (e) => {
     if (!document.documentElement.classList.contains('world-on')) return;
@@ -1152,6 +1258,7 @@ function addListeners() {
     const k = e.key.toLowerCase();
     if (introActive) { if (k === 'c') { exitWorld(); return; } e.preventDefault(); startDrop(); return; }
     if (k === 'c') { exitWorld(); return; }
+    if (k === 'm') { toggleMute(); return; }
     if (e.key === 'Escape') { closePanel(); return; }
     if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift',' '].includes(k)) {
       keys[k === ' ' ? 'space' : k] = true;
