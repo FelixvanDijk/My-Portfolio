@@ -87,6 +87,7 @@ let introActive = false; // sky hero-shot + instructions before the drop-in
 const visited = new Set();
 let wasBoost = false;
 const shards = []; let fragsTaken = 0; let turbo = false;
+const journeyArches = [];
 
 /* ---------- procedural Web-Audio (no asset files; unlocked by the drop gesture) ---------- */
 let actx = null, masterGain = null, audioMuted = false, audioReady = false;
@@ -420,6 +421,8 @@ function buildScene() {
   });
 
   buildBusinessFork();
+  buildSkillSigns();
+  buildJourneyArches();
   buildPacket();
   buildCollectibles();
 
@@ -870,6 +873,58 @@ function updateFrags() {
   }
 }
 
+/* crisp sign text (auto-fits) */
+function makeSignTexture(text, color) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 128;
+  const x = c.getContext('2d'); x.clearRect(0, 0, 512, 128);
+  x.fillStyle = color || '#9effc0'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  let fs = 58; x.font = 'bold ' + fs + 'px "JetBrains Mono", monospace';
+  while (x.measureText(text).width > 480 && fs > 20) { fs -= 4; x.font = 'bold ' + fs + 'px "JetBrains Mono", monospace'; }
+  x.fillText(text, 256, 64);
+  const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4; return tex;
+}
+function lerpV(ax, az, bx, bz, t) { return new THREE.Vector3(ax + (bx - ax) * t, 0, az + (bz - az) * t); }
+
+/* skill road-signs: gantries you drive under along the CPU→Skills lane */
+function buildSkillSigns() {
+  const cpu = chips.cpu.pos, sk = chips.skills.pos;
+  const dir = Math.atan2(cpu.x - sk.x, cpu.z - sk.z); // face back toward the approach
+  const labels = ['React · TS', 'Node · Go', 'Python · C', 'SQL · Haskell'];
+  const postMat = new THREE.MeshStandardMaterial({ color: 0x12202c, metalness: 0.7, roughness: 0.4, emissive: GREEN, emissiveIntensity: 0.08 });
+  labels.forEach((label, i) => {
+    const p = lerpV(cpu.x, cpu.z, sk.x, sk.z, 0.32 + i * 0.16);
+    const g = new THREE.Group();
+    const postGeo = new THREE.BoxGeometry(0.28, 4, 0.28);
+    const L = new THREE.Mesh(postGeo, postMat); L.position.set(-3.4, 2, 0); g.add(L);
+    const R = new THREE.Mesh(postGeo, postMat); R.position.set(3.4, 2, 0); g.add(R);
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.55, 0.4), postMat); beam.position.y = 4; g.add(beam);
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.07, 0.07), new THREE.MeshBasicMaterial({ color: GREEN })));
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: makeSignTexture(label, '#9effc0'), transparent: true }));
+    sign.position.set(0, 4, 0.24); g.add(sign);
+    g.position.set(p.x, 0, p.z); g.rotation.y = dir;
+    scene.add(g);
+  });
+}
+
+/* journey milestone arches that light as you pass, along the CPU→Journey lane */
+function buildJourneyArches() {
+  const cpu = chips.cpu.pos, jr = chips.journey.pos;
+  const dir = Math.atan2(jr.x - cpu.x, jr.z - cpu.z);
+  const stops = ['2016 · Alun School', '2021 · Sixth Form', '2023 · Bristol BSc', 'F van Dijk Ltd'];
+  stops.forEach((label, i) => {
+    const p = lerpV(cpu.x, cpu.z, jr.x, jr.z, 0.32 + i * 0.17);
+    const g = new THREE.Group();
+    const mat = new THREE.MeshStandardMaterial({ color: 0x101826, metalness: 0.6, roughness: 0.4, emissive: GREEN, emissiveIntensity: 0.05 });
+    const arch = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.22, 8, 28, Math.PI), mat);
+    g.add(arch);
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(5, 1.3), new THREE.MeshBasicMaterial({ map: makeSignTexture(label, '#bfe0ff'), transparent: true, opacity: 0.85 }));
+    sign.position.set(0, 3.7, 0); g.add(sign);
+    g.position.set(p.x, 0, p.z); g.rotation.y = dir;
+    scene.add(g);
+    journeyArches.push({ group: g, mat, x: p.x, z: p.z, lit: false });
+  });
+}
+
 function buildPacket() {
   const g = new THREE.Group();
   // chamfered glowing core
@@ -920,7 +975,7 @@ let trailTick = 0;
 function updateDrive(dt) {
   // ----- input → controls -----
   const thrust = (keys['w'] || keys['arrowup'] ? 1 : 0) - (keys['s'] || keys['arrowdown'] ? 0.7 : 0);
-  const steer = (keys['a'] || keys['arrowleft'] ? 1 : 0) - (keys['d'] || keys['arrowright'] ? 1 : 0);
+  const steer = (keys['d'] || keys['arrowright'] ? 1 : 0) - (keys['a'] || keys['arrowleft'] ? 1 : 0);
   const wantBoost = !!(keys['shift'] && thrust > 0);
   if (wantBoost && !wasBoost) boostWhoosh();
   wasBoost = wantBoost;
@@ -985,6 +1040,17 @@ function updateDrive(dt) {
       s.mesh.scale.set(sc, sc, sc);
     }
   });
+
+  // ----- light journey arches as you pass under them -----
+  for (let i = 0; i < journeyArches.length; i++) {
+    const a = journeyArches[i];
+    if (a.lit) continue;
+    if (Math.hypot(drive.pos.x - a.x, drive.pos.z - a.z) < 4.2) {
+      a.lit = true;
+      if (window.gsap) window.gsap.to(a.mat, { emissiveIntensity: 0.85, duration: 0.5, onUpdate: requestRender });
+      else a.mat.emissiveIntensity = 0.85;
+    }
+  }
 
   // ----- collect data-fragments -----
   for (let i = 0; i < shards.length; i++) {
