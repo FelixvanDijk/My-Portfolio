@@ -120,11 +120,18 @@ function initAudio() {
   engOsc.start(); engSub.start();
   audioReady = true;
   applyMute();
-  masterGain.gain.setTargetAtTime(audioMuted ? 0 : 0.85, actx.currentTime, 0.6);
 }
 function applyMute() {
   const btn = $('#world-mute'); if (btn) { btn.textContent = audioMuted ? '♪ off' : '♪ on'; btn.classList.toggle('is-off', audioMuted); }
-  if (masterGain && actx) masterGain.gain.setTargetAtTime(audioMuted ? 0 : 0.85, actx.currentTime, 0.2);
+  if (masterGain && actx) {
+    const now = actx.currentTime, g = masterGain.gain;
+    // linearRamp reaches EXACTLY the target (setTargetAtTime is asymptotic and
+    // leaves an audible residual) — snap to true silence, gently fade back in.
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(g.value, now);
+    if (audioMuted) g.linearRampToValueAtTime(0, now + 0.08);
+    else g.linearRampToValueAtTime(0.85, now + 0.4);
+  }
 }
 function toggleMute() { audioMuted = !audioMuted; try { localStorage.setItem('felix-muted', audioMuted ? '1' : '0'); } catch (e) {} applyMute(); }
 function updateEngineAudio(speed, boost) {
@@ -1403,6 +1410,7 @@ function onResize() {
 function enterWorld() {
   document.documentElement.classList.add('world-on');
   try { localStorage.setItem('felix-view', 'world'); } catch (e) {}
+  if (actx && actx.state === 'suspended' && !audioMuted) actx.resume(); // returning from classic view: bring audio back
   if (!built) {
     buildScene();
     buildHud();
@@ -1430,6 +1438,7 @@ function exitWorld() {
   document.documentElement.classList.remove('world-on', 'world-driving');
   try { localStorage.setItem('felix-view', 'classic'); } catch (e) {}
   running = false;
+  if (actx && actx.state === 'running') actx.suspend(); // silence world audio when leaving to classic (resumes on next drop-in)
   closePanel();
   history.replaceState(null, '', location.pathname);
 }

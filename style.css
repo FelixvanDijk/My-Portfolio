@@ -569,6 +569,16 @@ html.js #hero-rendered.is-shown { opacity: 1; visibility: visible; transition: o
 }
 .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
 
+/* Below the desktop-pin width (>=1024px) the printf->headline morph never runs,
+   so the printf code would stay on screen stacked under the headline. Hide the
+   code layer here and just present the finished headline cleanly. */
+@media (max-width: 1023px) {
+    .hero-pre, .hero-caret { display: none !important; }
+    html.js #hero-rendered,
+    html.js.pin-hero #hero-rendered { opacity: 1 !important; visibility: visible !important; }
+    #hero { min-height: auto; align-items: flex-start; padding-top: calc(var(--topbar-h) + 48px); padding-bottom: 56px; }
+}
+
 .scroll-cue {
     position: absolute;
     left: 50%;
