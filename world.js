@@ -441,6 +441,9 @@ function buildScene() {
 /* ---------- the business-side fork: a second board the Journey trace splits toward ---------- */
 let bizBoard, bizLabelEl;
 const bizForkPos = new THREE.Vector3(-42, 2, 20);
+const GATE = { x: -29, z: 14 };   // reachable blue gateway pad on the main board
+let bizGate = null;
+let portaling = false;            // true once the business-portal cinematic has started
 function buildBusinessFork() {
   const g = new THREE.Group();
   g.position.set(-42, 0, 20);
@@ -479,6 +482,38 @@ function buildBusinessFork() {
   el.addEventListener('click', () => { window.location.href = 'business.html'; });
   $('#world-labels').appendChild(el);
   bizLabelEl = el;
+
+  // ---- reachable gateway pad on the main board: drive the packet in to portal across ----
+  const gate = new THREE.Group();
+  gate.position.set(GATE.x, 0, GATE.z);
+  const gpad = new THREE.Mesh(
+    new THREE.CircleGeometry(3, 48),
+    new THREE.MeshStandardMaterial({ color: 0x0a1626, emissive: BLUE, emissiveIntensity: 0.3, metalness: 0.6, roughness: 0.4 })
+  );
+  gpad.rotation.x = -Math.PI / 2; gpad.position.y = 0.05; gate.add(gpad);
+  const gring = new THREE.Mesh(
+    new THREE.RingGeometry(2.7, 3.1, 48),
+    new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
+  );
+  gring.rotation.x = -Math.PI / 2; gring.position.y = 0.07; gate.add(gring);
+  const ghole = new THREE.Mesh(
+    new THREE.CircleGeometry(2.4, 48),
+    new THREE.MeshBasicMaterial({ color: 0x01040a })
+  );
+  ghole.rotation.x = -Math.PI / 2; ghole.position.y = 0.08; ghole.scale.setScalar(0.001); gate.add(ghole);
+  const gbeam = new THREE.Mesh(
+    new THREE.CylinderGeometry(2.0, 2.0, 12, 28, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0x7fc4ff, transparent: true, opacity: 0, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  gbeam.position.y = 6; gbeam.scale.y = 0.001; gate.add(gbeam);
+  const glabel = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.6, 2.3),
+    new THREE.MeshBasicMaterial({ map: makeChipLabelTexture('fvandijk.ltd', '#a9ccff'), transparent: true })
+  );
+  glabel.rotation.x = -Math.PI / 2; glabel.position.set(0, 0.12, 2.1); gate.add(glabel);
+  const glight = new THREE.PointLight(BLUE, 0, 20, 2); glight.position.set(GATE.x, 2.5, GATE.z); scene.add(glight);
+  scene.add(gate);
+  bizGate = { hole: ghole, beam: gbeam, ring: gring, light: glight };
 }
 
 /* ---------- boot cascade: power the CPU, race a clock-pulse out to each district ---------- */
@@ -1162,6 +1197,9 @@ function updateDrive(dt) {
   } else if (nd > EXIT_R) {
     dockedZone = null;
   }
+  // ----- business gateway: drive the packet into the blue pad → portal across to fvandijk.ltd -----
+  if (!portaling && Math.hypot(drive.pos.x - GATE.x, drive.pos.z - GATE.z) < 3.4) { enterBusinessPortal(); return; }
+
   updateEngineAudio(drive.speed, drive.boost);
 }
 
@@ -1381,6 +1419,54 @@ function landingFlash() {
     window.gsap.to(ring.scale, { x: 16, y: 16, z: 16, duration: 0.9, ease: 'power2.out', onUpdate: requestRender });
     window.gsap.to(ring.material, { opacity: 0, duration: 0.9, ease: 'power2.out', onComplete: () => { scene.remove(ring); ring.geometry.dispose(); ring.material.dispose(); } });
   }
+}
+
+/* ---------- business portal: drive in → dive → turn blue → hand off to fvandijk.ltd ---------- */
+function openBizGate() {
+  if (!bizGate) return;
+  if (!window.gsap || reduceMotion) { bizGate.hole.scale.setScalar(1); return; }
+  window.gsap.to(bizGate.hole.scale, { x: 1, y: 1, z: 1, duration: 0.5, ease: 'power2.out', onUpdate: requestRender });
+  window.gsap.to(bizGate.beam.scale, { y: 1, duration: 0.7, ease: 'power2.out', onUpdate: requestRender });
+  window.gsap.to(bizGate.beam.material, { opacity: 0.4, duration: 0.4, ease: 'power2.out', onUpdate: requestRender });
+  window.gsap.to(bizGate.light, { intensity: 3.5, duration: 0.4, onUpdate: requestRender });
+}
+
+function showPortalOverlay() {
+  let ov = document.getElementById('world-portal');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'world-portal'; ov.innerHTML = '<span class="wp-dot"></span>'; document.body.appendChild(ov); }
+  requestAnimationFrame(() => ov.classList.add('is-on'));
+}
+
+function goToBusiness() {
+  try { sessionStorage.setItem('felix-arrival', '1'); } catch (e) {}
+  window.location.href = 'business.html';
+}
+
+function enterBusinessPortal() {
+  if (portaling) return;
+  portaling = true;
+  isFlying = true;                       // freeze the drive loop; gsap drives the cinematic
+  drive.speed = 0; drive.vel.set(0, 0, 0);
+  openBizGate();
+  try { boostWhoosh(); } catch (e) {}
+  if (!window.gsap || reduceMotion || !packet) { goToBusiness(); return; }
+  const core = packet.children[0], glow = packet.children[2];
+  const cFrom = new THREE.Color(GREEN), cTo = new THREE.Color(BLUE), cTmp = new THREE.Color();
+  const col = { v: 0 };
+  window.gsap.to(packet.position, { x: GATE.x, z: GATE.z, duration: 0.45, ease: 'power2.out', onUpdate: requestRender });
+  window.gsap.to(packet.position, { y: -6, duration: 0.95, delay: 0.42, ease: 'power2.in', onUpdate: requestRender });
+  window.gsap.to(packet.scale, { x: 0.25, y: 0.25, z: 0.25, duration: 0.95, delay: 0.42, ease: 'power2.in', onUpdate: requestRender });
+  window.gsap.to(col, { v: 1, duration: 0.6, delay: 0.3, onUpdate: () => {
+    cTmp.copy(cFrom).lerp(cTo, col.v);
+    if (core && core.material.emissive) core.material.emissive.copy(cTmp);
+    if (glow && glow.material.color) glow.material.color.copy(cTmp);
+    if (packetLight) packetLight.color.copy(cTmp);
+    requestRender();
+  } });
+  window.gsap.to(view.target, { x: GATE.x, y: 0.5, z: GATE.z, duration: 0.9, ease: 'power2.inOut', onUpdate: requestRender });
+  window.gsap.to(view, { radius: 9, phi: 0.32, duration: 0.9, ease: 'power2.in', onUpdate: requestRender });
+  setTimeout(showPortalOverlay, 460);
+  setTimeout(goToBusiness, 1250);
 }
 
 /* ---------- exploration checklist ---------- */

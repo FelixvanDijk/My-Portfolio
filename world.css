@@ -498,3 +498,29 @@ html.world-touch.world-driving #world-boost {
     -webkit-tap-highlight-color: transparent;
 }
 #world-boost:active { background: rgba(34,197,94,0.22); }
+
+/* ---- business portal: navy bridge overlay that hides the page navigation ---- */
+#world-portal {
+    position: fixed;
+    inset: 0;
+    background: #0A0E1A;
+    opacity: 0;
+    z-index: 10000;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+#world-portal.is-on { opacity: 1; }
+#world-portal .wp-dot {
+    position: absolute;
+    left: 50%;
+    top: 14%;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border-radius: 50%;
+    background: #4a90e2;
+    box-shadow: 0 0 18px #4a90e2;
+    opacity: 0;
+}
+#world-portal.is-on .wp-dot { opacity: 1; animation: wp-fall 0.7s ease-in 0.2s forwards; }
+@keyframes wp-fall { to { transform: translateY(70px); } }

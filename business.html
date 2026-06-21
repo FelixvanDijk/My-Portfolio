@@ -19,6 +19,15 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=20260612">
     <script>document.documentElement.classList.add('js');</script>
+    <style>
+        html { background: #0A0E1A; }
+        html.felix-arriving #hero-headline { opacity: 1 !important; transform: none !important; animation: none !important; }
+        .arrival-dot { position: fixed; left: 0; top: 0; width: 16px; height: 16px; border-radius: 4px; background: #4a90e2; box-shadow: 0 0 18px #4a90e2; z-index: 10000; pointer-events: none; opacity: 0; will-change: transform; }
+        .arrival-ripple { position: fixed; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #4a90e2; z-index: 9999; pointer-events: none; opacity: 0.9; transform: scale(0.4); }
+        .arrival-ripple.go { opacity: 0; transform: scale(7); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        @media (prefers-reduced-motion: reduce) { .arrival-dot, .arrival-ripple { display: none; } }
+    </style>
+    <script>(function(){try{var a=sessionStorage.getItem('felix-arrival');if(a)sessionStorage.removeItem('felix-arrival');window.__felixArrive=!!a&&!matchMedia('(prefers-reduced-motion: reduce)').matches;if(window.__felixArrive)document.documentElement.classList.add('felix-arriving');}catch(e){}})();</script>
 </head>
 <body class="has-gutter theme-biz">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -91,7 +100,7 @@
         <section id="hero" class="section biz-hero" data-ln="001">
             <div class="hero-stage">
                 <p class="kicker mono" aria-hidden="true">$ fvandijk-ltd --init</p>
-                <h1 id="hero-headline" class="rise-1">Hello, I'm <span class="accent">Felix</span>.<br>
+                <h1 id="hero-headline" class="rise-1">Hello, I'm <span class="accent">Fel<span class="arrival-i">i</span>x</span>.<br>
                     <span class="h1-line2">Founder of F van Dijk Ltd.</span></h1>
                 <p class="hero-sub rise-2">Automation &amp; Software Solutions for Ambitious Businesses.</p>
                 <div class="hero-ctas rise-3">
@@ -503,5 +512,36 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
     <script src="scripts.js?v=20260612" defer></script>
+    <script>
+    (function () {
+        if (!window.__felixArrive) return;
+        var ran = false;
+        function start() {
+            if (ran) return; ran = true;
+            var iEl = document.querySelector('#hero-headline .arrival-i');
+            if (!iEl || !window.gsap) return;
+            var r = iEl.getBoundingClientRect();
+            var cx = r.left + r.width / 2, cy = r.top + r.height * 0.2;   // the tittle of the i
+            var dot = document.createElement('div'); dot.className = 'arrival-dot'; document.body.appendChild(dot);
+            gsap.set(dot, { x: window.innerWidth / 2 - 8, y: -40, opacity: 1, scale: 1 });
+            gsap.to(dot, { x: cx - 8, duration: 1.15, ease: 'power3.out' });
+            gsap.to(dot, { scale: 0.5, duration: 1.15, ease: 'power2.out' });
+            gsap.to(dot, { y: cy - 8, duration: 1.15, ease: 'bounce.out', onComplete: land });
+            function land() {
+                var rp = document.createElement('div'); rp.className = 'arrival-ripple';
+                rp.style.left = (cx - 8) + 'px'; rp.style.top = (cy - 8) + 'px'; document.body.appendChild(rp);
+                requestAnimationFrame(function () { rp.classList.add('go'); });
+                var h = document.getElementById('hero-headline');
+                if (h) { h.style.transition = 'text-shadow .25s ease-out'; h.style.textShadow = '0 0 22px rgba(74,144,226,0.6)'; setTimeout(function () { h.style.textShadow = ''; }, 320); }
+                gsap.to(dot, { opacity: 0, duration: 0.5, delay: 0.4, onComplete: function () { dot.remove(); } });  // merge into the real tittle
+                setTimeout(function () { rp.remove(); }, 900);
+            }
+        }
+        if (document.fonts && document.fonts.status === 'loaded') start();
+        else if (document.fonts && document.fonts.ready) document.fonts.ready.then(start);
+        window.addEventListener('load', start);
+        setTimeout(start, 400);
+    })();
+    </script>
 </body>
 </html>
