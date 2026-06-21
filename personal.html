@@ -36,11 +36,14 @@
         var small = innerWidth < 900;
         // felix-view2: bumped from felix-view to clear values polluted by an old auto-downgrade bug
         var pref = null; try { pref = localStorage.getItem('felix-view2'); } catch (e) {}
+        // one-shot: a perf bail reloads into classic for this load only (does not persist)
+        var skip3d = null; try { skip3d = sessionStorage.getItem('felix-skip3d'); if (skip3d) sessionStorage.removeItem('felix-skip3d'); } catch (e) {}
         var webgl = (function () { try { var c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); } catch (e) { return false; } })();
         var cores = navigator.hardwareConcurrency || 4;
         var lite = coarse || small || cores <= 4;
         var shouldBoot;
-        if (pref === 'classic') shouldBoot = false;
+        if (skip3d) shouldBoot = false;
+        else if (pref === 'classic') shouldBoot = false;
         else if (pref === 'world') shouldBoot = webgl && !rm;
         else shouldBoot = webgl && !rm && !small && !coarse;
         window.__FELIX = { shouldBoot: shouldBoot, webgl: webgl, reducedMotion: rm, lite: lite };
@@ -694,6 +697,6 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
     <script src="scripts.js?v=20260612" defer></script>
-    <script type="module" src="world.js?v=20260621q"></script>
+    <script type="module" src="world.js?v=20260621t"></script>
 </body>
 </html>

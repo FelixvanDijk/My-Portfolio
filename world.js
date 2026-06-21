@@ -441,7 +441,7 @@ function buildScene() {
 /* ---------- the business-side fork: a second board the Journey trace splits toward ---------- */
 let bizBoard, bizLabelEl;
 const bizForkPos = new THREE.Vector3(-42, 2, 20);
-const GATE = { x: -29, z: 14 };   // reachable blue gateway pad on the main board
+const GATE = { x: -30, z: 0 };    // reachable blue gateway pad, in open west space (clear of districts)
 let bizGate = null;
 let portaling = false;            // true once the business-portal cinematic has started
 function buildBusinessFork() {
@@ -472,8 +472,8 @@ function buildBusinessFork() {
   scene.add(g);
   bizBoard = b;
 
-  // the fork: a blue trace splitting off the Journey district toward the business board
-  const r = buildTrace(new THREE.Vector3(-19, 0, 9), new THREE.Vector3(-42, 0, 20), BLUE);
+  // the fork: a blue trace running from the gateway pad off toward the business board
+  const r = buildTrace(new THREE.Vector3(GATE.x, 0, GATE.z), new THREE.Vector3(-42, 0, 20), BLUE);
   buildPulses(r.curve, 0x7fc4ff, 3, 0.085);
 
   const el = document.createElement('button');
@@ -1185,6 +1185,9 @@ function updateDrive(dt) {
     }
   }
 
+  // ----- business gateway: bump the blue fvandijk.ltd pad from ANY side → portal across (takes priority over docking) -----
+  if (!portaling && Math.abs(drive.pos.x - GATE.x) < 4.2 && Math.abs(drive.pos.z - GATE.z) < 3.8) { enterBusinessPortal(); return; }
+
   // ----- docking: arrive at a district → boot it (nearest-within-port, hysteresis on exit) -----
   let near = null, nd = 1e9;
   for (const d of DISTRICTS) {
@@ -1197,8 +1200,6 @@ function updateDrive(dt) {
   } else if (nd > EXIT_R) {
     dockedZone = null;
   }
-  // ----- business gateway: drive the packet into the blue pad → portal across to fvandijk.ltd -----
-  if (!portaling && Math.hypot(drive.pos.x - GATE.x, drive.pos.z - GATE.z) < 3.4) { enterBusinessPortal(); return; }
 
   updateEngineAudio(drive.speed, drive.boost);
 }
@@ -1293,7 +1294,7 @@ function frame() {
   if (introActive && packet) {
     // sky hero shot: packet hovers/spins above the board, camera slowly orbits
     packet.rotation.y += dt * 0.5;
-    packet.position.set(0, 42 + Math.sin(t * 1.2) * 0.7, 9);
+    packet.position.set(0, 42 + Math.sin(t * 1.2) * 0.7, -16);
     view.theta += dt * 0.06;
   } else if (driveMode && packet && !isFlying && !panelOpen()) {
     // felix.run: drive the packet; the chase cam feeds the same view model
@@ -1535,12 +1536,15 @@ function autoExitClassic() {
 }
 
 function exitWorld(persist) {
-  document.documentElement.classList.remove('world-on', 'world-driving');
-  if (persist !== false) { try { localStorage.setItem('felix-view2', 'classic'); } catch (e) {} } // only an explicit user choice sticks
-  running = false;
-  if (actx && actx.state === 'running') actx.suspend(); // silence world audio when leaving to classic (resumes on next drop-in)
-  closePanel();
-  history.replaceState(null, '', location.pathname);
+  try {
+    if (persist === false) sessionStorage.setItem('felix-skip3d', '1'); // perf bail → classic for this load only
+    else localStorage.setItem('felix-view2', 'classic');               // explicit choice sticks
+  } catch (e) {}
+  // Full reload so the classic site initialises against a VISIBLE DOM. Booting in 3D hides
+  // #main (html.world-on), so its scroll/pin/morph choreography measured a display:none hero
+  // and an in-page reveal left it broken. A reload is the same clean path as clicking the tabs.
+  if (location.hash) history.replaceState(null, '', location.pathname);
+  location.reload();
 }
 
 function addListeners() {
