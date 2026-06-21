@@ -440,21 +440,23 @@ function buildScene() {
 
 /* ---------- the business-side fork: a second board the Journey trace splits toward ---------- */
 let bizBoard, bizLabelEl;
-const bizForkPos = new THREE.Vector3(-42, 2, 20);
-const GATE = { x: -30, z: 0 };    // reachable blue gateway pad, in open west space (clear of districts)
+const GATE = { x: -30, z: 20 };   // the business board+chip: dock it (like any chip) to portal across
+const bizForkPos = new THREE.Vector3(GATE.x, 2, GATE.z);
 let bizGate = null;
 let portaling = false;            // true once the business-portal cinematic has started
 function buildBusinessFork() {
+  // the F van Dijk Ltd board lives on the playfield now: drive into its chip to dock (like any
+  // other chip) and the portal cinematic fires instead of opening a side panel.
   const g = new THREE.Group();
-  g.position.set(-42, 0, 20);
+  g.position.set(GATE.x, 0, GATE.z);
   const b = new THREE.Mesh(
-    new THREE.BoxGeometry(16, 0.5, 11),
+    new THREE.BoxGeometry(12, 0.5, 9),
     new THREE.MeshStandardMaterial({ color: 0x0a1422, roughness: 0.6, metalness: 0.5, emissive: BLUE, emissiveIntensity: 0.16 })
   );
   b.userData.zone = 'business';
   g.add(b);
   g.add(new THREE.LineSegments(
-    new THREE.EdgesGeometry(new THREE.BoxGeometry(16, 0.5, 11)),
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(12, 0.5, 9)),
     new THREE.LineBasicMaterial({ color: BLUE, transparent: true, opacity: 0.5 })
   ));
   const chip = new THREE.Mesh(
@@ -464,16 +466,26 @@ function buildBusinessFork() {
   chip.position.y = 0.75; chip.userData.zone = 'business';
   g.add(chip);
   const lbl = new THREE.Mesh(
-    new THREE.PlaneGeometry(4, 2),
-    new THREE.MeshBasicMaterial({ map: makeChipLabelTexture('LTD', '#a9ccff'), transparent: true })
+    new THREE.PlaneGeometry(5, 2.2),
+    new THREE.MeshBasicMaterial({ map: makeChipLabelTexture('fvandijk.ltd', '#a9ccff'), transparent: true })
   );
   lbl.rotation.x = -Math.PI / 2; lbl.position.set(0, 1.28, 0);
   g.add(lbl);
+  // portal "opening": a dark iris on the chip that scales open + a light beam (hidden until dock)
+  const ghole = new THREE.Mesh(new THREE.CircleGeometry(1.8, 40), new THREE.MeshBasicMaterial({ color: 0x01040a }));
+  ghole.rotation.x = -Math.PI / 2; ghole.position.set(0, 1.3, 0); ghole.scale.setScalar(0.001); g.add(ghole);
+  const gbeam = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.5, 1.5, 12, 28, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0x7fc4ff, transparent: true, opacity: 0, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  gbeam.position.set(0, 6.75, 0); gbeam.scale.y = 0.001; g.add(gbeam);
   scene.add(g);
   bizBoard = b;
+  const glight = new THREE.PointLight(BLUE, 0, 22, 2); glight.position.set(GATE.x, 2.5, GATE.z); scene.add(glight);
+  bizGate = { hole: ghole, beam: gbeam, light: glight };
 
-  // the fork: a blue trace running from the gateway pad off toward the business board
-  const r = buildTrace(new THREE.Vector3(GATE.x, 0, GATE.z), new THREE.Vector3(-42, 0, 20), BLUE);
+  // the blue wire: runs from the CPU (felix.c) out to the business board
+  const r = buildTrace(new THREE.Vector3(0, 0, 1), new THREE.Vector3(GATE.x, 0, GATE.z), BLUE);
   buildPulses(r.curve, 0x7fc4ff, 3, 0.085);
 
   const el = document.createElement('button');
@@ -482,38 +494,6 @@ function buildBusinessFork() {
   el.addEventListener('click', () => { window.location.href = 'business.html'; });
   $('#world-labels').appendChild(el);
   bizLabelEl = el;
-
-  // ---- reachable gateway pad on the main board: drive the packet in to portal across ----
-  const gate = new THREE.Group();
-  gate.position.set(GATE.x, 0, GATE.z);
-  const gpad = new THREE.Mesh(
-    new THREE.CircleGeometry(3, 48),
-    new THREE.MeshStandardMaterial({ color: 0x0a1626, emissive: BLUE, emissiveIntensity: 0.3, metalness: 0.6, roughness: 0.4 })
-  );
-  gpad.rotation.x = -Math.PI / 2; gpad.position.y = 0.05; gate.add(gpad);
-  const gring = new THREE.Mesh(
-    new THREE.RingGeometry(2.7, 3.1, 48),
-    new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
-  );
-  gring.rotation.x = -Math.PI / 2; gring.position.y = 0.07; gate.add(gring);
-  const ghole = new THREE.Mesh(
-    new THREE.CircleGeometry(2.4, 48),
-    new THREE.MeshBasicMaterial({ color: 0x01040a })
-  );
-  ghole.rotation.x = -Math.PI / 2; ghole.position.y = 0.08; ghole.scale.setScalar(0.001); gate.add(ghole);
-  const gbeam = new THREE.Mesh(
-    new THREE.CylinderGeometry(2.0, 2.0, 12, 28, 1, true),
-    new THREE.MeshBasicMaterial({ color: 0x7fc4ff, transparent: true, opacity: 0, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })
-  );
-  gbeam.position.y = 6; gbeam.scale.y = 0.001; gate.add(gbeam);
-  const glabel = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.6, 2.3),
-    new THREE.MeshBasicMaterial({ map: makeChipLabelTexture('fvandijk.ltd', '#a9ccff'), transparent: true })
-  );
-  glabel.rotation.x = -Math.PI / 2; glabel.position.set(0, 0.12, 2.1); gate.add(glabel);
-  const glight = new THREE.PointLight(BLUE, 0, 20, 2); glight.position.set(GATE.x, 2.5, GATE.z); scene.add(glight);
-  scene.add(gate);
-  bizGate = { hole: ghole, beam: gbeam, ring: gring, light: glight };
 }
 
 /* ---------- boot cascade: power the CPU, race a clock-pulse out to each district ---------- */
@@ -1185,8 +1165,8 @@ function updateDrive(dt) {
     }
   }
 
-  // ----- business gateway: bump the blue fvandijk.ltd pad from ANY side → portal across (takes priority over docking) -----
-  if (!portaling && Math.abs(drive.pos.x - GATE.x) < 4.2 && Math.abs(drive.pos.z - GATE.z) < 3.8) { enterBusinessPortal(); return; }
+  // ----- dock the F van Dijk Ltd chip (same port radius as any chip) → portal across instead of a panel -----
+  if (!portaling && Math.hypot(drive.pos.x - GATE.x, drive.pos.z - GATE.z) < PORT_R) { enterBusinessPortal(); return; }
 
   // ----- docking: arrive at a district → boot it (nearest-within-port, hysteresis on exit) -----
   let near = null, nd = 1e9;
@@ -1401,12 +1381,26 @@ function startDrop() {
 
 function finishDrop() {
   drive.pos.set(0, 0.9, -16); drive.heading = 0; drive.vel.set(0, 0, 0); drive.speed = 0;
-  dockedZone = null; driveMode = true; isFlying = false;
-  // start the perf benchmark fresh, skipping the first ~1.2s (drop hitch / warm-up)
-  benchStart = 0; benchFrames = 0; benchStage = 0; benchGrace = clock.elapsedTime + 1.2;
-  document.documentElement.classList.add('world-driving'); // reveal touch joystick
-  const cl = $('#world-checklist'); if (cl) cl.classList.add('is-on');
-  const h = $('#world-hint'); if (h) { h.style.opacity = '1'; hideHintSoon(); }
+  dockedZone = null;
+  // chase-cam resting pose (heading 0 → forward +z)
+  const rest = { tx: 0, ty: drive.pos.y + 1.6, tz: drive.pos.z + 2 };
+  function beginDriving() {
+    isFlying = false; driveMode = true;
+    benchStart = 0; benchFrames = 0; benchStage = 0; benchGrace = clock.elapsedTime + 1.2; // skip the warm-up
+    document.documentElement.classList.add('world-driving'); // reveal touch joystick
+    const cl = $('#world-checklist'); if (cl) cl.classList.add('is-on');
+    const h = $('#world-hint'); if (h) { h.style.opacity = '1'; hideHintSoon(); }
+  }
+  // ease from the close landing pose out into the driving view, THEN hand to the chase cam
+  // (avoids the hard snap the chase-cam catch-up used to make right as the bounce settled)
+  if (window.gsap && !reduceMotion) {
+    isFlying = true; // hold the chase cam idle during the settle
+    window.gsap.to(view.target, { x: rest.tx, y: rest.ty, z: rest.tz, duration: 1.0, ease: 'power2.inOut', onUpdate: requestRender });
+    window.gsap.to(view, { radius: 13, phi: 0.92, theta: Math.PI, duration: 1.0, ease: 'power2.inOut', onUpdate: requestRender, onComplete: beginDriving });
+  } else {
+    view.target.set(rest.tx, rest.ty, rest.tz); view.radius = 13; view.phi = 0.92; view.theta = Math.PI;
+    beginDriving();
+  }
 }
 
 function landingFlash() {
