@@ -33,7 +33,8 @@
         var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
         var coarse = matchMedia('(pointer: coarse)').matches;
         var small = innerWidth < 900;
-        var pref = null; try { pref = localStorage.getItem('felix-view'); } catch (e) {}
+        // felix-view2: bumped from felix-view to clear values polluted by an old auto-downgrade bug
+        var pref = null; try { pref = localStorage.getItem('felix-view2'); } catch (e) {}
         var webgl = (function () { try { var c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); } catch (e) { return false; } })();
         var cores = navigator.hardwareConcurrency || 4;
         var lite = coarse || small || cores <= 4;
@@ -692,6 +693,6 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
     <script src="scripts.js?v=20260612" defer></script>
-    <script type="module" src="world.js?v=20260621l"></script>
+    <script type="module" src="world.js?v=20260621m"></script>
 </body>
 </html>

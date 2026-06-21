@@ -170,7 +170,7 @@ function boostWhoosh() {
 }
 const LITE = !!(window.__FELIX && window.__FELIX.lite);
 const useBloom = !LITE;
-let benchStart = 0, benchFrames = 0, benchStage = 0;
+let benchStart = 0, benchFrames = 0, benchStage = 0, benchGrace = 0;
 const chips = {};            // id -> { group, mesh, pos }
 const labelEls = {};         // id -> DOM button
 const dockEls = {};          // id -> DOM button
@@ -1194,21 +1194,28 @@ function frame() {
   const dt = Math.min(clock.getDelta(), 0.05);
   const t = clock.elapsedTime;
 
-  // startup FPS benchmark → graceful two-stage downgrade (never yanks a capable machine)
+  // startup FPS benchmark → graceful two-stage downgrade (never yanks a capable machine).
+  // Only measure *steady-state driving* over a contiguous window: the intro is an idle
+  // orbit and the one-time drop renders a big shader/texture-compile hitch — neither is
+  // representative, and measuring them used to cause a false bail right after landing.
   if (benchStage < 2) {
-    if (benchStart === 0) benchStart = t;
-    benchFrames++;
-    if (t - benchStart > 2.5) {
-      const fps = benchFrames / (t - benchStart);
-      if (benchStage === 0) {
-        // stage 1: if struggling, shed the most expensive effect (bloom) and re-measure
-        if (fps < 48 && composer) composer = null;
-        benchStage = 1; benchStart = t; benchFrames = 0;
-      } else {
-        // stage 2: only bail to the classic site if even the lightened world is unusable
-        if (fps < 22) { autoExitClassic(); return; }
-        benchStage = 2;
+    if (driveMode && !isFlying && !panelOpen() && t > benchGrace) {
+      if (benchStart === 0) { benchStart = t; benchFrames = 0; }
+      benchFrames++;
+      if (t - benchStart > 2.5) {
+        const fps = benchFrames / (t - benchStart);
+        if (benchStage === 0) {
+          // stage 1: if struggling, shed the most expensive effect (bloom) and re-measure
+          if (fps < 48 && composer) composer = null;
+          benchStage = 1; benchStart = 0;
+        } else {
+          // stage 2: only bail to the classic site if even the lightened world is unusable
+          if (fps < 22) { autoExitClassic(); return; }
+          benchStage = 2;
+        }
       }
+    } else {
+      benchStart = 0; // window interrupted (intro / flying / panel) → restart when driving resumes
     }
   }
 
@@ -1356,6 +1363,8 @@ function startDrop() {
 function finishDrop() {
   drive.pos.set(0, 0.9, -16); drive.heading = 0; drive.vel.set(0, 0, 0); drive.speed = 0;
   dockedZone = null; driveMode = true; isFlying = false;
+  // start the perf benchmark fresh, skipping the first ~1.2s (drop hitch / warm-up)
+  benchStart = 0; benchFrames = 0; benchStage = 0; benchGrace = clock.elapsedTime + 1.2;
   document.documentElement.classList.add('world-driving'); // reveal touch joystick
   const cl = $('#world-checklist'); if (cl) cl.classList.add('is-on');
   const h = $('#world-hint'); if (h) { h.style.opacity = '1'; hideHintSoon(); }
@@ -1409,7 +1418,7 @@ function onResize() {
 
 function enterWorld() {
   document.documentElement.classList.add('world-on');
-  try { localStorage.setItem('felix-view', 'world'); } catch (e) {}
+  try { localStorage.setItem('felix-view2', 'world'); } catch (e) {}
   if (actx && actx.state === 'suspended' && !audioMuted) actx.resume(); // returning from classic view: bring audio back
   if (!built) {
     buildScene();
@@ -1429,14 +1438,14 @@ function enterWorld() {
 }
 
 function autoExitClassic() {
-  exitWorld();
-  try { localStorage.setItem('felix-view', 'classic'); } catch (e) {}
+  // session-only fallback: never persist, so a perf dip can't permanently override the 3D default
+  exitWorld(false);
   console.info('felix.os → switched to fast (classic) view for performance');
 }
 
-function exitWorld() {
+function exitWorld(persist) {
   document.documentElement.classList.remove('world-on', 'world-driving');
-  try { localStorage.setItem('felix-view', 'classic'); } catch (e) {}
+  if (persist !== false) { try { localStorage.setItem('felix-view2', 'classic'); } catch (e) {} } // only an explicit user choice sticks
   running = false;
   if (actx && actx.state === 'running') actx.suspend(); // silence world audio when leaving to classic (resumes on next drop-in)
   closePanel();
@@ -1470,7 +1479,7 @@ function addListeners() {
     if (document.hidden) running = false;
     else if (document.documentElement.classList.contains('world-on')) { running = true; clock.start(); }
   });
-  $('#world-classic-btn').addEventListener('click', exitWorld);
+  $('#world-classic-btn').addEventListener('click', () => exitWorld(true)); // explicit choice → persist
   $('#world-panel .wpanel-close').addEventListener('click', closePanel);
   const introEl = $('#world-intro');
   if (introEl) introEl.addEventListener('click', () => { if (introActive) startDrop(); });
