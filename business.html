@@ -523,10 +523,10 @@
             var r = iEl.getBoundingClientRect();
             var cx = r.left + r.width / 2, cy = r.top + r.height * 0.2;   // the tittle of the i
             var dot = document.createElement('div'); dot.className = 'arrival-dot'; document.body.appendChild(dot);
-            gsap.set(dot, { x: window.innerWidth / 2 - 8, y: -40, opacity: 1, scale: 1 });
-            gsap.to(dot, { x: cx - 8, duration: 1.15, ease: 'power3.out' });
-            gsap.to(dot, { scale: 0.5, duration: 1.15, ease: 'power2.out' });
-            gsap.to(dot, { y: cy - 8, duration: 1.15, ease: 'bounce.out', onComplete: land });
+            gsap.set(dot, { x: window.innerWidth / 2 - 8, y: -60, opacity: 1, scale: 1 });
+            gsap.to(dot, { x: cx - 8, duration: 1.6, ease: 'power3.out' });
+            gsap.to(dot, { scale: 0.5, duration: 1.6, ease: 'power2.out' });
+            gsap.to(dot, { y: cy - 8, duration: 1.6, ease: 'bounce.out', onComplete: land });
             function land() {
                 var rp = document.createElement('div'); rp.className = 'arrival-ripple';
                 rp.style.left = (cx - 8) + 'px'; rp.style.top = (cy - 8) + 'px'; document.body.appendChild(rp);

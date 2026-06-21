@@ -1425,10 +1425,10 @@ function landingFlash() {
 function openBizGate() {
   if (!bizGate) return;
   if (!window.gsap || reduceMotion) { bizGate.hole.scale.setScalar(1); return; }
-  window.gsap.to(bizGate.hole.scale, { x: 1, y: 1, z: 1, duration: 0.5, ease: 'power2.out', onUpdate: requestRender });
-  window.gsap.to(bizGate.beam.scale, { y: 1, duration: 0.7, ease: 'power2.out', onUpdate: requestRender });
-  window.gsap.to(bizGate.beam.material, { opacity: 0.4, duration: 0.4, ease: 'power2.out', onUpdate: requestRender });
-  window.gsap.to(bizGate.light, { intensity: 3.5, duration: 0.4, onUpdate: requestRender });
+  window.gsap.to(bizGate.hole.scale, { x: 1, y: 1, z: 1, duration: 0.8, ease: 'power2.out', onUpdate: requestRender });
+  window.gsap.to(bizGate.beam.scale, { y: 1, duration: 1.2, ease: 'power2.out', onUpdate: requestRender });
+  window.gsap.to(bizGate.beam.material, { opacity: 0.45, duration: 0.7, ease: 'power2.out', onUpdate: requestRender });
+  window.gsap.to(bizGate.light, { intensity: 3.8, duration: 0.7, onUpdate: requestRender });
 }
 
 function showPortalOverlay() {
@@ -1450,23 +1450,28 @@ function enterBusinessPortal() {
   openBizGate();
   try { boostWhoosh(); } catch (e) {}
   if (!window.gsap || reduceMotion || !packet) { goToBusiness(); return; }
-  const core = packet.children[0], glow = packet.children[2];
+  const core = packet.children[0], wire = packet.children[1], glow = packet.children[2];
   const cFrom = new THREE.Color(GREEN), cTo = new THREE.Color(BLUE), cTmp = new THREE.Color();
+  const wFrom = new THREE.Color(0xaaffcc), wTo = new THREE.Color(0xaaccff), wTmp = new THREE.Color();
   const col = { v: 0 };
-  window.gsap.to(packet.position, { x: GATE.x, z: GATE.z, duration: 0.45, ease: 'power2.out', onUpdate: requestRender });
-  window.gsap.to(packet.position, { y: -6, duration: 0.95, delay: 0.42, ease: 'power2.in', onUpdate: requestRender });
-  window.gsap.to(packet.scale, { x: 0.25, y: 0.25, z: 0.25, duration: 0.95, delay: 0.42, ease: 'power2.in', onUpdate: requestRender });
-  window.gsap.to(col, { v: 1, duration: 0.6, delay: 0.3, onUpdate: () => {
+  // 1) glide onto the open gate and hover
+  window.gsap.to(packet.position, { x: GATE.x, z: GATE.z, duration: 0.7, ease: 'power2.out', onUpdate: requestRender });
+  // 2) clearly shift green -> blue while it hovers (drawn out for legibility)
+  window.gsap.to(col, { v: 1, duration: 1.3, delay: 0.55, ease: 'sine.inOut', onUpdate: () => {
     cTmp.copy(cFrom).lerp(cTo, col.v);
     if (core && core.material.emissive) core.material.emissive.copy(cTmp);
     if (glow && glow.material.color) glow.material.color.copy(cTmp);
+    if (wire && wire.material.color) wire.material.color.copy(wTmp.copy(wFrom).lerp(wTo, col.v));
     if (packetLight) packetLight.color.copy(cTmp);
     requestRender();
   } });
-  window.gsap.to(view.target, { x: GATE.x, y: 0.5, z: GATE.z, duration: 0.9, ease: 'power2.inOut', onUpdate: requestRender });
-  window.gsap.to(view, { radius: 9, phi: 0.32, duration: 0.9, ease: 'power2.in', onUpdate: requestRender });
-  setTimeout(showPortalOverlay, 460);
-  setTimeout(goToBusiness, 1250);
+  // 3) only then dive through, slowly, camera following down
+  window.gsap.to(packet.position, { y: -6, duration: 1.5, delay: 1.5, ease: 'power2.in', onUpdate: requestRender });
+  window.gsap.to(packet.scale, { x: 0.25, y: 0.25, z: 0.25, duration: 1.5, delay: 1.5, ease: 'power2.in', onUpdate: requestRender });
+  window.gsap.to(view.target, { x: GATE.x, y: 0.5, z: GATE.z, duration: 2.0, ease: 'power2.inOut', onUpdate: requestRender });
+  window.gsap.to(view, { radius: 9, phi: 0.3, duration: 2.0, ease: 'power2.in', onUpdate: requestRender });
+  setTimeout(showPortalOverlay, 2150);
+  setTimeout(goToBusiness, 3200);
 }
 
 /* ---------- exploration checklist ---------- */
