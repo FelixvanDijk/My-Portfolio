@@ -13,7 +13,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
 /* cinematic grade: vignette + chromatic aberration (boost-reactive) + film grain */
 const GradeShader = {
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0012 }, uVignette: { value: 1.15 }, uGrain: { value: 0.055 } },
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0012 }, uVignette: { value: 0.9 }, uGrain: { value: 0.05 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
   fragmentShader: [
     'varying vec2 vUv; uniform sampler2D tDiffuse; uniform float uTime, uAberration, uVignette, uGrain;',
@@ -25,7 +25,7 @@ const GradeShader = {
     '  float b = texture2D(tDiffuse, vUv + d * uAberration).b;',
     '  vec3 col = vec3(r, g, b);',
     '  float vig = smoothstep(0.95, 0.25, length(d) * uVignette);',
-    '  col *= mix(0.5, 1.0, vig);',
+    '  col *= mix(0.68, 1.0, vig);',
     '  col += (rand(vUv + fract(uTime)) - 0.5) * uGrain;',
     '  gl_FragColor = vec4(col, 1.0);',
     '}',
@@ -67,7 +67,7 @@ const DISTRICTS = [
 
 let renderer, scene, camera, composer, raf = 0, built = false, running = false;
 let clock;
-let bgGrid, starfield;
+let bgGrid, starfield, voidGlyphs;
 
 /* ---------- felix.run: drive-the-packet state ---------- */
 let driveMode = false;
@@ -380,15 +380,15 @@ function buildScene() {
   renderer = new THREE.WebGLRenderer({ canvas: $('#world-canvas'), antialias: !LITE, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, LITE ? 1.5 : 2));
   renderer.setSize(innerWidth, innerHeight);
-  renderer.setClearColor(0x05070e, 1);
+  renderer.setClearColor(0x0a1018, 1);
 
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x05070e, 0.012);
+  scene.fog = new THREE.FogExp2(0x0a1018, 0.0085);
   camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 400);
   clock = new THREE.Clock();
 
-  scene.add(new THREE.AmbientLight(0x33415a, 1.1));
-  const key = new THREE.DirectionalLight(0xbcd0ff, 1.0);
+  scene.add(new THREE.AmbientLight(0x3a4a66, 1.5));
+  const key = new THREE.DirectionalLight(0xbcd0ff, 1.2);
   key.position.set(18, 40, 24);
   scene.add(key);
   const rim = new THREE.DirectionalLight(GREEN, 0.25);
@@ -396,13 +396,14 @@ function buildScene() {
   scene.add(rim);
 
   buildBackground();
+  buildVoidGlyphs();
 
   // board
   const boardTex = makeBoardTexture();
   boardTex.repeat.set(3, 2.2);
   const board = new THREE.Mesh(
     new THREE.BoxGeometry(72, 0.6, 50),
-    new THREE.MeshStandardMaterial({ map: boardTex, color: 0x0a160e, roughness: 0.8, metalness: 0.3 })
+    new THREE.MeshStandardMaterial({ map: boardTex, color: 0x16291c, roughness: 0.75, metalness: 0.3, emissive: 0x0a1a10, emissiveIntensity: 0.25 })
   );
   board.position.y = -0.1;
   scene.add(board);
@@ -628,6 +629,49 @@ function buildBackground() {
   });
   starfield = new THREE.Points(g, mat);
   scene.add(starfield);
+}
+
+/* faint "iykyk" glyphs drifting far out in the void — CS nods (green) + finance nods (blue).
+   Kept sparse, dim and outside the board so it reads as atmosphere, never clutter. */
+const _glyphCache = {};
+function makeGlyphTex(text, hex) {
+  const key = text + '|' + hex;
+  if (_glyphCache[key]) return _glyphCache[key];
+  const c = document.createElement('canvas');
+  const font = '600 40px "JetBrains Mono", ui-monospace, monospace';
+  let ctx = c.getContext('2d');
+  ctx.font = font;
+  const w = Math.max(48, Math.ceil(ctx.measureText(text).width) + 20);
+  c.width = w; c.height = 56;
+  ctx = c.getContext('2d');
+  ctx.font = font; ctx.textBaseline = 'middle'; ctx.fillStyle = hex;
+  ctx.fillText(text, 10, 30);
+  const tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.LinearFilter;
+  _glyphCache[key] = { tex: tex, aspect: w / 56 };
+  return _glyphCache[key];
+}
+function buildVoidGlyphs() {
+  const cs = ['01001100', '11010', '0xDEADBEEF', '0xCAFEBABE', 'O(n log n)', 'P =? NP', 'λx.x', '{ }', 'git push', 'sudo', '404', 'null', 'NaN', '→', '∑', 'Hello, World', ':wq', '∞'];
+  const fin = ['α', 'β', 'EV/EBITDA', 'bps', '$ ↗', '▲ ▼', 'compound', 'ROI ↑'];
+  const grp = new THREE.Group();
+  const N = LITE ? 14 : 26;
+  for (let i = 0; i < N; i++) {
+    const isFin = Math.random() < 0.32;
+    const list = isFin ? fin : cs;
+    const g = makeGlyphTex(list[(Math.random() * list.length) | 0], isFin ? '#9fc6ff' : '#8fe9b4');
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: g.tex, transparent: true, opacity: 0.15 + Math.random() * 0.18,
+      depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
+    }));
+    const r = 58 + Math.random() * 120, a = Math.random() * Math.PI * 2;
+    s.position.set(Math.cos(a) * r, -6 + Math.random() * 58, Math.sin(a) * r);
+    const sc = 7 + Math.random() * 5;
+    s.scale.set(sc * g.aspect, sc, 1);
+    grp.add(s);
+  }
+  scene.add(grp);
+  voidGlyphs = grp;
 }
 
 function setupComposer() {
@@ -1281,6 +1325,7 @@ function frame() {
 
   // drifting void
   if (starfield) starfield.rotation.y += dt * 0.012;
+  if (voidGlyphs) voidGlyphs.rotation.y -= dt * 0.006; // glyph layer drifts the other way for subtle parallax
 
   if (introActive && packet) {
     // sky hero shot: packet hovers/spins above the board, camera slowly orbits
