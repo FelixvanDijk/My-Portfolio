@@ -440,7 +440,7 @@ function buildScene() {
 
 /* ---------- the business-side fork: a second board the Journey trace splits toward ---------- */
 let bizBoard, bizLabelEl;
-const GATE = { x: -30, z: 20 };   // the business board+chip: dock it (like any chip) to portal across
+const GATE = { x: -31, z: -8 };   // F van Dijk Ltd board+chip (bottom-left); dock it to portal across
 const bizForkPos = new THREE.Vector3(GATE.x, 2, GATE.z);
 let bizGate = null;
 let portaling = false;            // true once the business-portal cinematic has started
@@ -484,9 +484,20 @@ function buildBusinessFork() {
   const glight = new THREE.PointLight(BLUE, 0, 22, 2); glight.position.set(GATE.x, 2.5, GATE.z); scene.add(glight);
   bizGate = { hole: ghole, beam: gbeam, light: glight };
 
-  // the blue wire: runs from the CPU (felix.c) out to the business board
-  const r = buildTrace(new THREE.Vector3(0, 0, 1), new THREE.Vector3(GATE.x, 0, GATE.z), BLUE);
-  buildPulses(r.curve, 0x7fc4ff, 3, 0.085);
+  // the blue wire: a distinct route from the CPU (felix.c) that threads the gap between the About
+  // and Journey chips, then curves down to the business board — never crossing another chip
+  const wy = 0.28;
+  const wireCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, wy, 1),
+    new THREE.Vector3(-10, wy, 0),
+    new THREE.Vector3(-18, wy, -1),      // threads between About and Journey
+    new THREE.Vector3(-25, wy, -4.5),
+    new THREE.Vector3(GATE.x, wy, GATE.z),
+  ], false, 'catmullrom', 0.2);
+  const wireMat = roadMaterial(BLUE);
+  scene.add(new THREE.Mesh(new THREE.TubeGeometry(wireCurve, 90, 0.12, 8, false), wireMat));
+  traceMats.push(wireMat);
+  buildPulses(wireCurve, 0x7fc4ff, 3, 0.085);
 
   const el = document.createElement('button');
   el.className = 'wlabel is-biz';
@@ -1370,6 +1381,7 @@ function startDrop() {
   const el = $('#world-intro');
   if (el) { el.style.transition = 'opacity .4s'; el.style.opacity = '0'; setTimeout(() => { el.hidden = true; }, 420); }
   isFlying = true;
+  if (packet) { packet.rotation.y = 0; packet.rotation.z = 0; } // fall facing forward so driving doesn't snap the orientation
   if (window.gsap && !reduceMotion) {
     window.gsap.killTweensOf(view); window.gsap.killTweensOf(view.target);
     window.gsap.to(packet.position, { y: 0.9, duration: 1.2, ease: 'bounce.out', onUpdate: requestRender });
