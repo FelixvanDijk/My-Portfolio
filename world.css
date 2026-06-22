@@ -453,6 +453,11 @@ html.world-on #explore-btn { display: none !important; }
 #world-frags.got { color: #3ce0c6; border-color: rgba(60,224,198,0.4); }
 @media (max-width: 760px) { #world-frags { top: auto; bottom: 120px; } }
 
+/* on touch devices the bottom corners belong to the joystick (left) + boost (right),
+   so dock the counters to the top corners instead, clear of the topbar */
+html.world-touch #world-checklist { top: 60px; bottom: auto; right: 12px; }
+html.world-touch #world-frags { top: 60px; bottom: auto; left: 12px; }
+
 /* ---- touch controls: virtual joystick + boost (only on coarse pointers while driving) ---- */
 #world-joy, #world-boost { display: none; }
 html.world-touch.world-driving #world-joy {

@@ -577,6 +577,8 @@ html.js #hero-rendered.is-shown { opacity: 1; visibility: visible; transition: o
     html.js #hero-rendered,
     html.js.pin-hero #hero-rendered { opacity: 1 !important; visibility: visible !important; }
     #hero { min-height: auto; align-items: flex-start; padding-top: calc(var(--topbar-h) + 48px); padding-bottom: 56px; }
+    /* the scroll cue is desktop-morph specific and lands awkwardly on the compact mobile hero */
+    .scroll-cue { display: none !important; }
 }
 
 .scroll-cue {
