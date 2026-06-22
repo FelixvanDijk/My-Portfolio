@@ -314,12 +314,12 @@
                 <aside class="proc-list" id="proc-list" aria-label="Project list">
                     <p class="proc-list-head mono" aria-hidden="true">PID&nbsp;&nbsp;PROCESS</p>
                     <button class="proc-row is-active" type="button" data-index="7"><span class="pid mono">1000</span><span class="proc-name">f1-ai-commentary</span><span class="proc-state mono">running</span></button>
-                    <button class="proc-row" type="button" data-index="0"><span class="pid mono">1001</span><span class="proc-name">gathouse-vets</span><span class="proc-state mono">queued</span></button>
-                    <button class="proc-row" type="button" data-index="1"><span class="pid mono">1002</span><span class="proc-name">consultant</span><span class="proc-state mono">queued</span></button>
-                    <button class="proc-row" type="button" data-index="2"><span class="pid mono">1003</span><span class="proc-name">scotland-yard-ai</span><span class="proc-state mono">queued</span></button>
-                    <button class="proc-row" type="button" data-index="3"><span class="pid mono">1004</span><span class="proc-name">sketch</span><span class="proc-state mono">queued</span></button>
-                    <button class="proc-row" type="button" data-index="4"><span class="pid mono">1005</span><span class="proc-name">portfolio</span><span class="proc-state mono">queued</span></button>
-                    <button class="proc-row" type="button" data-index="5"><span class="pid mono">1006</span><span class="proc-name">sf-barbers</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="2"><span class="pid mono">1001</span><span class="proc-name">scotland-yard-ai</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="0"><span class="pid mono">1002</span><span class="proc-name">gathouse-vets</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="5"><span class="pid mono">1003</span><span class="proc-name">sf-barbers</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="1"><span class="pid mono">1004</span><span class="proc-name">consultant</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="3"><span class="pid mono">1005</span><span class="proc-name">sketch</span><span class="proc-state mono">queued</span></button>
+                    <button class="proc-row" type="button" data-index="4"><span class="pid mono">1006</span><span class="proc-name">portfolio</span><span class="proc-state mono">queued</span></button>
                     <button class="proc-row" type="button" data-index="6"><span class="pid mono">1007</span><span class="proc-name">cold-emailer</span><span class="proc-state mono">queued</span></button>
                 </aside>
 
@@ -336,6 +336,7 @@
                                 <p class="proc-cmd mono" aria-hidden="true">$ ./f1-ai-commentary --run</p>
                                 <h3>F1 AI Commentary</h3>
                                 <p class="proc-desc">A cloud-deployed Formula 1 telemetry replay platform, built with <strong>IBM</strong> for the University of Bristol. It streams high-frequency motorsport data over WebSockets into a live, F1-style race dashboard and generates natural spoken race commentary in real time via OpenAI's Realtime API — keeping telemetry, playback controls and AI audio frame-accurately in sync across web and desktop.</p>
+                                <p class="proc-impact mono">&rarr; IBM partnership &middot; live telemetry + spoken AI commentary in real time, deployed on AWS.</p>
                                 <ul class="proc-tags">
                                     <li data-tech="ai">IBM × Bristol</li>
                                     <li data-tech="ai">AI Commentary</li>
@@ -386,6 +387,36 @@
                         </div>
                     </article>
 
+                    <article class="proc-card" id="proj-2" data-index="2">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/scotland-yard-ai</span>
+                            <span class="status-badge status-shipped">SHIPPED</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./scotland-yard-ai --run</p>
+                                <h3>AI Project</h3>
+                                <p class="proc-desc">An AI designed to help a character in Scotland Yard make the best possible move — sharper move selection, strategy under pressure, and better decision making each turn, built around a problem where one decision can change the whole game.</p>
+                                <p class="proc-impact mono">&rarr; A Java AI that searches the game tree to out-play human strategy under pressure.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="java">Java</li>
+                                    <li data-tech="ai">Artificial Intelligence</li>
+                                    <li data-tech="strategy">Game Strategy</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="https://github.com/marek727/cw-ai" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>github.com/marek727/cw-ai</div>
+                                    <div class="shot-wrap"><img src="images/ai.png" alt="AI Project — Scotland Yard game board visualisation" loading="lazy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
                     <article class="proc-card" id="proj-0" data-index="0">
                         <div class="proc-chrome">
                             <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -397,6 +428,7 @@
                                 <p class="proc-cmd mono" aria-hidden="true">$ ./gathouse-vets --run</p>
                                 <h3>The Gatehouse Vets</h3>
                                 <p class="proc-desc">An old fashioned, paper based, veterinary system made digital. Turning traditional clinic workflows into something faster, clearer, and easier to use — with the full development journey documented in a dedicated project PDF.</p>
+                                <p class="proc-impact mono">&rarr; Replaced a paper-based practice with a full digital management system.</p>
                                 <ul class="proc-tags">
                                     <li data-tech="health">Health Tech</li>
                                     <li data-tech="design">System Design</li>
@@ -416,6 +448,37 @@
                         </div>
                     </article>
 
+                    <article class="proc-card" id="proj-5" data-index="5">
+                        <div class="proc-chrome">
+                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="proc-title mono">~/projects/sf-barbers</span>
+                            <span class="status-badge status-shipped">SHIPPED</span>
+                        </div>
+                        <div class="proc-body">
+                            <div class="proc-output">
+                                <p class="proc-cmd mono" aria-hidden="true">$ ./sf-barbers --run</p>
+                                <h3>S&amp;F Barbers Booking System</h3>
+                                <p class="proc-desc">A comprehensive web-based booking management system for S&amp;F Barbers featuring user authentication, appointment scheduling, admin controls, and automated email notifications. Built with Python Flask, SQLite, and Bootstrap 5.</p>
+                                <p class="proc-impact mono">&rarr; A live 24/7 booking system real customers use every day.</p>
+                                <ul class="proc-tags">
+                                    <li data-tech="python">Python · Flask</li>
+                                    <li data-tech="db">SQLite</li>
+                                    <li data-tech="web">Bootstrap 5</li>
+                                </ul>
+                                <div class="proc-actions">
+                                    <a class="btn-flag" href="https://nath-booking-p6ty.onrender.com" target="_blank" rel="noopener noreferrer"><span class="flag mono">--live</span><span class="flag-en">Live demo</span></a>
+                                    <a class="btn-flag" href="https://github.com/FelixvanDijk/SF-Barbers" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
+                                </div>
+                            </div>
+                            <div class="proc-media">
+                                <div class="mini-browser">
+                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>nath-booking.onrender.com</div>
+                                    <div class="shot-wrap"><img src="images/S%26F.png" alt="S&amp;F Barbers Booking System — screenshot" loading="lazy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
                     <article class="proc-card" id="proj-1" data-index="1">
                         <div class="proc-chrome">
                             <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -427,6 +490,7 @@
                                 <p class="proc-cmd mono" aria-hidden="true">$ ./consultant --run</p>
                                 <h3>Consultant Project</h3>
                                 <p class="proc-desc">An online veterinary consultancy system for pet owners — helping people understand what may be wrong with their animal before visiting a physical vet. Still under active development, so some parts are placeholders and will change.</p>
+                                <p class="proc-impact mono">&rarr; Early-stage online vet triage tool &ndash; in active development.</p>
                                 <ul class="proc-tags">
                                     <li data-tech="health">Health Tech</li>
                                     <li data-tech="js">Web App</li>
@@ -446,35 +510,6 @@
                         </div>
                     </article>
 
-                    <article class="proc-card" id="proj-2" data-index="2">
-                        <div class="proc-chrome">
-                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                            <span class="proc-title mono">~/projects/scotland-yard-ai</span>
-                            <span class="status-badge status-shipped">SHIPPED</span>
-                        </div>
-                        <div class="proc-body">
-                            <div class="proc-output">
-                                <p class="proc-cmd mono" aria-hidden="true">$ ./scotland-yard-ai --run</p>
-                                <h3>AI Project</h3>
-                                <p class="proc-desc">An AI designed to help a character in Scotland Yard make the best possible move — sharper move selection, strategy under pressure, and better decision making each turn, built around a problem where one decision can change the whole game.</p>
-                                <ul class="proc-tags">
-                                    <li data-tech="java">Java</li>
-                                    <li data-tech="ai">Artificial Intelligence</li>
-                                    <li data-tech="strategy">Game Strategy</li>
-                                </ul>
-                                <div class="proc-actions">
-                                    <a class="btn-flag" href="https://github.com/marek727/cw-ai" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
-                                </div>
-                            </div>
-                            <div class="proc-media">
-                                <div class="mini-browser">
-                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>github.com/marek727/cw-ai</div>
-                                    <div class="shot-wrap"><img src="images/ai.png" alt="AI Project — Scotland Yard game board visualisation" loading="lazy"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-
                     <article class="proc-card" id="proj-3" data-index="3">
                         <div class="proc-chrome">
                             <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -486,6 +521,7 @@
                                 <p class="proc-cmd mono" aria-hidden="true">$ ./sketch --run</p>
                                 <h3>Sketch Project</h3>
                                 <p class="proc-desc">A C program for image manipulation and sketching. Hands-on graphics work with image edits, sketch features, and direct control over the implementation — a systems-level project where the visual output comes from low-level decisions.</p>
+                                <p class="proc-impact mono">&rarr; Low-level C graphics &ndash; image manipulation built from scratch.</p>
                                 <ul class="proc-tags">
                                     <li data-tech="c">C</li>
                                     <li data-tech="graphics">Image Manipulation</li>
@@ -515,6 +551,7 @@
                                 <p class="proc-cmd mono" aria-hidden="true">$ ./portfolio --run</p>
                                 <h3>Portfolio Website</h3>
                                 <p class="proc-desc">My personal portfolio website showcasing my projects and skills — presenting technical work with motion, structure, and a style that feels personal. Part project, part ongoing design system for how I want my work to be seen.</p>
+                                <p class="proc-impact mono">&rarr; This very site &ndash; hand-built, no frameworks, with a drivable 3D world.</p>
                                 <p class="proc-warn mono" aria-hidden="true">warning: recursive reference — you are here.</p>
                                 <ul class="proc-tags">
                                     <li data-tech="js">Frontend</li>
@@ -534,36 +571,6 @@
                         </div>
                     </article>
 
-                    <article class="proc-card" id="proj-5" data-index="5">
-                        <div class="proc-chrome">
-                            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                            <span class="proc-title mono">~/projects/sf-barbers</span>
-                            <span class="status-badge status-shipped">SHIPPED</span>
-                        </div>
-                        <div class="proc-body">
-                            <div class="proc-output">
-                                <p class="proc-cmd mono" aria-hidden="true">$ ./sf-barbers --run</p>
-                                <h3>S&amp;F Barbers Booking System</h3>
-                                <p class="proc-desc">A comprehensive web-based booking management system for S&amp;F Barbers featuring user authentication, appointment scheduling, admin controls, and automated email notifications. Built with Python Flask, SQLite, and Bootstrap 5.</p>
-                                <ul class="proc-tags">
-                                    <li data-tech="python">Python · Flask</li>
-                                    <li data-tech="db">SQLite</li>
-                                    <li data-tech="web">Bootstrap 5</li>
-                                </ul>
-                                <div class="proc-actions">
-                                    <a class="btn-flag" href="https://nath-booking-p6ty.onrender.com" target="_blank" rel="noopener noreferrer"><span class="flag mono">--live</span><span class="flag-en">Live demo</span></a>
-                                    <a class="btn-flag" href="https://github.com/FelixvanDijk/SF-Barbers" target="_blank" rel="noopener noreferrer"><span class="flag mono">--github</span><span class="flag-en">View code</span></a>
-                                </div>
-                            </div>
-                            <div class="proc-media">
-                                <div class="mini-browser">
-                                    <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>nath-booking.onrender.com</div>
-                                    <div class="shot-wrap"><img src="images/S%26F.png" alt="S&amp;F Barbers Booking System — screenshot" loading="lazy"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-
                     <article class="proc-card" id="proj-6" data-index="6">
                         <div class="proc-chrome">
                             <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -575,6 +582,7 @@
                                 <p class="proc-cmd mono" aria-hidden="true">$ ./cold-emailer --run</p>
                                 <h3>Cold Emailer System</h3>
                                 <p class="proc-desc">A comprehensive Python cold email outreach system that reads leads from Apollo-exported CSV files and sends personalised cold emails with intelligent follow-up sequences via SMTP. Features rotating templates, HTML formatting, smart delays, and automatic follow-up management.</p>
+                                <p class="proc-impact mono">&rarr; An automated cold-email outreach pipeline.</p>
                                 <ul class="proc-tags">
                                     <li data-tech="python">Python</li>
                                     <li data-tech="auto">Automation</li>
