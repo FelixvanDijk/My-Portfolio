@@ -26,6 +26,21 @@
         .arrival-ripple { position: fixed; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #4a90e2; z-index: 9999; pointer-events: none; opacity: 0.9; transform: scale(0.4); }
         .arrival-ripple.go { opacity: 0; transform: scale(7); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
         @media (prefers-reduced-motion: reduce) { .arrival-dot, .arrival-ripple { display: none; } }
+        /* automation ROI calculator */
+        #roi .roi-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
+        .roi-card { background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 14px; padding: 26px 28px; }
+        .roi-field { margin-bottom: 22px; }
+        .roi-field:last-child { margin-bottom: 0; }
+        .roi-field label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 14px; color: var(--fg-mid); margin-bottom: 10px; }
+        .roi-field .roi-val { font-family: var(--mono); color: var(--accent); font-weight: 600; font-size: 15px; white-space: nowrap; }
+        .roi-field input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+        .roi-result { display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+        .roi-num { font-family: var(--mono); font-size: clamp(30px, 5vw, 46px); font-weight: 700; color: var(--accent); line-height: 1.04; letter-spacing: -0.02em; }
+        .roi-stat .roi-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+        .roi-foot { font-size: 13.5px; color: var(--fg-mid); margin: 4px 0 0; }
+        .roi-cta { margin-top: 10px; }
+        .roi-note { display: block; text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px; }
+        @media (max-width: 760px) { #roi .roi-wrap { grid-template-columns: 1fr; } }
     </style>
     <script>(function(){try{var a=sessionStorage.getItem('felix-arrival');if(a)sessionStorage.removeItem('felix-arrival');window.__felixArrive=!!a&&!matchMedia('(prefers-reduced-motion: reduce)').matches;if(window.__felixArrive)document.documentElement.classList.add('felix-arriving');}catch(e){}})();</script>
 </head>
@@ -418,6 +433,49 @@
             </div>
         </section>
 
+        <!-- ============ ROI CALCULATOR ============ -->
+        <section id="roi" class="section" data-ln="165">
+            <div class="section-head">
+                <p class="kicker" aria-hidden="true">$ ./estimate --automation-roi</p>
+                <h2>What could automation save you?</h2>
+            </div>
+            <div class="roi-wrap">
+                <div class="roi-card">
+                    <div class="roi-field">
+                        <label for="roi-hours">Hours/week on repetitive manual work <span class="roi-val" id="roi-hours-v">8h</span></label>
+                        <input type="range" id="roi-hours" min="1" max="40" step="1" value="8">
+                    </div>
+                    <div class="roi-field">
+                        <label for="roi-people">People doing that work <span class="roi-val" id="roi-people-v">3</span></label>
+                        <input type="range" id="roi-people" min="1" max="50" step="1" value="3">
+                    </div>
+                    <div class="roi-field">
+                        <label for="roi-rate">Average cost per hour (£) <span class="roi-val" id="roi-rate-v">£22</span></label>
+                        <input type="range" id="roi-rate" min="12" max="80" step="1" value="22">
+                    </div>
+                    <div class="roi-field">
+                        <label for="roi-cover">How much of it is automatable <span class="roi-val" id="roi-cover-v">70%</span></label>
+                        <input type="range" id="roi-cover" min="30" max="95" step="5" value="70">
+                    </div>
+                </div>
+                <div class="roi-card roi-result">
+                    <div class="roi-stat">
+                        <div class="roi-num" id="roi-hours-out">0</div>
+                        <div class="roi-label">hours reclaimed every year</div>
+                    </div>
+                    <div class="roi-stat">
+                        <div class="roi-num" id="roi-money-out">£0</div>
+                        <div class="roi-label">saved on labour, every year</div>
+                    </div>
+                    <p class="roi-foot" id="roi-weeks">≈ 0 working weeks handed back to your team.</p>
+                    <div class="roi-cta">
+                        <a class="btn btn-solid" href="#contact">Turn this into reality →</a>
+                    </div>
+                </div>
+            </div>
+            <span class="roi-note mono" aria-hidden="true">// indicative estimate from your numbers — most automation projects pay for themselves within months</span>
+        </section>
+
         <!-- ============ CONTACT ============ -->
         <section id="contact" class="section" data-ln="178">
             <div class="section-head">
@@ -541,6 +599,48 @@
         else if (document.fonts && document.fonts.ready) document.fonts.ready.then(start);
         window.addEventListener('load', start);
         setTimeout(start, 400);
+    })();
+    </script>
+    <script>
+    (function () {
+        function byId(x) { return document.getElementById(x); }
+        var hours = byId('roi-hours'); if (!hours) return;
+        var people = byId('roi-people'), rate = byId('roi-rate'), cover = byId('roi-cover');
+        var hoursOut = byId('roi-hours-out'), moneyOut = byId('roi-money-out'), weeksOut = byId('roi-weeks');
+        var fmt = new Intl.NumberFormat('en-GB');
+        var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var cur = { h: 0, m: 0 };
+        function labels() {
+            byId('roi-hours-v').textContent = hours.value + 'h';
+            byId('roi-people-v').textContent = people.value;
+            byId('roi-rate-v').textContent = '£' + rate.value;
+            byId('roi-cover-v').textContent = cover.value + '%';
+        }
+        function calc() {
+            var reclaimed = Math.round(+hours.value * +people.value * 52 * (+cover.value / 100));
+            return { reclaimed: reclaimed, money: Math.round(reclaimed * +rate.value), weeks: Math.round(reclaimed / 37.5) };
+        }
+        function tween(el, key, target, prefix) {
+            var start = cur[key], t0 = null;
+            function s(ts) { if (t0 === null) t0 = ts; var p = Math.min((ts - t0) / 550, 1); var e = 1 - Math.pow(1 - p, 3); el.textContent = prefix + fmt.format(Math.round(start + (target - start) * e)); if (p < 1) requestAnimationFrame(s); else cur[key] = target; }
+            requestAnimationFrame(s);
+        }
+        function render(animate) {
+            labels();
+            var r = calc();
+            weeksOut.textContent = '≈ ' + fmt.format(r.weeks) + ' working weeks handed back to your team.';
+            if (animate && !reduce) { tween(hoursOut, 'h', r.reclaimed, ''); tween(moneyOut, 'm', r.money, '£'); }
+            else { cur.h = r.reclaimed; cur.m = r.money; hoursOut.textContent = fmt.format(r.reclaimed); moneyOut.textContent = '£' + fmt.format(r.money); }
+        }
+        [hours, people, rate, cover].forEach(function (el) { el.addEventListener('input', function () { render(true); }); });
+        labels();
+        var r0 = calc();
+        weeksOut.textContent = '≈ ' + fmt.format(r0.weeks) + ' working weeks handed back to your team.';
+        var seen = false;
+        if ('IntersectionObserver' in window) {
+            var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting && !seen) { seen = true; render(true); } }); }, { threshold: 0.25 });
+            io.observe(byId('roi'));
+        } else { render(false); }
     })();
     </script>
 </body>
