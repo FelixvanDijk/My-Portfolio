@@ -41,6 +41,17 @@
         .roi-cta { margin-top: 10px; }
         .roi-note { display: block; text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px; }
         @media (max-width: 760px) { #roi .roi-wrap { grid-template-columns: 1fr; } }
+        /* case-study metric strips + tech-stack badges */
+        .case-metrics { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 16px; }
+        .metric { flex: 1 1 150px; min-width: 140px; background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 12px; padding: 14px 16px; }
+        .metric .m-num, .metric .m-ba { display: block; font-family: var(--mono); color: var(--accent); line-height: 1.05; letter-spacing: -0.02em; }
+        .metric .m-num { font-size: 30px; font-weight: 700; }
+        .metric .m-ba { font-size: 20px; font-weight: 600; }
+        .metric .m-ba i { font-style: normal; color: var(--muted); margin: 0 5px; }
+        .metric .m-cap { display: block; font-size: 12px; color: var(--muted); margin-top: 7px; }
+        .case-stack { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 20px; }
+        .case-stack .stack-lbl { color: var(--muted); font-size: 11px; font-family: var(--mono); }
+        .stack-badge { font-family: var(--mono); font-size: 11.5px; color: var(--fg-mid); background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); border-radius: 6px; padding: 4px 9px; }
     </style>
     <script>(function(){try{var a=sessionStorage.getItem('felix-arrival');if(a)sessionStorage.removeItem('felix-arrival');window.__felixArrive=!!a&&!matchMedia('(prefers-reduced-motion: reduce)').matches;if(window.__felixArrive)document.documentElement.classList.add('felix-arriving');}catch(e){}})();</script>
 </head>
@@ -210,6 +221,12 @@
                         <h3>Real-World Impact: AHV International</h3>
                     </div>
                     <p class="case-intro">At AHV International, I designed and delivered end-to-end automation tools that dramatically improved operational efficiency and decision-making across the business.</p>
+                    <div class="case-metrics">
+                        <div class="metric"><span class="m-num" data-to="5">0</span><span class="m-cap">automation systems delivered</span></div>
+                        <div class="metric"><span class="m-ba">Days <i>&rarr;</i> Seconds</span><span class="m-cap">report turnaround</span></div>
+                        <div class="metric"><span class="m-num" data-to="100" data-suffix="s+">0</span><span class="m-cap">hours saved / month</span></div>
+                    </div>
+                    <p class="case-stack"><span class="stack-lbl">stack</span><span class="stack-badge">Python</span><span class="stack-badge">Excel automation</span><span class="stack-badge">Web scraping</span><span class="stack-badge">PDF generation</span><span class="stack-badge">AI commentary</span><span class="stack-badge">GUI app</span></p>
                     <div class="impact-grid">
                         <div class="impact-item">
                             <h4>Automated Report Generation System</h4>
@@ -256,6 +273,12 @@
                         <h3>Digital Revolution: The Gatehouse Vets</h3>
                     </div>
                     <p class="case-intro">I successfully spearheaded a transformative project, revolutionizing a paper-based system for a veterinary surgery into a cutting-edge digital solution. Through comprehensive stakeholder engagement and iterative development, I delivered a complete practice management system.</p>
+                    <div class="case-metrics">
+                        <div class="metric"><span class="m-ba">Paper <i>&rarr;</i> Digital</span><span class="m-cap">whole practice</span></div>
+                        <div class="metric"><span class="m-num" data-to="5">0</span><span class="m-cap">integrated modules</span></div>
+                        <div class="metric"><span class="m-num" data-to="100" data-suffix="%">0</span><span class="m-cap">processes digitised</span></div>
+                    </div>
+                    <p class="case-stack"><span class="stack-lbl">stack</span><span class="stack-badge">Booking engine</span><span class="stack-badge">Billing &amp; costing</span><span class="stack-badge">Stock database</span><span class="stack-badge">Secure auth</span><span class="stack-badge">Dynamic calendar</span></p>
                     <div class="impact-grid">
                         <div class="impact-item">
                             <h4>Complete Practice Management System</h4>
@@ -302,6 +325,12 @@
                         <h3>Complete Digital Solution: S&amp;F Barbers</h3>
                     </div>
                     <p class="case-intro">I developed a comprehensive web-based booking management system for S&amp;F Barbers in Mold, completely digitalizing their appointment booking process and providing sophisticated administrative tools for modern barber shop operations.</p>
+                    <div class="case-metrics">
+                        <div class="metric"><span class="m-num" data-to="24" data-suffix="/7">0</span><span class="m-cap">online booking access</span></div>
+                        <div class="metric"><span class="m-num" data-to="14" data-suffix="-day">0</span><span class="m-cap">live booking calendar</span></div>
+                        <div class="metric"><span class="m-ba">Phone <i>&rarr;</i> Online</span><span class="m-cap">appointments</span></div>
+                    </div>
+                    <p class="case-stack"><span class="stack-lbl">stack</span><span class="stack-badge">Flask</span><span class="stack-badge">Bootstrap</span><span class="stack-badge">Werkzeug auth</span><span class="stack-badge">Gmail SMTP</span><span class="stack-badge">Guest + member booking</span></p>
                     <div class="impact-grid">
                         <div class="impact-item">
                             <h4>Complete User Authentication System</h4>
@@ -351,6 +380,12 @@
                         <h3>Modern Web Presence: FlowSource</h3>
                     </div>
                     <p class="case-intro">I designed and built a professional, responsive landing page for FlowSource, an emerging Amazon advertising consultancy. This project showcased modern frontend development techniques with brand-focused design tailored for early-stage businesses.</p>
+                    <div class="case-metrics">
+                        <div class="metric"><span class="m-num" data-to="100" data-suffix="%">0</span><span class="m-cap">responsive, mobile-first</span></div>
+                        <div class="metric"><span class="m-num" data-to="4">0</span><span class="m-cap">crafted page sections</span></div>
+                        <div class="metric"><span class="m-ba">Idea <i>&rarr;</i> Live</span><span class="m-cap">deployed &amp; maintained</span></div>
+                    </div>
+                    <p class="case-stack"><span class="stack-lbl">stack</span><span class="stack-badge">React</span><span class="stack-badge">Tailwind CSS</span><span class="stack-badge">Scroll animation</span><span class="stack-badge">GitHub CI/CD</span></p>
                     <div class="impact-grid">
                         <div class="impact-item">
                             <h4>React &amp; Tailwind CSS Development</h4>
@@ -621,9 +656,10 @@
             return { reclaimed: reclaimed, money: Math.round(reclaimed * +rate.value), weeks: Math.round(reclaimed / 37.5) };
         }
         function tween(el, key, target, prefix) {
-            var start = cur[key], t0 = null;
-            function s(ts) { if (t0 === null) t0 = ts; var p = Math.min((ts - t0) / 550, 1); var e = 1 - Math.pow(1 - p, 3); el.textContent = prefix + fmt.format(Math.round(start + (target - start) * e)); if (p < 1) requestAnimationFrame(s); else cur[key] = target; }
+            var from = cur[key], t0 = performance.now();
+            function s() { var p = Math.min((performance.now() - t0) / 550, 1); var e = 1 - Math.pow(1 - p, 3); el.textContent = prefix + fmt.format(Math.round(from + (target - from) * e)); if (p < 1) requestAnimationFrame(s); else cur[key] = target; }
             requestAnimationFrame(s);
+            setTimeout(function () { el.textContent = prefix + fmt.format(target); cur[key] = target; }, 650); // safety net if rAF is throttled
         }
         function render(animate) {
             labels();
@@ -637,10 +673,31 @@
         var r0 = calc();
         weeksOut.textContent = '≈ ' + fmt.format(r0.weeks) + ' working weeks handed back to your team.';
         var seen = false;
-        if ('IntersectionObserver' in window) {
-            var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting && !seen) { seen = true; render(true); } }); }, { threshold: 0.25 });
-            io.observe(byId('roi'));
-        } else { render(false); }
+        function reveal() { if (seen) return; var r = byId('roi').getBoundingClientRect(); var h = window.innerHeight || document.documentElement.clientHeight; if (r.top < h * 0.8 && r.bottom > 0) { seen = true; render(true); } }
+        window.addEventListener('scroll', reveal, { passive: true });
+        window.addEventListener('resize', reveal);
+        reveal();
+    })();
+    </script>
+    <script>
+    (function () {
+        var nums = document.querySelectorAll('.m-num[data-to]');
+        if (!nums.length) return;
+        var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var fmt = new Intl.NumberFormat('en-GB');
+        function run(el) {
+            if (el.__ran) return; el.__ran = true;
+            var to = +el.getAttribute('data-to'), suf = el.getAttribute('data-suffix') || '';
+            if (reduce) { el.textContent = fmt.format(to) + suf; return; }
+            var t0 = performance.now();
+            function s() { var p = Math.min((performance.now() - t0) / 900, 1); var e = 1 - Math.pow(1 - p, 3); el.textContent = fmt.format(Math.round(to * e)) + suf; if (p < 1) requestAnimationFrame(s); }
+            requestAnimationFrame(s);
+            setTimeout(function () { el.textContent = fmt.format(to) + suf; }, 1000); // safety net if rAF is throttled
+        }
+        function check() { var h = window.innerHeight || document.documentElement.clientHeight; nums.forEach(function (el) { if (el.__ran) return; var r = el.getBoundingClientRect(); if (r.top < h * 0.9 && r.bottom > 0) run(el); }); }
+        window.addEventListener('scroll', check, { passive: true });
+        window.addEventListener('resize', check);
+        check();
     })();
     </script>
 </body>
