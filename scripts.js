@@ -212,13 +212,15 @@
     var procCards = $all('.proc-card');
 
     function setActiveProcess(idx) {
-        $all('.proc-row').forEach(function (row) {
-            var i = parseInt(row.dataset.index, 10);
-            row.classList.toggle('is-active', i === idx);
+        // match the active row by data-index, but derive exit/running/queued from DOM order
+        // so projects can be listed in any index order (e.g. a flagship pinned to the top)
+        var rows = $all('.proc-row');
+        var activePos = -1;
+        rows.forEach(function (row, pos) { if (parseInt(row.dataset.index, 10) === idx) activePos = pos; });
+        rows.forEach(function (row, pos) {
+            row.classList.toggle('is-active', pos === activePos);
             var state = row.querySelector('.proc-state');
-            if (state) {
-                state.textContent = i < idx ? 'exit 0' : (i === idx ? 'running' : 'queued');
-            }
+            if (state) state.textContent = pos < activePos ? 'exit 0' : (pos === activePos ? 'running' : 'queued');
         });
     }
 
@@ -504,8 +506,8 @@
         if (procCards.length) {
             var spyLine = window.innerHeight * 0.45;
             var procIdx = 0;
-            procCards.forEach(function (card, i) {
-                if (card.getBoundingClientRect().top < spyLine) procIdx = i;
+            procCards.forEach(function (card) {
+                if (card.getBoundingClientRect().top < spyLine) procIdx = parseInt(card.dataset.index, 10);
             });
             setActiveProcess(procIdx);
         }
