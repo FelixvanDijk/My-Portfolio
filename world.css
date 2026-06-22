@@ -529,3 +529,7 @@ html.world-touch.world-driving #world-boost {
 }
 #world-portal.is-on .wp-dot { opacity: 1; animation: wp-fall 0.7s ease-in 0.2s forwards; }
 @keyframes wp-fall { to { transform: translateY(70px); } }
+
+/* F1 project card: live SVG telemetry widget (replaces the static screenshot) */
+.shot-wrap.f1-live { aspect-ratio: 44 / 25; background: #080d17; overflow: hidden; }
+.shot-wrap.f1-live svg { display: block; width: 100%; height: 100%; }

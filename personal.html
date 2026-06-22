@@ -19,7 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=20260621x">
     <link rel="prefetch" href="business.html">
-    <link rel="stylesheet" href="world.css?v=20260621x">
+    <link rel="stylesheet" href="world.css?v=20260622">
     <script type="importmap">
     {
       "imports": {
@@ -350,7 +350,35 @@
                             <div class="proc-media">
                                 <div class="mini-browser">
                                     <div class="mini-bar mono"><span class="mini-dots" aria-hidden="true"></span>dev.f1aicommentary.co.uk</div>
-                                    <div class="shot-wrap"><img src="images/IBMF1Dashboard.png" alt="F1 AI Commentary — live telemetry dashboard with RPM, speed heatmap, colour-coded track map and brake temperatures" loading="eager"></div>
+                                    <div class="shot-wrap f1-live" role="img" aria-label="Live F1 telemetry: a car laps a track while RPM, speed, throttle and brake readouts update in real time">
+                                        <svg viewBox="0 0 440 250" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                                            <defs>
+                                                <linearGradient id="f1trk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c55e"/><stop offset="0.5" stop-color="#f5c542"/><stop offset="1" stop-color="#ef4444"/></linearGradient>
+                                                <linearGradient id="f1rpm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22c55e"/><stop offset="1" stop-color="#f5c542"/></linearGradient>
+                                                <radialGradient id="f1car"><stop offset="0" stop-color="#eafff2"/><stop offset="1" stop-color="#22c55e"/></radialGradient>
+                                            </defs>
+                                            <rect x="0" y="0" width="440" height="250" fill="#080d17"/>
+                                            <circle cx="20" cy="22" r="4" fill="#ef4444"><animate attributeName="opacity" values="1;0.25;1" dur="1.4s" repeatCount="indefinite"/></circle>
+                                            <text x="32" y="26" fill="#9fb0c7" font-family="monospace" font-size="11">LIVE TELEMETRY · ks_brands_hatch</text>
+                                            <g transform="translate(92,150)">
+                                                <path d="M -50,0 A 50,50 0 0 1 50,0" fill="none" stroke="#1b2536" stroke-width="9" stroke-linecap="round"/>
+                                                <path d="M -50,0 A 50,50 0 0 1 30,-40" fill="none" stroke="url(#f1rpm)" stroke-width="9" stroke-linecap="round"/>
+                                                <line x1="0" y1="7" x2="0" y2="-42" stroke="#eaf2ff" stroke-width="3" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" values="-78;55;-28;70;-78" keyTimes="0;0.3;0.55;0.82;1" dur="3.4s" repeatCount="indefinite"/></line>
+                                                <circle cx="0" cy="0" r="5.5" fill="#0b1422" stroke="#eaf2ff" stroke-width="2"/>
+                                                <text x="0" y="22" text-anchor="middle" fill="#9fb0c7" font-family="monospace" font-size="11">RPM</text>
+                                            </g>
+                                            <path id="f1track" d="M252,90 C246,58 286,46 322,52 C366,59 406,66 401,102 C397,131 360,133 350,113 C342,98 326,104 330,122 C334,142 299,151 285,131 C275,117 262,124 256,108 C252,98 254,100 252,90 Z" fill="none" stroke="#22c55e" stroke-width="11" stroke-linecap="round" opacity="0.12"/>
+                                            <use xlink:href="#f1track" stroke="url(#f1trk)" stroke-width="5" fill="none" stroke-linecap="round"/>
+                                            <circle r="6" fill="url(#f1car)" stroke="#eafff2" stroke-width="1.5"><animateMotion dur="6s" repeatCount="indefinite" rotate="auto"><mpath xlink:href="#f1track"/></animateMotion></circle>
+                                            <text x="326" y="172" text-anchor="middle" fill="#9fb0c7" font-family="monospace" font-size="11">TRACK MAP</text>
+                                            <g transform="translate(34,212)" font-family="monospace" font-size="10" fill="#9fb0c7">
+                                                <rect x="0" y="-26" width="64" height="8" rx="4" fill="#101a2b"/><rect x="0" y="-26" width="22" height="8" rx="4" fill="#3aa0ff"><animate attributeName="width" values="22;60;34;62;26;22" dur="3s" repeatCount="indefinite"/></rect><text x="0" y="2">SPEED</text>
+                                                <rect x="92" y="-26" width="64" height="8" rx="4" fill="#101a2b"/><rect x="92" y="-26" width="44" height="8" rx="4" fill="#22c55e"><animate attributeName="width" values="44;62;14;56;44" dur="2.4s" repeatCount="indefinite"/></rect><text x="92" y="2">THROTTLE</text>
+                                                <rect x="196" y="-26" width="64" height="8" rx="4" fill="#101a2b"/><rect x="196" y="-26" width="10" height="8" rx="4" fill="#ef4444"><animate attributeName="width" values="10;6;50;8;32;10" dur="2.8s" repeatCount="indefinite"/></rect><text x="196" y="2">BRAKE</text>
+                                                <rect x="300" y="-26" width="64" height="8" rx="4" fill="#101a2b"/><rect x="300" y="-26" width="0" height="8" rx="4" fill="#f5c542"><animate attributeName="width" values="0;0;64;64;0" dur="5s" repeatCount="indefinite"/></rect><text x="300" y="2">DRS</text>
+                                            </g>
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
                         </div>
