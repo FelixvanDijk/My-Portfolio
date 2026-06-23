@@ -67,7 +67,7 @@ const DISTRICTS = [
 
 let renderer, scene, camera, composer, raf = 0, built = false, running = false;
 let clock;
-let bgGrid, starfield, voidGlyphs, nextZap = 5;
+let bgGrid, starfield, nextZap = 5;
 
 /* ---------- felix.run: drive-the-packet state ---------- */
 let driveMode = false;
@@ -396,7 +396,6 @@ function buildScene() {
   scene.add(rim);
 
   buildBackground();
-  buildVoidGlyphs();
 
   // board
   const boardTex = makeBoardTexture();
@@ -611,64 +610,40 @@ function buildBackground() {
   grid2.material.depthWrite = false;
   scene.add(grid2);
 
-  // drifting data motes (glow under bloom)
-  const N = LITE ? 550 : 1300;
-  const pos = new Float32Array(N * 3);
-  for (let i = 0; i < N; i++) {
-    const r = 48 + Math.random() * 130;
-    const a = Math.random() * Math.PI * 2;
-    pos[i * 3] = Math.cos(a) * r;
-    pos[i * 3 + 1] = -8 + Math.random() * 66;
-    pos[i * 3 + 2] = Math.sin(a) * r;
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const mat = new THREE.PointsMaterial({
-    size: 1.25, map: makeDotSprite(), transparent: true, opacity: 0.75,
-    depthWrite: false, blending: THREE.AdditiveBlending, color: 0x7effb0, fog: false,
+  // floating binary field (replaces the old orb motes): a fine green bitstream drifting in the void.
+  // Rendered as two points clouds (0s + 1s) so it's "lots of small bits" but still cheap (2 draw calls).
+  const bitGrp = new THREE.Group();
+  const total = LITE ? 520 : 1000;
+  ['0', '1'].forEach((ch) => {
+    const n = Math.floor(total / 2);
+    const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      const r = 44 + Math.random() * 142;
+      const a = Math.random() * Math.PI * 2;
+      pos[i * 3] = Math.cos(a) * r;
+      pos[i * 3 + 1] = -10 + Math.random() * 72;
+      pos[i * 3 + 2] = Math.sin(a) * r;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({
+      size: 2.9, map: makeBitTex(ch), transparent: true, opacity: 0.56,
+      depthWrite: false, blending: THREE.AdditiveBlending, color: 0x7effb0, fog: false, sizeAttenuation: true,
+    });
+    bitGrp.add(new THREE.Points(g, mat));
   });
-  starfield = new THREE.Points(g, mat);
-  scene.add(starfield);
+  scene.add(bitGrp);
+  starfield = bitGrp;
 }
 
-/* faint binary bits drifting in the void, the same green as the data-mote orbs —
-   subtle "inside a computer" atmosphere, paired with occasional electric zaps (spawnZap). */
-const _glyphCache = {};
-function makeGlyphTex(text, hex) {
-  const key = text + '|' + hex;
-  if (_glyphCache[key]) return _glyphCache[key];
-  const c = document.createElement('canvas');
-  const font = '600 40px "JetBrains Mono", ui-monospace, monospace';
-  let ctx = c.getContext('2d');
-  ctx.font = font;
-  const w = Math.max(48, Math.ceil(ctx.measureText(text).width) + 20);
-  c.width = w; c.height = 56;
-  ctx = c.getContext('2d');
-  ctx.font = font; ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = hex;
-  ctx.fillText(text, w / 2, 30);
-  const tex = new THREE.CanvasTexture(c);
-  tex.minFilter = THREE.LinearFilter;
-  _glyphCache[key] = { tex: tex, aspect: w / 56 };
-  return _glyphCache[key];
-}
-function buildVoidGlyphs() {
-  const bits = ['0', '1', '0', '1', '1', '0', '10', '01', '110', '001'];
-  const grp = new THREE.Group();
-  const N = LITE ? 26 : 46;
-  for (let i = 0; i < N; i++) {
-    const g = makeGlyphTex(bits[(Math.random() * bits.length) | 0], '#7effb0'); // same green as the orbs
-    const s = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: g.tex, transparent: true, opacity: 0.3 + Math.random() * 0.3,
-      depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
-    }));
-    const r = 48 + Math.random() * 132, a = Math.random() * Math.PI * 2;
-    s.position.set(Math.cos(a) * r, -8 + Math.random() * 64, Math.sin(a) * r);
-    const sc = 2.6 + Math.random() * 3.4;
-    s.scale.set(sc * g.aspect, sc, 1);
-    grp.add(s);
-  }
-  scene.add(grp);
-  voidGlyphs = grp;
+function makeBitTex(ch) {
+  const c = document.createElement('canvas'); c.width = c.height = 48;
+  const ctx = c.getContext('2d');
+  ctx.font = '700 38px "JetBrains Mono", ui-monospace, monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#ffffff';
+  ctx.fillText(ch, 24, 25);
+  const t = new THREE.CanvasTexture(c); t.minFilter = THREE.LinearFilter;
+  return t;
 }
 
 /* occasional electric zap — a brief jagged arc that flashes through the void */
@@ -1346,7 +1321,6 @@ function frame() {
 
   // drifting void
   if (starfield) starfield.rotation.y += dt * 0.012;
-  if (voidGlyphs) voidGlyphs.rotation.y -= dt * 0.006; // binary layer drifts the other way for subtle parallax
   if (!reduceMotion && t > nextZap && !panelOpen()) { nextZap = t + 3.5 + Math.random() * 5; spawnZap(); }
 
   if (introActive && packet) {
