@@ -67,7 +67,7 @@ const DISTRICTS = [
 
 let renderer, scene, camera, composer, raf = 0, built = false, running = false;
 let clock;
-let bgGrid, starfield, voidGlyphs;
+let bgGrid, starfield, voidGlyphs, nextZap = 5;
 
 /* ---------- felix.run: drive-the-packet state ---------- */
 let driveMode = false;
@@ -631,8 +631,8 @@ function buildBackground() {
   scene.add(starfield);
 }
 
-/* faint "iykyk" glyphs drifting far out in the void — CS nods (green) + finance nods (blue).
-   Kept sparse, dim and outside the board so it reads as atmosphere, never clutter. */
+/* faint binary bits drifting in the void, the same green as the data-mote orbs —
+   subtle "inside a computer" atmosphere, paired with occasional electric zaps (spawnZap). */
 const _glyphCache = {};
 function makeGlyphTex(text, hex) {
   const key = text + '|' + hex;
@@ -644,34 +644,55 @@ function makeGlyphTex(text, hex) {
   const w = Math.max(48, Math.ceil(ctx.measureText(text).width) + 20);
   c.width = w; c.height = 56;
   ctx = c.getContext('2d');
-  ctx.font = font; ctx.textBaseline = 'middle'; ctx.fillStyle = hex;
-  ctx.fillText(text, 10, 30);
+  ctx.font = font; ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = hex;
+  ctx.fillText(text, w / 2, 30);
   const tex = new THREE.CanvasTexture(c);
   tex.minFilter = THREE.LinearFilter;
   _glyphCache[key] = { tex: tex, aspect: w / 56 };
   return _glyphCache[key];
 }
 function buildVoidGlyphs() {
-  const cs = ['01001100', '11010', '0xDEADBEEF', '0xCAFEBABE', 'O(n log n)', 'P =? NP', 'λx.x', '{ }', 'git push', 'sudo', '404', 'null', 'NaN', '→', '∑', 'Hello, World', ':wq', '∞'];
-  const fin = ['α', 'β', 'EV/EBITDA', 'bps', '$ ↗', '▲ ▼', 'compound', 'ROI ↑'];
+  const bits = ['0', '1', '0', '1', '1', '0', '10', '01', '110', '001'];
   const grp = new THREE.Group();
-  const N = LITE ? 14 : 26;
+  const N = LITE ? 26 : 46;
   for (let i = 0; i < N; i++) {
-    const isFin = Math.random() < 0.32;
-    const list = isFin ? fin : cs;
-    const g = makeGlyphTex(list[(Math.random() * list.length) | 0], isFin ? '#9fc6ff' : '#8fe9b4');
+    const g = makeGlyphTex(bits[(Math.random() * bits.length) | 0], '#7effb0'); // same green as the orbs
     const s = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: g.tex, transparent: true, opacity: 0.15 + Math.random() * 0.18,
+      map: g.tex, transparent: true, opacity: 0.3 + Math.random() * 0.3,
       depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
     }));
-    const r = 58 + Math.random() * 120, a = Math.random() * Math.PI * 2;
-    s.position.set(Math.cos(a) * r, -6 + Math.random() * 58, Math.sin(a) * r);
-    const sc = 7 + Math.random() * 5;
+    const r = 48 + Math.random() * 132, a = Math.random() * Math.PI * 2;
+    s.position.set(Math.cos(a) * r, -8 + Math.random() * 64, Math.sin(a) * r);
+    const sc = 2.6 + Math.random() * 3.4;
     s.scale.set(sc * g.aspect, sc, 1);
     grp.add(s);
   }
   scene.add(grp);
   voidGlyphs = grp;
+}
+
+/* occasional electric zap — a brief jagged arc that flashes through the void */
+function spawnZap() {
+  if (!scene) return;
+  const ang = Math.random() * Math.PI * 2;
+  const r1 = 18 + Math.random() * 55, r2 = 18 + Math.random() * 55;
+  const a2 = ang + (Math.random() - 0.5) * 1.6;
+  const A = new THREE.Vector3(Math.cos(ang) * r1, 1 + Math.random() * 32, Math.sin(ang) * r1);
+  const B = new THREE.Vector3(Math.cos(a2) * r2, 1 + Math.random() * 32, Math.sin(a2) * r2);
+  const SEG = 9, pts = [];
+  for (let i = 0; i <= SEG; i++) {
+    const p = A.clone().lerp(B, i / SEG);
+    if (i > 0 && i < SEG) { p.x += (Math.random() - 0.5) * 7; p.y += (Math.random() - 0.5) * 7; p.z += (Math.random() - 0.5) * 7; }
+    pts.push(p);
+  }
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = new THREE.LineBasicMaterial({ color: 0xcfffe6, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, fog: false });
+  const bolt = new THREE.Line(geo, mat);
+  scene.add(bolt);
+  const done = () => { scene.remove(bolt); geo.dispose(); mat.dispose(); };
+  if (window.gsap && !reduceMotion) window.gsap.fromTo(mat, { opacity: 0.95 }, { opacity: 0, duration: 0.3 + Math.random() * 0.2, ease: 'power2.in', onUpdate: requestRender, onComplete: done });
+  else setTimeout(done, 180);
+  requestRender();
 }
 
 function setupComposer() {
@@ -1325,7 +1346,8 @@ function frame() {
 
   // drifting void
   if (starfield) starfield.rotation.y += dt * 0.012;
-  if (voidGlyphs) voidGlyphs.rotation.y -= dt * 0.006; // glyph layer drifts the other way for subtle parallax
+  if (voidGlyphs) voidGlyphs.rotation.y -= dt * 0.006; // binary layer drifts the other way for subtle parallax
+  if (!reduceMotion && t > nextZap && !panelOpen()) { nextZap = t + 3.5 + Math.random() * 5; spawnZap(); }
 
   if (introActive && packet) {
     // sky hero shot: packet hovers/spins above the board, camera slowly orbits
