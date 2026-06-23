@@ -567,25 +567,57 @@ function runBootCascade() {
 function scatterSMD() {
   const footprints = DISTRICTS.map((d) => ({ x: d.x, z: d.z, rx: d.w / 2 + 1.5, rz: d.d / 2 + 1.5 }));
   const free = (x, z) => !footprints.some((f) => Math.abs(x - f.x) < f.rx && Math.abs(z - f.z) < f.rz);
-  // little resistors/caps (dark with faint sheen)
+  // little SMD components — a believable mixed palette instead of flat black:
+  // charcoal IC packages (most common), dark-brown resistors, amber tantalum caps,
+  // tan ceramic caps, the odd green. Low metalness + matte roughness so they read as
+  // plastic that catches a little light (high metalness would darken them back to black).
+  const SMD_COLORS = [
+    0x2d3137, 0x2d3137, 0x33383f, 0x272b31, 0x363b42, // charcoal/graphite IC bodies (weighted common)
+    0x2a2420, 0x322a23,                               // dark-brown resistor bodies
+    0xb5731d, 0xc4842a,                               // tantalum cap amber/orange
+    0xb89b67, 0xa78d5b,                               // tan ceramic (MLCC)
+    0x24402d,                                         // occasional dark green
+  ];
+  const yUp = new THREE.Vector3(0, 1, 0);
   const compGeo = new THREE.BoxGeometry(0.7, 0.35, 0.4);
-  const compMat = new THREE.MeshStandardMaterial({ color: 0x141a24, roughness: 0.6, metalness: 0.5 });
+  const compMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.55, metalness: 0.18 });
   const comps = new THREE.InstancedMesh(compGeo, compMat, 160);
   const m = new THREE.Matrix4(); const q = new THREE.Quaternion(); const s = new THREE.Vector3(1, 1, 1); const p = new THREE.Vector3();
+  const _col = new THREE.Color();
   let ci = 0, tries = 0;
   while (ci < 160 && tries < 1200) {
     tries++;
     const x = -33 + Math.random() * 66, z = -23 + Math.random() * 46;
     if (!free(x, z)) continue;
-    q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.random() < 0.5 ? 0 : Math.PI / 2);
+    q.setFromAxisAngle(yUp, Math.random() < 0.5 ? 0 : Math.PI / 2);
     p.set(x, 0.32, z);
     const sc = 0.6 + Math.random() * 1.1; s.set(sc, 1, sc);
     m.compose(p, q, s);
-    comps.setMatrixAt(ci++, m);
+    comps.setMatrixAt(ci, m);
+    comps.setColorAt(ci, _col.setHex(SMD_COLORS[(Math.random() * SMD_COLORS.length) | 0]));
+    ci++;
   }
   comps.count = ci;
   comps.instanceMatrix.needsUpdate = true;
+  if (comps.instanceColor) comps.instanceColor.needsUpdate = true;
   scene.add(comps);
+  // a few metallic cans — electrolytic/tantalum cylinders & crystal cases — for shape + material variety
+  const canGeo = new THREE.CylinderGeometry(0.26, 0.26, 0.5, 12);
+  const canMat = new THREE.MeshStandardMaterial({ color: 0x9aa1a9, roughness: 0.34, metalness: 0.9 });
+  const cans = new THREE.InstancedMesh(canGeo, canMat, 18);
+  let ki = 0; tries = 0;
+  while (ki < 18 && tries < 600) {
+    tries++;
+    const x = -32 + Math.random() * 64, z = -22 + Math.random() * 44;
+    if (!free(x, z)) continue;
+    const sc = 0.7 + Math.random() * 0.7;
+    s.set(sc, 0.55 + Math.random() * 0.6, sc);
+    m.compose(p.set(x, 0.4, z), q.identity(), s);
+    cans.setMatrixAt(ki++, m);
+  }
+  cans.count = ki;
+  cans.instanceMatrix.needsUpdate = true;
+  scene.add(cans);
   // glowing vias (tiny emissive dots)
   const viaGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.05, 6);
   const viaMat = new THREE.MeshStandardMaterial({ color: COPPER, emissive: 0x4a3a14, emissiveIntensity: 0.6, metalness: 1, roughness: 0.4 });
