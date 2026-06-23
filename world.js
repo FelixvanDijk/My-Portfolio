@@ -215,37 +215,58 @@ function makeBoardTexture() {
   const c = document.createElement('canvas');
   c.width = c.height = 1024;
   const x = c.getContext('2d');
-  x.fillStyle = '#06110b';
+  // base solder-mask: a readable dark PCB green (lifted well off pure black so the floor reads)
+  const bg = x.createLinearGradient(0, 0, 1024, 1024);
+  bg.addColorStop(0, '#1b4a33');
+  bg.addColorStop(0.5, '#163e2a');
+  bg.addColorStop(1, '#123524');
+  x.fillStyle = bg;
   x.fillRect(0, 0, 1024, 1024);
-  // subtle solder-mask mottle
-  for (let i = 0; i < 1400; i++) {
-    x.fillStyle = `rgba(20,${60 + Math.random() * 40 | 0},40,0.05)`;
-    const r = 2 + Math.random() * 5;
+  // solder-mask mottle for surface life
+  for (let i = 0; i < 1600; i++) {
+    x.fillStyle = `rgba(50,${130 + Math.random() * 70 | 0},95,0.07)`;
+    const r = 2 + Math.random() * 6;
     x.beginPath();
     x.arc(Math.random() * 1024, Math.random() * 1024, r, 0, 7);
     x.fill();
   }
   // silkscreen grid
-  x.strokeStyle = 'rgba(120,150,140,0.06)';
+  x.strokeStyle = 'rgba(160,200,180,0.14)';
   x.lineWidth = 1;
   for (let i = 0; i <= 1024; i += 32) {
     x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 1024); x.stroke();
     x.beginPath(); x.moveTo(0, i); x.lineTo(1024, i); x.stroke();
   }
-  // scattered copper pads + silkscreen marks
-  for (let i = 0; i < 240; i++) {
+  // etched copper routing — thin Manhattan traces so the substrate reads as a real PCB
+  x.lineCap = 'round'; x.lineJoin = 'round';
+  for (let i = 0; i < 64; i++) {
+    x.strokeStyle = `rgba(${165 + (Math.random() * 40 | 0)},${130 + (Math.random() * 40 | 0)},${55 + (Math.random() * 30 | 0)},0.30)`;
+    x.lineWidth = 1.5 + Math.random() * 2.2;
+    let px = Math.random() * 1024, py = Math.random() * 1024;
+    x.beginPath(); x.moveTo(px, py);
+    const steps = 2 + (Math.random() * 3 | 0);
+    for (let s = 0; s < steps; s++) {
+      if (Math.random() < 0.5) px += (Math.random() - 0.5) * 280; else py += (Math.random() - 0.5) * 280;
+      x.lineTo(px, py);
+    }
+    x.stroke();
+  }
+  // scattered copper pads (with drilled holes) + silkscreen marks
+  for (let i = 0; i < 260; i++) {
     const px = Math.random() * 1024, py = Math.random() * 1024;
     if (Math.random() < 0.5) {
-      x.fillStyle = 'rgba(150,110,50,0.5)';
-      x.beginPath(); x.arc(px, py, 2.5 + Math.random() * 3, 0, 7); x.fill();
+      x.fillStyle = 'rgba(200,150,65,0.62)';
+      x.beginPath(); x.arc(px, py, 2.8 + Math.random() * 3, 0, 7); x.fill();
+      x.fillStyle = 'rgba(14,26,20,0.85)';
+      x.beginPath(); x.arc(px, py, 1 + Math.random() * 1.3, 0, 7); x.fill();
     } else {
-      x.strokeStyle = 'rgba(160,180,170,0.10)';
+      x.strokeStyle = 'rgba(200,220,210,0.2)';
       x.strokeRect(px, py, 8 + Math.random() * 26, 8 + Math.random() * 16);
     }
   }
   const tex = new THREE.CanvasTexture(c);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.anisotropy = 4;
+  tex.anisotropy = 8;
   return tex;
 }
 
@@ -387,11 +408,13 @@ function buildScene() {
   camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 400);
   clock = new THREE.Clock();
 
-  scene.add(new THREE.AmbientLight(0x3a4a66, 1.5));
-  const key = new THREE.DirectionalLight(0xbcd0ff, 1.2);
+  scene.add(new THREE.AmbientLight(0x3a4a66, 1.7));
+  // hemisphere fill: lifts the whole board floor evenly (green sky / dark ground) without flattening the mood
+  scene.add(new THREE.HemisphereLight(0x4a7d66, 0x0a160f, 0.7));
+  const key = new THREE.DirectionalLight(0xbcd0ff, 1.45);
   key.position.set(18, 40, 24);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(GREEN, 0.25);
+  const rim = new THREE.DirectionalLight(GREEN, 0.3);
   rim.position.set(-20, 12, -20);
   scene.add(rim);
 
@@ -402,7 +425,7 @@ function buildScene() {
   boardTex.repeat.set(3, 2.2);
   const board = new THREE.Mesh(
     new THREE.BoxGeometry(72, 0.6, 50),
-    new THREE.MeshStandardMaterial({ map: boardTex, color: 0x16291c, roughness: 0.75, metalness: 0.3, emissive: 0x0a1a10, emissiveIntensity: 0.25 })
+    new THREE.MeshStandardMaterial({ map: boardTex, color: 0xdfeee6, roughness: 0.66, metalness: 0.12, emissive: 0x123826, emissiveIntensity: 0.32 })
   );
   board.position.y = -0.1;
   scene.add(board);
