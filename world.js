@@ -82,17 +82,17 @@ const drive = {
 };
 const keys = Object.create(null);
 let joyX = 0, joyY = 0;  // touch joystick: steer (+right), thrust (+forward)
-// Robust touch detection. The primary `pointer: coarse` query alone is unreliable —
-// some mobile browsers report a `fine` primary pointer, and the query can read stale on a
-// cold / bfcache load — which used to leave the joystick + boost hidden for that session.
-// `any-pointer: coarse` + touch-point count + ontouchstart cover the cases it misses.
-function isTouchDevice() {
-  try {
-    return matchMedia('(any-pointer: coarse)').matches
-      || matchMedia('(pointer: coarse)').matches
-      || (navigator.maxTouchPoints || 0) > 0
-      || ('ontouchstart' in window);
-  } catch (e) { return (navigator.maxTouchPoints || 0) > 0 || ('ontouchstart' in window); }
+// Is this *primarily* a touch device (phone/tablet)? Deliberately strict: the main pointer
+// must be coarse (a finger) AND the device can't hover. Laptops/desktops — including
+// touchscreen laptops and Windows machines whose precision touchpads report touch capability
+// (maxTouchPoints > 0 / any-pointer: coarse) — are driven by a mouse/trackpad, so they fail
+// this and get the keyboard (WASD) prompts. Anything uncertain defaults to false → WASD.
+// NOTE: *showing* the touch controls reliably on phones does NOT depend on this — a first
+// real touch reveals them (see revealTouch), so a phone that momentarily mis-reads still
+// works the instant the user taps to drop in.
+function isPrimaryTouch() {
+  try { return matchMedia('(pointer: coarse) and (hover: none)').matches; }
+  catch (e) { return false; }
 }
 let dockedZone = null;   // spawn in open space — nothing docked, free to roam
 let camFov = 55;
@@ -1474,7 +1474,7 @@ function startIntro() {
   view.target.set(0, 2, 0); view.radius = 76; view.theta = 0; view.phi = 0.5;
   const el = $('#world-intro'); if (el) { el.hidden = false; el.style.opacity = ''; }
   // touch devices: swap the keyboard-centric prompts for the on-screen joystick + boost
-  if (isTouchDevice()) {
+  if (isPrimaryTouch()) {
     const go = $('#world-intro .intro-go'); if (go) go.textContent = 'tap to drop in ▾';
     const hint = $('#world-hint'); if (hint) hint.textContent = 'left stick to drive · BOOST to dash · arrive at a chip to open it · dock below to jump';
     const keysList = $('#world-intro .intro-keys');
@@ -1702,7 +1702,7 @@ function addListeners() {
   if (muteBtn) muteBtn.addEventListener('click', toggleMute);
 
   // touch controls: virtual joystick + boost button
-  if (isTouchDevice()) document.documentElement.classList.add('world-touch');
+  if (isPrimaryTouch()) document.documentElement.classList.add('world-touch');
   // belt-and-suspenders: any real touch reveals the controls, even if the static checks
   // above missed on this load. The drop-in tap alone is a touch, so this fires before driving.
   const revealTouch = (e) => {
