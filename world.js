@@ -82,6 +82,18 @@ const drive = {
 };
 const keys = Object.create(null);
 let joyX = 0, joyY = 0;  // touch joystick: steer (+right), thrust (+forward)
+// Robust touch detection. The primary `pointer: coarse` query alone is unreliable —
+// some mobile browsers report a `fine` primary pointer, and the query can read stale on a
+// cold / bfcache load — which used to leave the joystick + boost hidden for that session.
+// `any-pointer: coarse` + touch-point count + ontouchstart cover the cases it misses.
+function isTouchDevice() {
+  try {
+    return matchMedia('(any-pointer: coarse)').matches
+      || matchMedia('(pointer: coarse)').matches
+      || (navigator.maxTouchPoints || 0) > 0
+      || ('ontouchstart' in window);
+  } catch (e) { return (navigator.maxTouchPoints || 0) > 0 || ('ontouchstart' in window); }
+}
 let dockedZone = null;   // spawn in open space — nothing docked, free to roam
 let camFov = 55;
 let introActive = false; // sky hero-shot + instructions before the drop-in
@@ -1462,7 +1474,7 @@ function startIntro() {
   view.target.set(0, 2, 0); view.radius = 76; view.theta = 0; view.phi = 0.5;
   const el = $('#world-intro'); if (el) { el.hidden = false; el.style.opacity = ''; }
   // touch devices: relabel the keyboard-centric prompts
-  if (matchMedia('(pointer: coarse)').matches) {
+  if (isTouchDevice()) {
     const go = $('#world-intro .intro-go'); if (go) go.textContent = 'tap to drop in ▾';
     const hint = $('#world-hint'); if (hint) hint.textContent = 'left stick to drive · BOOST to dash · arrive at a chip to open it · dock below to jump';
   }
@@ -1684,7 +1696,16 @@ function addListeners() {
   if (muteBtn) muteBtn.addEventListener('click', toggleMute);
 
   // touch controls: virtual joystick + boost button
-  if (matchMedia('(pointer: coarse)').matches) document.documentElement.classList.add('world-touch');
+  if (isTouchDevice()) document.documentElement.classList.add('world-touch');
+  // belt-and-suspenders: any real touch reveals the controls, even if the static checks
+  // above missed on this load. The drop-in tap alone is a touch, so this fires before driving.
+  const revealTouch = (e) => {
+    if (e.type === 'touchstart' || e.pointerType === 'touch') {
+      document.documentElement.classList.add('world-touch');
+    }
+  };
+  window.addEventListener('pointerdown', revealTouch, { passive: true });
+  window.addEventListener('touchstart', revealTouch, { passive: true });
   const joy = $('#world-joy'); const knob = joy && joy.querySelector('.joy-knob');
   if (joy) {
     let jid = null, jcx = 0, jcy = 0; const R = 42;
