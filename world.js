@@ -1473,10 +1473,16 @@ function startIntro() {
   if (packet) packet.position.set(0, 42, -16);
   view.target.set(0, 2, 0); view.radius = 76; view.theta = 0; view.phi = 0.5;
   const el = $('#world-intro'); if (el) { el.hidden = false; el.style.opacity = ''; }
-  // touch devices: relabel the keyboard-centric prompts
+  // touch devices: swap the keyboard-centric prompts for the on-screen joystick + boost
   if (isTouchDevice()) {
     const go = $('#world-intro .intro-go'); if (go) go.textContent = 'tap to drop in ▾';
     const hint = $('#world-hint'); if (hint) hint.textContent = 'left stick to drive · BOOST to dash · arrive at a chip to open it · dock below to jump';
+    const keysList = $('#world-intro .intro-keys');
+    if (keysList) keysList.innerHTML =
+      '<li><span><b>left stick</b> — drive</span></li>' +
+      '<li><span><b>BOOST</b> button — dash</span></li>' +
+      '<li><span>arrive at a chip — it opens</span></li>' +
+      '<li><span>tap <b>Classic view</b> — switch anytime</span></li>';
   }
   requestRender();
 }
